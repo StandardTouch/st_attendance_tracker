@@ -9,6 +9,7 @@ import json
 import re
 
 import frappe
+from frappe.query_builder.functions import Count, Sum
 from frappe.utils import add_days, getdate, today
 
 from st_attendance_tracker.api import (
@@ -279,12 +280,21 @@ def get_company_week(from_date, to_date):
     start, end = _validated_range(from_date, to_date, MAX_TEAM_RANGE_DAYS)
 
     total = frappe.db.count("Employee", {"status": "Active"})
-    rows = frappe.get_all(
-        "Daily Work Log",
-        filters={"date": ["between", [start, end]], "morning_submitted": 1},
-        fields=["date", "count(name) as present", "sum(is_late) as late", "sum(eod_submitted) as eod_done"],
-        group_by="date",
+    # qb, not get_all("count(x) as y"): Frappe 16 rejects SQL functions written as strings.
+    log = frappe.qb.DocType("Daily Work Log")
+    rows = (
+        frappe.qb.from_(log)
+        .select(
+            log.date,
+            Count(log.name).as_("present"),
+            Sum(log.is_late).as_("late"),
+            Sum(log.eod_submitted).as_("eod_done"),
+        )
+        .where((log.date >= start) & (log.date <= end) & (log.morning_submitted == 1))
+        .groupby(log.date)
+        .run(as_dict=True)
     )
+    rows = [frappe._dict(r) for r in rows]
     by_date = {str(r.date): r for r in rows}
     days = []
     day = getdate(start)
@@ -335,12 +345,15 @@ def get_company_extra_hours(date):
     if not ({"HR Manager", "Management"} & set(frappe.get_roles(frappe.session.user))):
         frappe.throw("Access denied. HR Manager or Management role required.", frappe.PermissionError)
     day = str(getdate(date))
-    rows = frappe.get_all(
-        "Additional Work",
-        filters={"work_date": day},
-        fields=["employee", "sum(hours_spent) as hours"],
-        group_by="employee",
+    work = frappe.qb.DocType("Additional Work")
+    rows = (
+        frappe.qb.from_(work)
+        .select(work.employee, Sum(work.hours_spent).as_("hours"))
+        .where(work.work_date == day)
+        .groupby(work.employee)
+        .run(as_dict=True)
     )
+    rows = [frappe._dict(r) for r in rows]
     return {r.employee: round(r.hours or 0, 2) for r in rows}
 
 

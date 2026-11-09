@@ -42,6 +42,7 @@ def _make_employee_for(user_email, dept_name):
         return existing_emp
 
     e = frappe.new_doc("Employee")
+    e.company = company
     e.first_name = "QA"
     e.last_name = "Announce"
     e.gender = "Male"
