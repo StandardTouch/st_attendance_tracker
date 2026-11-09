@@ -14,7 +14,7 @@
       {% if docs_url %}<a href="{{ docs_url }}" target="_blank" rel="noopener" class="tnav-btn"><i class="ti ti-book-2" aria-hidden="true"></i>Docs</a>{% endif %}
       {% if tour_js %}<button type="button" class="tnav-btn" onclick="{{ tour_js }}"><i class="ti ti-map-2" aria-hidden="true"></i>Tour</button>{% endif %}
       <div class="wn-bell-wrap" id="wn-mount"></div>
-      <div class="tnav-av" onclick="toggleProfileDropdown(event)" style="cursor:pointer;" title="Account Options">{{ (employee.employee_name or 'U')[:2].upper() }}</div>
+      <div class="tnav-av" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false" aria-controls="profile-dropdown" onclick="toggleProfileDropdown(event)" style="cursor:pointer;" title="Account Options">{{ (employee.employee_name or 'U')[:2].upper() }}</div>
       <div class="profile-dropdown" id="profile-dropdown">
         {% if employee.name %}<a href="/app/employee/{{ employee.name }}" class="pd-item"><i class="ti ti-user" aria-hidden="true"></i>My Profile</a>{% endif %}
         <a href="/app" class="pd-item"><i class="ti ti-layout-dashboard" aria-hidden="true"></i>Switch to Desk</a>
@@ -36,6 +36,7 @@
     ('additional', 'Additional work', '/additional-work-classic', 'ti-briefcase', 'Additional Work', ''),
     ('team', 'My team', '/team-dashboard-classic', 'ti-users', 'Team', 'team'),
     ('management', 'Management Dashboard', '/management-dashboard-classic', 'ti-building', 'Management', 'management'),
+    ('report', 'Report', '/management-report-classic', 'ti-report-analytics', 'Report', 'management'),
   ] %}
   {{ caller(rows | selectattr(5, 'in', ['', 'team' if 'team' in keys else '', 'management' if 'management' in keys else '']) | list) }}
 {% endmacro %}

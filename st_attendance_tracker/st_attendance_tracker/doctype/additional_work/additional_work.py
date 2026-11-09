@@ -4,12 +4,17 @@ from frappe.utils import getdate, today
 from st_attendance_tracker.time_utils import parse_duration_to_hours, time_to_minutes
 
 
-BLOCKED_MESSAGE = "Additional work can be logged after you check out for that day, or on a day you are on leave."
+BLOCKED_MESSAGE = (
+    "Additional work can be logged after you check out for that day, on a day you are on leave, "
+    "or on a Sunday or holiday."
+)
 
 
 def additional_work_allowed(employee, work_date):
     """Extra hours are logged once the day's work is closed: after check-out, or on a full-day leave.
-    Returns (allowed, reason), where reason is "checked_out", "on_leave" or "" when not allowed."""
+    A Sunday or a holiday from the employee's holiday list is a day off, so extra work can be logged without
+    a check-in. Returns (allowed, reason), where reason is "checked_out", "on_leave", "day_off" or "" when
+    not allowed."""
     if not (employee and work_date):
         return True, ""
     day = str(getdate(work_date))
@@ -19,7 +24,21 @@ def additional_work_allowed(employee, work_date):
 
     if employee in _get_employees_on_leave([employee], day) and not _has_half_day_leave(employee, day):
         return True, "on_leave"
+    if _is_day_off(employee, day):
+        return True, "day_off"
     return False, ""
+
+
+def _is_day_off(employee, day):
+    """True for a Sunday, or a date in the employee's holiday list (weekly offs and holidays)."""
+    if getdate(day).weekday() == 6:
+        return True
+    try:
+        from hrms.hr.utils import get_holidays_for_employee
+
+        return bool(get_holidays_for_employee(employee, day, day, raise_exception=False))
+    except Exception:
+        return False
 
 
 def _has_half_day_leave(employee, day):
@@ -60,6 +79,12 @@ class AdditionalWork(Document):
         from st_attendance_tracker.additional_work_mail import queue_additional_work_email
 
         queue_additional_work_email(self)
+
+    def on_update(self):
+        # Every additional work banks its hours (insert and later edits).
+        from st_attendance_tracker.time_bank import sync_additional_work_credit
+
+        sync_additional_work_credit(self)
 
     def _check_no_partial_overlap(self):
         """Two entries on one day may not overlap in time, except an identical window: the
@@ -106,6 +131,9 @@ class AdditionalWork(Document):
         # guard above is silently bypassed for the one action (delete) the
         # doctype's own permissions actually allow employees to do.
         self._check_ownership()
+        from st_attendance_tracker.time_bank import remove_additional_work_credit
+
+        remove_additional_work_credit(self)
 
     def _check_ownership(self):
         """Block cross-employee edits (BOLA guard) — same pattern as Daily Task."""

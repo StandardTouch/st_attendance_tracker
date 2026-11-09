@@ -18,6 +18,7 @@ NAV_ITEMS = (
     ("recurring", "Recurring Tasks", "/recurring-tasks", "ti-repeat", "all"),
     ("team", "Team Dashboard", "/team-dashboard", "ti-users", "team_leader"),
     ("management", "Management Dashboard", "/management-dashboard", "ti-chart-bar", "hr"),
+    ("report", "Report", "/management-report", "ti-report-analytics", "hr"),
 )
 
 

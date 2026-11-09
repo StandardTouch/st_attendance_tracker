@@ -30,6 +30,10 @@ doc_events = {
     "Employee Checkin": {
         "after_insert": "st_attendance_tracker.api.notify_external_checkin",
     },
+    "Attendance": {
+        "before_validate": "st_attendance_tracker.time_bank.apply_to_attendance",
+        "after_insert": "st_attendance_tracker.time_bank.note_attendance",
+    },
 }
 
 
@@ -63,6 +67,7 @@ website_route_rules = [
     {"from_route": "/daily-checkin-classic", "to_route": "daily_checkin"},
     {"from_route": "/team-dashboard",       "to_route": "team_dashboard"},
     {"from_route": "/management-dashboard", "to_route": "management_dashboard"},
+    {"from_route": "/management-report",    "to_route": "management_report"},
     {"from_route": "/my-history",           "to_route": "my_history"},
     {"from_route": "/recurring-tasks",      "to_route": "recurring_tasks"},
     {"from_route": "/additional-work",      "to_route": "additional_work"},
@@ -74,4 +79,5 @@ website_route_rules = [
     {"from_route": "/task-backlog-classic",         "to_route": "task_backlog_classic"},
     {"from_route": "/team-dashboard-classic",       "to_route": "team_dashboard_classic"},
     {"from_route": "/management-dashboard-classic", "to_route": "management_dashboard_classic"},
+    {"from_route": "/management-report-classic",    "to_route": "management_report_classic"},
 ]

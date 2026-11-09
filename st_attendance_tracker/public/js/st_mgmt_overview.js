@@ -81,7 +81,8 @@
   function rows() {
     return allEmployees().filter(function (e) {
       if (S.dept && e.department !== S.dept) return false;
-      if (S.status !== 'all' && e.status !== S.status) return false;
+      if (S.status === 'active') { if (e.status !== 'checked_in' && e.status !== 'late') return false; }
+      else if (S.status !== 'all' && e.status !== S.status) return false;
       return !S.q || (e.employee_name + ' ' + (e.designation || '')).toLowerCase().indexOf(S.q) >= 0;
     }).map(function (e) {
       var st = DAY_STATUS[e.status] || DAY_STATUS.missing, initials = e.employee_name.split(' ').filter(Boolean).slice(0, 2).map(function (w) { return w[0]; }).join('').toUpperCase();
@@ -96,8 +97,8 @@
     var r = S.dash.rankings || [], std = S.dash.standard_workday_minutes || 480;
     if (!r.length) return '<div class="cal-empty">Nobody has checked out for this day yet.</div>';
     return '<ol class="mg-lb">' + r.map(function (x, i) {
-      var pct = Math.min(100, Math.round(x.net_minutes / std * 100));
-      return '<li><span class="n">' + (i + 1) + '</span><div style="flex:1;min-width:0"><div class="cal-row cal-between" style="flex-wrap:nowrap"><b style="overflow-wrap:anywhere">' + esc(x.employee_name) + '</b><span style="font-variant-numeric:tabular-nums;font-weight:600">' + esc(x.net_hours) + '</span></div>' +
+      var pct = Math.min(100, Math.round(x.task_minutes / std * 100));
+      return '<li><span class="n">' + (i + 1) + '</span><div style="flex:1;min-width:0"><div class="cal-row cal-between" style="flex-wrap:nowrap"><b style="overflow-wrap:anywhere">' + esc(x.employee_name) + '</b><span style="font-variant-numeric:tabular-nums;font-weight:600">' + esc(x.task_hours) + '</span></div>' +
         '<div class="cal-bar" style="margin:4px 0"><i style="width:' + pct + '%;background:var(--st-ink)"></i></div><small style="color:var(--st-muted)">' + esc(x.login_time) + ' – ' + esc(x.logout_time) + (x.is_half_day ? ' · half day' : '') + '</small></div></li>';
     }).join('') + '</ol>';
   }

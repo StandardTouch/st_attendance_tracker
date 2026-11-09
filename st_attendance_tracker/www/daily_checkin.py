@@ -254,6 +254,11 @@ def get_context(context):
     context.shift_info = shift_info
     context.leave_today = leave_today
     context.has_reset_today = has_reset_today
+    from st_attendance_tracker.time_bank import available_hours
+    context.time_bank_balance = available_hours(employee.name, date)
+    # The reset button vanishes one hour after the real check-in; the server enforces the same window.
+    from st_attendance_tracker.api import _reset_seconds_left
+    context.reset_seconds_left = _reset_seconds_left(employee.name, date) if morning_log and not eod_log else 0
     context.working_hours = working_hours_val
     context.title = "Daily Check-In"
     context.st_shell = get_shell_context("checkin", employee)

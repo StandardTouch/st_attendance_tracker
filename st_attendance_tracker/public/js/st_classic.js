@@ -20,3 +20,27 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', add); else add();
 })();
+/* Account menu in the top bar (avatar -> My Profile, Switch to Desk, Logout). Most classic pages define
+   toggleProfileDropdown inline; this covers pages that do not, and adds keyboard and Escape support. */
+(function () {
+  if (typeof window.toggleProfileDropdown !== 'function') {
+    window.toggleProfileDropdown = function (e) {
+      if (e) e.stopPropagation();
+      var dd = document.getElementById('profile-dropdown');
+      if (dd) {
+        var open = dd.classList.toggle('show');
+        var av = document.querySelector('.tnav-av'); if (av) av.setAttribute('aria-expanded', open ? 'true' : 'false');
+      }
+    };
+    document.addEventListener('click', function (e) {
+      var dd = document.getElementById('profile-dropdown');
+      if (dd && dd.classList.contains('show') && !dd.contains(e.target)) dd.classList.remove('show');
+    });
+  }
+  document.addEventListener('keydown', function (e) {
+    var av = document.querySelector('.tnav-av'), dd = document.getElementById('profile-dropdown');
+    if (!av || !dd) return;
+    if (e.key === 'Escape' && dd.classList.contains('show')) { dd.classList.remove('show'); av.setAttribute('aria-expanded', 'false'); av.focus(); }
+    else if ((e.key === 'Enter' || e.key === ' ') && document.activeElement === av) { e.preventDefault(); window.toggleProfileDropdown(); }
+  });
+})();

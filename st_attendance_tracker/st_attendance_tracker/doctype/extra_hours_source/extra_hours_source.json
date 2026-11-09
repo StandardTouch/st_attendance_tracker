@@ -1,0 +1,24 @@
+{
+ "actions": [],
+ "creation": "2026-11-06 00:00:00",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": ["credit", "credit_date", "hours"],
+ "fields": [
+  {"fieldname": "credit", "fieldtype": "Link", "in_list_view": 1, "label": "Earned Extra Hours", "options": "Extra Hours Entry", "reqd": 1},
+  {"fetch_from": "credit.date", "fieldname": "credit_date", "fieldtype": "Date", "in_list_view": 1, "label": "Work Date", "read_only": 1},
+  {"fieldname": "hours", "fieldtype": "Float", "in_list_view": 1, "label": "Hours Used", "reqd": 1}
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2026-11-06 00:00:00",
+ "modified_by": "Administrator",
+ "module": "ST Attendance Tracker",
+ "name": "Extra Hours Source",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

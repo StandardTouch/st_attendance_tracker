@@ -1,0 +1,23 @@
+{% extends "templates/web.html" %}
+{% block title %}Management Report{% endblock %}
+{% block head_include %}
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_brand.css?v=22">
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_calendar.css?v=20">
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_report.css?v=12">
+{% endblock %}
+{% block page_content %}
+{% from "st_attendance_tracker/templates/macros/st_shell.html" import shell %}
+<script>window.ST_REPORT = {"from": {{ from_date | tojson }}, "to": {{ to_date | tojson }}};</script>
+{% call shell(st_shell, "Management Report", None, None, None, False, False) %}
+<div class="cal-page" id="rp-page" style="height:calc(100vh - 56px);overflow:auto;display:block">
+{% include "st_attendance_tracker/templates/report_body.html" %}
+</div>
+{% endcall %}
+<script src="/assets/st_attendance_tracker/js/st_shell.js?v=11"></script>
+<script src="/assets/st_attendance_tracker/js/st_mgmt_report.js?v=11"></script>
+{% endblock %}

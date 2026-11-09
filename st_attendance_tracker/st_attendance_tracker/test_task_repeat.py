@@ -287,7 +287,7 @@ class TestTaskRepeat(FrappeTestCase):
         set_task_repeat(task["name"], 1)
         submit_eod_log(lunch_from="", lunch_to="", logout_time="18:00",
                        task_updates=json.dumps([{"name": task["name"], "status": "In Progress", "actual_time": "30m",
-                                                 "remarks": "", "repeat_next_day": 1}]), adhoc_tasks="[]")
+                                                 "remarks": "not finished", "repeat_next_day": 1}]), adhoc_tasks="[]")
         self.assertEqual(self._rows(self.emp_a, today(), "Not finished")[0].repeat_next_day, 0)
         copies = self._rows(self.emp_a, self._next_day(), "Not finished")
         self.assertEqual((len(copies), copies[0].repeat_next_day), (1, 0), "carried like any unfinished task, not repeated")

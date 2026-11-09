@@ -311,7 +311,7 @@ class TestQACheckinFull(FrappeTestCase):
         # estimated_time being part of the update payload at all.
         submit_eod_log(
             lunch_from="", lunch_to="", logout_time="18:00",
-            task_updates=json.dumps([{"name": task_name, "status": "In Progress", "actual_time": "30m"}]),
+            task_updates=json.dumps([{"name": task_name, "status": "In Progress", "actual_time": "30m", "remarks": "half done"}]),
             adhoc_tasks="[]",
         )
         work_log = _get_work_log(self.emp_name, today())
@@ -1068,7 +1068,8 @@ class TestQACheckinFull(FrappeTestCase):
         submit_eod_log(
             lunch_from="", lunch_to="", logout_time="18:00",
             task_updates=json.dumps([{
-                "name": task_name, "status": "Pending", "actual_time": "", "carry_forward": False
+                "name": task_name, "status": "Pending", "actual_time": "", "carry_forward": False,
+                "remarks": "not needed"
             }]),
             adhoc_tasks="[]"
         )

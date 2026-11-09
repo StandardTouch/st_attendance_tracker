@@ -857,6 +857,14 @@ function renderLog(log) {
   if (log.login_time)  metas.push('<span class="dm"><i class="ti ti-login" aria-hidden="true"></i>' + formatTimeHM(log.login_time) + '</span>');
   if (log.logout_time) metas.push('<span class="dm"><i class="ti ti-logout" aria-hidden="true"></i>' + formatTimeHM(log.logout_time) + '</span>');
   if (log.net_hours)   metas.push('<span class="dm"><i class="ti ti-clock" aria-hidden="true"></i>' + log.net_hours + '</span>');
+  var ot = +log.overtime_hours || 0, otUsed = +log.overtime_used_hours || 0, r2 = function (n) { return Math.round(n * 100) / 100; };
+  var chip = 'background:rgba(21,128,61,.14);border:1px solid rgba(21,128,61,.45);border-radius:6px;padding:1px 8px;font-weight:700';
+  if (ot > 0) {
+    var otText = otUsed <= 0 ? 'Overtime ' + r2(ot) + 'h · ' + r2(ot) + 'h left to use'
+      : (otUsed + 0.001 >= ot ? 'Overtime ' + r2(ot) + 'h · all used as time off' : 'Overtime ' + r2(ot) + 'h · ' + r2(otUsed) + 'h used · ' + r2(ot - otUsed) + 'h left');
+    metas.push('<span class="dm" style="' + chip + '" title="Hours worked beyond a full day. You can use them as time off on a later day, from the check-out screen."><i class="ti ti-hourglass" aria-hidden="true"></i>' + otText + '</span>');
+  }
+  if ((+log.extra_hours_used_today || 0) > 0) metas.push('<span class="dm" style="' + chip + '" title="Extra hours used as time off on this day."><i class="ti ti-circle-check" aria-hidden="true"></i>Used ' + r2(+log.extra_hours_used_today) + 'h of extra hours</span>');
 
   return '<div class="day-card" data-date="' + esc(log.date) + '" onclick="toggleDay(this)">' +
     '<div class="day-head">' +
@@ -1033,5 +1041,5 @@ document.addEventListener('click', function(e) {
 });
 </script>
 <link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_classic.css?v=19">
-<script src="/assets/st_attendance_tracker/js/st_classic.js?v=8" data-new="/my-history"></script>
+<script src="/assets/st_attendance_tracker/js/st_classic.js?v=9" data-new="/my-history"></script>
 {% endblock %}

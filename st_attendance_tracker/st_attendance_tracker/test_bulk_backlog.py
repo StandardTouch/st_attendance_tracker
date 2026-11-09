@@ -94,7 +94,7 @@ class TestBulkMoveToBacklog(FrappeTestCase):
     def test_nothing_moves_after_checkout(self):
         tasks = self._check_in(self.user_a, "Late one")
         submit_eod_log(lunch_from="13:00", lunch_to="14:00", logout_time="18:00",
-                       task_updates=json.dumps([{"name": tasks["Late one"], "status": "Pending", "actual_time": "", "carry_forward": True}]),
+                       task_updates=json.dumps([{"name": tasks["Late one"], "status": "Pending", "actual_time": "", "carry_forward": True, "remarks": "blocked"}]),
                        adhoc_tasks="[]")
         result = bulk_move_to_backlog([tasks["Late one"]])
         self.assertEqual(result["moved"], [])

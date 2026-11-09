@@ -62,11 +62,19 @@ class DailyWorkLog(Document):
             self.locked_at = None
 
     def on_trash(self):
-        pass
+        from st_attendance_tracker.time_bank import clear_log_bank
+
+        clear_log_bank(self.name)
 
     def on_update(self):
-        if self.eod_submitted and self.get_doc_before_save() and not self.get_doc_before_save().eod_submitted:
+        before = self.get_doc_before_save()
+        if self.eod_submitted and before and not before.eod_submitted:
             self._trigger_eod_automation()
+        elif before and before.eod_submitted and not self.eod_submitted:
+            # Checkout undone (HR edit): give back banked hours it used, drop its overtime credit
+            from st_attendance_tracker.time_bank import clear_log_bank
+
+            clear_log_bank(self.name)
 
     def _trigger_eod_automation(self):
         from st_attendance_tracker.api import (
@@ -87,6 +95,15 @@ class DailyWorkLog(Document):
         
         # Rollover
         _rollover_pending_tasks(self.employee, self.date)
+
+        # Bank any overtime. A bank problem must never stop a checkout, so it is logged instead.
+        try:
+            from st_attendance_tracker.time_bank import sync_overtime_credit
+
+            sync_overtime_credit(self)
+        except Exception:
+            frappe.log_error(title="ST Attendance Tracker — time bank overtime credit failed",
+                             message=frappe.get_traceback())
         
         # Notify
         is_late_checkout = str(self.date) != str(now_datetime().strftime("%Y-%m-%d"))

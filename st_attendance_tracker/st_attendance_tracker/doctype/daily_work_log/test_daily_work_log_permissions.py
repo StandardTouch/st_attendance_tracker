@@ -44,6 +44,19 @@ class TestDailyWorkLogPermissions(FrappeTestCase):
         self.assertTrue(self.log_a.has_permission("read", user=self.user_a))
         self.assertTrue(self.log_a.has_permission("write", user=self.user_a))
 
+    def test_hook_says_true_on_frappe_16(self):
+        # Frappe 16 reads None from a has_permission hook as "denied".
+        from unittest.mock import patch
+
+        from st_attendance_tracker.permissions import has_permission_daily_work_log as hook
+
+        with patch.object(frappe, "__version__", "16.0.0"):
+            self.assertIs(hook(self.log_a, "write", self.user_a), True)
+            self.assertIs(hook(self.log_a, "read", self.user_hr), True)
+            self.assertIs(hook(self.log_a, "write", self.user_b), False)
+        with patch.object(frappe, "__version__", "15.123.1"):
+            self.assertIsNone(hook(self.log_a, "write", self.user_a))
+
     def test_other_employee_denied_read_and_write(self):
         self.assertFalse(self.log_a.has_permission("read", user=self.user_b))
         self.assertFalse(self.log_a.has_permission("write", user=self.user_b))
@@ -54,14 +67,14 @@ class TestDailyWorkLogPermissions(FrappeTestCase):
     def test_hook_lets_team_leader_read_but_not_write(self):
         from st_attendance_tracker.permissions import has_permission_daily_work_log as hook
 
-        self.assertIsNone(hook(self.log_a, "read", self.user_lead))
+        self.assertIn(hook(self.log_a, "read", self.user_lead), (None, True))
         self.assertFalse(hook(self.log_a, "write", self.user_lead))
 
     def test_hook_does_not_restrict_hr_manager(self):
         from st_attendance_tracker.permissions import has_permission_daily_work_log as hook
 
-        self.assertIsNone(hook(self.log_a, "read", self.user_hr))
-        self.assertIsNone(hook(self.log_a, "write", self.user_hr))
+        self.assertIn(hook(self.log_a, "read", self.user_hr), (None, True))
+        self.assertIn(hook(self.log_a, "write", self.user_hr), (None, True))
 
     def test_get_list_hides_other_employees_logs(self):
         frappe.set_user(self.user_b)

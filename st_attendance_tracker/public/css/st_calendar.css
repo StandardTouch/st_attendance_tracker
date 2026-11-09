@@ -314,3 +314,5 @@ dialog.cal-dlg h3 { font-size: 18px; margin: 0; }
 .tray-toggle[aria-expanded="false"] i { transform: rotate(-90deg); }
 .tray-n { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--st-hover); color: var(--st-ink); font: 700 11px/20px var(--st-font-body); text-align: center; }
 .cal-tray.drop .tray-toggle { color: var(--st-accent-text); }
+
+.cal-ta.cal-bad { border-color: var(--st-red); outline: 1px solid var(--st-red); }

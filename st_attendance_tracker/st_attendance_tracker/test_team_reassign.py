@@ -132,7 +132,7 @@ class TestTeamReassign(FrappeTestCase):
         frappe.set_user(self.users["m1"])
         submit_eod_log(lunch_from="13:00", lunch_to="14:00", logout_time="18:00",
                        task_updates=json.dumps([{"name": tasks["Locked source"], "status": "Done", "actual_time": "1h"},
-                                                {"name": tasks["Open source"], "status": "Pending", "actual_time": "", "carry_forward": True}]), adhoc_tasks="[]")
+                                                {"name": tasks["Open source"], "status": "Pending", "actual_time": "", "carry_forward": True, "remarks": "blocked"}]), adhoc_tasks="[]")
         frappe.set_user(self.users["lead"])
         with self.assertRaises(frappe.ValidationError):  # source checked out
             reassign_task(tasks["Open source"], self.emps["m2"])

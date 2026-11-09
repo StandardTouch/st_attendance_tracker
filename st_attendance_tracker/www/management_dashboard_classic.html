@@ -1095,6 +1095,7 @@ body {
         <span class="fc on" data-f="all">All</span>
         <span class="fc" data-f="missing">Missing</span>
         <span class="fc" data-f="late">Late</span>
+        <span class="fc" data-f="active" title="Checked in and not yet checked out">Active</span>
         <span class="fc" data-f="leave">On leave</span>
         <span class="fc" data-f="eod_done">Checkout done</span>
       </div>
@@ -1122,7 +1123,7 @@ body {
             <i class="ti ti-trophy" style="font-size: 20px; color: #fbbf24;"></i>
             <div class="dp-name" style="font-size: 15px;">Hours Leaderboard</div>
           </div>
-          <div class="dp-dept" style="color: rgba(255, 255, 255, 0.7); margin-top: 4px;">Employees ranked by net hours worked</div>
+          <div class="dp-dept" style="color: rgba(255, 255, 255, 0.7); margin-top: 4px;">Employees ranked by task hours (time logged on tasks)</div>
         </div>
         <div class="dp-body" id="leaderboard-body" style="max-height: 320px; overflow-y: auto; padding: 16px;">
           <div style="text-align: center; color: var(--text-light); font-size: 12px; padding: 16px 0;">No checkout logs submitted yet for this date.</div>
@@ -1165,7 +1166,11 @@ function renderDepts(){
 
   list.innerHTML = depts.map(function(dept, idx){
     var emps = dept.employees||[];
-    var filtered = CUR_FILTER==='all' ? emps : emps.filter(function(e){ return e.status===CUR_FILTER || (CUR_FILTER==='leave'&&e.status==='leave'); });
+    var filtered = CUR_FILTER==='all' ? emps : emps.filter(function(e){
+      // Active = checked in and not checked out yet (on time or late).
+      if (CUR_FILTER==='active') return e.status==='checked_in' || e.status==='late';
+      return e.status===CUR_FILTER;
+    });
     var checkedIn = emps.filter(function(e){ return ['checked_in','late','eod_done'].includes(e.status); }).length;
     var pct = emps.length>0?Math.round(checkedIn/emps.length*100):0;
     var iconCls = ['di0','di1','di2','di3','di4','di5'][idx%6];
@@ -1288,10 +1293,10 @@ function renderLeaderboard(rankings){
     else if(rankNum === 2) rankBadge = '<div style="width: 24px; height: 24px; border-radius: 50%; background: var(--st-panel2,#f1f5f9); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--st-muted,#475569);"><i class="ti ti-medal" style="font-size:12px;color:var(--st-muted,#475569)" aria-hidden="true"></i></div>';
     else if(rankNum === 3) rankBadge = '<div style="width: 24px; height: 24px; border-radius: 50%; background: #ffedd5; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #ea580c;"><i class="ti ti-medal" style="font-size:12px;color:#ea580c" aria-hidden="true"></i></div>';
 
-    var hoursStr = r.net_hours;
+    var hoursStr = r.task_hours;
     var otBadge = '';
-    if(r.net_minutes > STANDARD_WORKDAY_MINUTES) {
-      var otMin = r.net_minutes - STANDARD_WORKDAY_MINUTES;
+    if(r.ot_minutes > 0) {
+      var otMin = r.ot_minutes;
       var oth = Math.floor(otMin / 60);
       var otm = otMin % 60;
       var otStr = '+' + oth + 'h' + (otm > 0 ? ' ' + otm + 'm' : '') + ' OT';
@@ -1425,7 +1430,7 @@ var MANAGEMENT_DASHBOARD_TOUR_STEPS = [
   { element: '.filter-bar', popover: { title: 'Filter departments', description: 'Narrow every department card down by status.', side: 'bottom' } },
   { element: '#dept-list', popover: { title: 'Departments', description: 'Click any employee card to see their tasks and time for the day.', side: 'right' } },
   { element: '#detail-panel', popover: { title: 'Employee detail', description: 'Details for whoever you pick show up here.', side: 'left' } },
-  { element: '#leaderboard-body', popover: { title: 'Checkout leaderboard', description: 'Everyone who has submitted checkout for the date, ranked by net hours.', side: 'left' } }
+  { element: '#leaderboard-body', popover: { title: 'Checkout leaderboard', description: 'Everyone who has submitted checkout for the date, ranked by task hours.', side: 'left' } }
 ];
 
 frappe.ready(function(){
@@ -1453,5 +1458,5 @@ document.addEventListener('click', function(e) {
 });
 </script>
 <link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_classic.css?v=19">
-<script src="/assets/st_attendance_tracker/js/st_classic.js?v=8" data-new="/management-dashboard"></script>
+<script src="/assets/st_attendance_tracker/js/st_classic.js?v=9" data-new="/management-dashboard"></script>
 {% endblock %}

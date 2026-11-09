@@ -50,7 +50,8 @@ def get_context(context):
     recent_entries = frappe.get_all("Additional Work",
         filters={"employee": employee.name},
         fields=["name", "work_date", "project_name", "hours_spent",
-                "description", "remarks", "login_time", "logout_time", "status"],
+                "description", "remarks", "login_time", "logout_time", "status",
+                "compensated_hours", "remaining_hours"],
         order_by="work_date desc, creation desc",
         page_length=10)
 

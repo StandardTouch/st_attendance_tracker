@@ -46,8 +46,14 @@ class TestShellNavigation(FrappeTestCase):
 
     def test_management_user_without_employee_sees_only_management(self):
         ctx = self._ctx(["Management"], employee=frappe._dict(name="", employee_name="Boss"))
-        self.assertEqual(_keys(ctx), ["management"])
+        self.assertEqual(_keys(ctx), ["management", "report"])
         self.assertEqual(ctx["profile_url"], "")
+
+    def test_report_page_is_management_only_and_has_a_classic_twin(self):
+        self.assertNotIn("report", _keys(self._ctx(["Employee"])))
+        ctx = self._ctx(["HR Manager"], employee=frappe._dict(name="", employee_name="HR"))
+        self.assertIn("report", _keys(ctx))
+        self.assertEqual(ui_shell.get_shell_context("report", EMPLOYEE)["menu_links"][0]["href"], "/management-report-classic")
 
     def test_create_menu_follows_role(self):
         labels = lambda ctx: [i["label"] for i in ctx["create_items"]]
@@ -362,7 +368,7 @@ class TestClassicPages(FrappeTestCase):
 
         routes = {rule["from_route"]: rule["to_route"] for rule in hooks.website_route_rules}
         www = os.path.join(os.path.dirname(os.path.dirname(__file__)), "www")
-        for _key, _label, route, _icon, _audience in ui_shell.NAV_ITEMS:
+        for key, _label, route, _icon, _audience in ui_shell.NAV_ITEMS:
             classic = route + ui_shell.CLASSIC_SUFFIX
             self.assertIn(classic, routes, classic)
             for ext in ("html", "py"):

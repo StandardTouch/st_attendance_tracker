@@ -1,0 +1,29 @@
+{% extends "templates/web.html" %}
+{% block title %}Management Report · {{ employee.employee_name }}{% endblock %}
+{% block head_include %}
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_classic_chrome.css?v=2">
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_classic_layout.css?v=5">
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_classic.css?v=19">
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_report.css?v=12">
+{% endblock %}
+{% block page_content %}
+{% from "st_attendance_tracker/templates/macros/classic_shell.html" import classic_nav, classic_sidebar, classic_mobnav %}
+<script>window.ST_REPORT = {"from": {{ from_date | tojson }}, "to": {{ to_date | tojson }}};</script>
+{{ classic_nav(employee, 'Management', None, None, None) }}
+<div class="cols cols-2">
+{{ classic_sidebar(st_shell, employee, 'report') }}
+<main class="main">
+<div class="wrap">
+{% include "st_attendance_tracker/templates/report_body.html" %}
+</div>
+</main>
+</div>
+{{ classic_mobnav(st_shell, 'report') }}
+<script src="/assets/st_attendance_tracker/js/st_mgmt_report.js?v=11"></script>
+<script src="/assets/st_attendance_tracker/js/st_classic.js?v=9" data-new="/management-report"></script>
+{% endblock %}

@@ -1,0 +1,88 @@
+{#- Management report body, shared by the new-design page and the classic page. Only the page chrome differs. -#}
+<div class="rp-root" id="rp-root">
+  <div class="rp-hero">
+    <div class="rp-eyebrow">Management report</div>
+    <h1 class="rp-title">Company Hours and Overtime Report</h1>
+    <p class="rp-lead">Check-ins, task hours, overtime and late checkouts for every department.</p>
+  </div>
+
+  <form class="rp-filters" id="rp-form" novalidate aria-label="Report filters">
+    <div class="rp-field">
+      <span class="rp-label" id="rp-period-l">Period</span>
+      <div class="rp-chips" role="group" aria-labelledby="rp-period-l" id="rp-presets">
+        <button type="button" class="rp-chip" data-preset="7">7 days</button>
+        <button type="button" class="rp-chip on" data-preset="30">30 days</button>
+        <button type="button" class="rp-chip" data-preset="this-month">This month</button>
+        <button type="button" class="rp-chip" data-preset="last-month">Last month</button>
+        <button type="button" class="rp-chip" data-preset="custom" id="rp-custom">Custom</button>
+      </div>
+    </div>
+    <label class="rp-field"><span class="rp-label">From</span><input type="date" id="rp-from" class="rp-input" value="{{ from_date }}" required></label>
+    <label class="rp-field"><span class="rp-label">To</span><input type="date" id="rp-to" class="rp-input" value="{{ to_date }}" required></label>
+    <label class="rp-field"><span class="rp-label">Department</span>
+      <select id="rp-dept" class="rp-input"><option value="">All departments</option></select>
+    </label>
+    <span id="rp-err" class="rp-err" role="alert"></span>
+  </form>
+
+  <div id="rp-list-view">
+    <div class="rp-tabs" role="tablist" aria-label="Report sections" id="rp-tabs">
+      <button type="button" class="rp-tab on" role="tab" id="rp-t-overview" aria-selected="true" aria-controls="rp-p-overview" data-tab="overview">Overview</button>
+      <button type="button" class="rp-tab" role="tab" id="rp-t-employees" aria-selected="false" aria-controls="rp-p-employees" data-tab="employees" tabindex="-1">Employees</button>
+      <button type="button" class="rp-tab" role="tab" id="rp-t-late" aria-selected="false" aria-controls="rp-p-late" data-tab="late" tabindex="-1">Late checkouts<span class="rp-count" id="rp-c-late" hidden></span></button>
+      <button type="button" class="rp-tab" role="tab" id="rp-t-overtime" aria-selected="false" aria-controls="rp-p-overtime" data-tab="overtime" tabindex="-1">Overtime</button>
+    </div>
+
+    <section class="rp-panel" id="rp-p-overview" role="tabpanel" aria-labelledby="rp-t-overview" aria-live="polite">
+      <div class="rp-kpis" id="rp-kpis"></div>
+      <div id="rp-overview"></div>
+    </section>
+
+    <section class="rp-panel" id="rp-p-employees" role="tabpanel" aria-labelledby="rp-t-employees" hidden>
+      <div class="rp-toolbar">
+        <input type="search" id="rp-q-employees" class="rp-input rp-search" placeholder="Search employee or department" aria-label="Search employees">
+        <div class="rp-chips" role="group" aria-label="Employee filter" id="rp-chips-employees"></div>
+        <span class="rp-grow"></span>
+        <span class="rp-hint" id="rp-n-employees"></span>
+        <button type="button" class="rp-btn" id="rp-csv-emps">Export CSV</button>
+      </div>
+      <div class="rp-tw"><table class="rp-table"><thead id="rp-head-employees"></thead><tbody id="rp-emps"></tbody></table></div>
+      <p class="rp-hint rp-foot">Click an employee for their full view. Click a column heading to sort.</p>
+    </section>
+
+    <section class="rp-panel" id="rp-p-late" role="tabpanel" aria-labelledby="rp-t-late" hidden>
+      <div class="rp-toolbar">
+        <input type="search" id="rp-q-late" class="rp-input rp-search" placeholder="Search employee, department or reason" aria-label="Search late checkouts">
+        <div class="rp-chips" role="group" aria-label="Late checkout filter" id="rp-chips-late"></div>
+        <span class="rp-grow"></span>
+        <span class="rp-hint" id="rp-n-late"></span>
+        <button type="button" class="rp-btn" id="rp-csv-late">Export CSV</button>
+      </div>
+      <div class="rp-tw"><table class="rp-table">
+        <thead><tr><th>Employee</th><th>Department</th><th>Date</th><th>Status</th><th>Reason</th><th>Approved by</th><th>Approval note</th></tr></thead>
+        <tbody id="rp-late"></tbody>
+      </table></div>
+    </section>
+
+    <section class="rp-panel" id="rp-p-overtime" role="tabpanel" aria-labelledby="rp-t-overtime" hidden>
+      <div class="rp-toolbar">
+        <input type="search" id="rp-q-overtime" class="rp-input rp-search" placeholder="Search employee or department" aria-label="Search overtime">
+        <span class="rp-hint" id="rp-ot-note"></span>
+        <span class="rp-grow"></span>
+        <span class="rp-hint" id="rp-n-overtime"></span>
+        <button type="button" class="rp-btn" id="rp-csv-ot">Export CSV</button>
+      </div>
+      <div class="rp-tw"><table class="rp-table"><thead id="rp-head-overtime"></thead><tbody id="rp-ot"></tbody></table></div>
+    </section>
+  </div>
+
+  <div id="rp-employee-view" hidden>
+    <div class="rp-backbar">
+      <button type="button" class="rp-link" id="rp-back">&larr; Back to report</button>
+      <span class="rp-hint" id="rp-emp-range"></span>
+    </div>
+    <div class="rp-emp-head" id="rp-emp-head"></div>
+    <div class="rp-tabs" role="tablist" aria-label="Employee sections" id="rp-etabs"></div>
+    <div id="rp-detail-body" aria-live="polite"></div>
+  </div>
+</div>

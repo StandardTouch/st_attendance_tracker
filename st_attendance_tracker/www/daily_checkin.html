@@ -3405,7 +3405,7 @@ body > .container { padding-top: 0 !important; }
   <button class="fbtn gh" onclick="addEodProject()" title="Add a new project (Shift+P)"><i class="ti ti-folder-plus" aria-hidden="true"></i>Project</button>
   <button class="fbtn gh" onclick="addAdhoc()" title="Add a task (Shift+T)"><i class="ti ti-plus" aria-hidden="true"></i>Task</button>
   <button class="fbtn grn" id="btn-save-adhoc" onclick="saveAllAdhocTasks()" title="Save newly added tasks now so your Team Leader sees them right away" style="display:none"><i class="ti ti-device-floppy" aria-hidden="true"></i>Save</button>
-  <button class="fbtn gh" id="btn-reset-ci" onclick="resetCheckin()" style="background:#fff5f5;color:#dc2626;border:1px solid #fecaca"><i class="ti ti-rotate-clockwise" aria-hidden="true"></i>Reset check-in</button>
+  {% if reset_seconds_left and reset_seconds_left > 0 and not has_reset_today %}<button class="fbtn gh" id="btn-reset-ci" data-seconds-left="{{ reset_seconds_left }}" onclick="openResetConfirm()" style="background:#fff5f5;color:#dc2626;border:1px solid #fecaca"><i class="ti ti-rotate-clockwise" aria-hidden="true"></i>Reset check-in</button>{% endif %}
   <span id="autosave-status" style="font-size:11px;color:var(--text-muted);margin-left:auto;align-self:center;white-space:nowrap"></span>
 
 </footer>
@@ -3617,9 +3617,26 @@ body > .container { padding-top: 0 !important; }
     <div class="wfh-mi"><i class="ti ti-logout" aria-hidden="true"></i></div>
     <div class="wfh-mt">Check out for today?</div>
     <div class="wfh-ms">This submits your day — task statuses and time taken can't be edited afterward.</div>
+    {% if time_bank_balance and time_bank_balance > 0 %}
+    <div style="margin:4px 0 14px;text-align:left;font-size:13px">
+      <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;line-height:1.45"><input type="checkbox" id="bank-chk" onchange="toggleBank()" style="flex:none;width:18px;height:18px;margin-top:2px"> <span><b>Use my extra hours</b> (you have {{ "%g"|format(time_bank_balance) }}h from earlier overtime or additional work). They count as worked time today, so a short day still counts as a full day.</span></label>
+      <input type="number" id="bank-hours" min="0.25" max="{{ time_bank_balance }}" step="0.25" placeholder="Hours to use today" aria-label="Extra hours to use today" style="display:none;margin-top:8px;width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid var(--border,#cbd5e1);border-radius:8px">
+    </div>
+    {% endif %}
     <div class="wfh-ma">
       <button class="wfh-mb pr" onclick="closeCheckoutConfirm(); submitEOD();">Yes, check out</button>
       <button class="wfh-mb sc" onclick="closeCheckoutConfirm()">No, go back</button>
+    </div>
+  </div>
+</div>
+<div class="wfh-ov" id="reset-confirm-ov" style="display:none">
+  <div class="wfh-mo" role="dialog" aria-modal="true" aria-labelledby="reset-confirm-title">
+    <div class="wfh-mi"><i class="ti ti-rotate-clockwise" aria-hidden="true"></i></div>
+    <div class="wfh-mt" id="reset-confirm-title">Reset today's check-in?</div>
+    <div class="wfh-ms">Your login time is cleared and tasks go back to Pending. You can check in again. This can be done once a day.</div>
+    <div class="wfh-ma">
+      <button class="wfh-mb pr" id="reset-confirm-yes" onclick="closeResetConfirm(); resetCheckin();">Yes, reset check-in</button>
+      <button class="wfh-mb sc" onclick="closeResetConfirm()">No, keep it</button>
     </div>
   </div>
 </div>
@@ -4449,7 +4466,7 @@ async function submitEOD(){
     }
   }
   var tu=[];
-  var hasErrors=false;
+  var hasErrors=false, missingRemark=false;
   document.querySelectorAll('[data-id]').forEach(function(row){
     var id=row.dataset.id; if(!id) return;
     var sel=row.querySelector('.tsel[data-id="'+id+'"]'), act=row.querySelector('.act-in[data-id="'+id+'"]'), desc=row.querySelector('.desc-edit[data-id="'+id+'"]');
@@ -4457,6 +4474,13 @@ async function submitEOD(){
     var remarkChk=row.querySelector('.remark-chk'), remark=row.querySelector('.remark-in[data-id="'+id+'"]');
     if(act) act.classList.remove('input-err');
     if(sel && sel.value==='Done' && act && !act.value.trim()){ act.classList.add('input-err'); hasErrors=true; }
+    if(remark) remark.classList.remove('input-err');
+    var sentRemark = (remarkChk && remarkChk.checked && remark) ? remark.value : '';
+    if(sel && sel.value!=='Done' && remark && !sentRemark.replace(/\[(?:Auto-carried|Carried|Repeated) from [^\]]*\]/g,'').trim()){
+      // Not-done task: the remark is mandatory, so open the box and flag it.
+      if(remarkChk && !remarkChk.checked){ remarkChk.checked=true; toggleRemark(remarkChk); }
+      remark.classList.add('input-err'); hasErrors=true; missingRemark=true;
+    }
     if(sel) tu.push({name:id,status:sel.value,actual_time:act?act.value:'',description:desc?desc.value:'',remarks:(remarkChk&&remarkChk.checked&&remark)?remark.value:'',carry_forward:carryChk?carryChk.checked:true});
   });
   var at=[];
@@ -4485,11 +4509,20 @@ async function submitEOD(){
     var remarkChk=row.querySelector('.remark-chk'), remark=row.querySelector('.remark-in[data-aid="'+id+'"]');
     if(desc.trim()) at.push({description:desc.trim(),status:stat,estimated_time:est,actual_time:act,remarks:(remarkChk&&remarkChk.checked&&remark)?remark.value:'',project_name:proj,attachment_names:getRowAttachments(row).map(function(f){return f.name;}),series_id:row.dataset.savedSeries||undefined,repeat_next_day:(stat==='Done'&&(row.querySelector('.repeat-chk')||{}).checked)?1:0});
   });
-  if(hasErrors){ toast('Please provide time taken for task completion for all completed tasks.', 'err'); return; }
+  if(hasErrors){
+    toast(missingRemark ? 'Add a remark explaining why each unfinished task is not done.' : 'Please provide time taken for task completion for all completed tasks.', 'err');
+    return;
+  }
+  var bankChk=document.getElementById('bank-chk'), bankIn=document.getElementById('bank-hours'), bankH=0;
+  if(bankChk && bankChk.checked){
+    bankH=parseFloat(bankIn.value);
+    var bankMax=parseFloat(bankIn.getAttribute('max'))||0;
+    if(!(bankH>0) || bankH>bankMax+1e-9){ toast('Enter hours between 0 and '+bankMax+'.','err'); bankIn.focus(); return; }
+  }
   var btn=document.getElementById('btn-eod');
   btn.disabled=true; btn.innerHTML='<span class="spin"></span> Submitting...';
   try{
-    var r=await frappe.call({method:'st_attendance_tracker.api.submit_eod_log',args:{lunch_from:lfv,lunch_to:ltv,logout_time:logout,task_updates:JSON.stringify(tu),adhoc_tasks:JSON.stringify(at)}});
+    var r=await frappe.call({method:'st_attendance_tracker.api.submit_eod_log',args:{lunch_from:lfv,lunch_to:ltv,logout_time:logout,task_updates:JSON.stringify(tu),adhoc_tasks:JSON.stringify(at),use_bank_hours:bankH}});
     if(r.message&&r.message.success){
       localStorage.removeItem('st_eod_draft');
       localStorage.removeItem('st_eod_edits');
@@ -4842,8 +4875,18 @@ function setRepeat(chk, on, silent) {
     }
   });
 }
+function openResetConfirm() { document.getElementById('reset-confirm-ov').style.display = 'flex'; }
+function closeResetConfirm() { document.getElementById('reset-confirm-ov').style.display = 'none'; }
+document.addEventListener('click', function(e){ if (e.target === document.getElementById('reset-confirm-ov')) closeResetConfirm(); });
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeResetConfirm(); });
+// Hide the button the moment the one-hour window ends (the server rejects a late reset too).
+(function(){
+  var b = document.getElementById('btn-reset-ci');
+  if (!b) return;
+  var left = parseInt(b.getAttribute('data-seconds-left'), 10) || 0;
+  setTimeout(function(){ b.remove(); closeResetConfirm(); }, Math.min(left, 2147483) * 1000);
+})();
 async function resetCheckin() {
-  if (!confirm("Are you sure you want to reset today's check-in? This will delete today's check-in log and newly added morning tasks, restoring your state back to before check-in.")) return;
   var btn = document.getElementById('btn-reset-ci');
   if (btn) {
     btn.disabled = true;
@@ -5040,6 +5083,12 @@ document.addEventListener('paste', _stHandleImagePaste);
 document.addEventListener('click', function(e){ if (e.target === document.getElementById('paste-confirm-ov')) closePasteConfirm(); });
 function confirmCheckout() {
   document.getElementById('checkout-confirm-ov').style.display = 'flex';
+}
+function toggleBank() {
+  var c = document.getElementById('bank-chk'), h = document.getElementById('bank-hours');
+  if (!c || !h) return;
+  h.style.display = c.checked ? 'block' : 'none';
+  if (c.checked) h.focus();
 }
 function closeCheckoutConfirm() {
   document.getElementById('checkout-confirm-ov').style.display = 'none';
@@ -5825,5 +5874,5 @@ try {
 } catch(e) {}
 
 </script>
-<script src="/assets/st_attendance_tracker/js/st_classic.js?v=8" data-new="/daily-checkin"></script>
+<script src="/assets/st_attendance_tracker/js/st_classic.js?v=9" data-new="/daily-checkin"></script>
 {% endblock %}

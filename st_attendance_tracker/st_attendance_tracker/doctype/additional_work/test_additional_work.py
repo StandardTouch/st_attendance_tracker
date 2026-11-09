@@ -105,6 +105,10 @@ class TestAdditionalWork(FrappeTestCase):
         self.day_rule = patch("st_attendance_tracker.st_attendance_tracker.doctype.additional_work.additional_work.additional_work_allowed", return_value=(True, "checked_out"))
         self.day_rule.start()
         self.addCleanup(self.day_rule.stop)
+        # Today may be a Sunday or holiday; the day-off rule has its own tests below.
+        self.day_off = patch("st_attendance_tracker.st_attendance_tracker.doctype.additional_work.additional_work._is_day_off", return_value=False)
+        self.day_off.start()
+        self.addCleanup(self.day_off.stop)
 
     def tearDown(self):
         frappe.set_user("Administrator")
@@ -357,6 +361,44 @@ class TestAdditionalWork(FrappeTestCase):
         doc.reload(); doc.remarks = "later note"
         doc.save(ignore_permissions=True)  # the day is not closed, but this is not a new entry or a new day
         self.assertEqual(doc.remarks, "later note")
+
+    def test_sunday_opens_the_day_without_a_check_in(self):
+        self.day_rule.stop(); self.day_off.stop()
+        from st_attendance_tracker.st_attendance_tracker.doctype.additional_work.additional_work import additional_work_allowed
+        from frappe.utils import add_days, getdate
+
+        sunday = next(add_days(today(), -i) for i in range(1, 8) if getdate(add_days(today(), -i)).weekday() == 6)
+        self.assertEqual(additional_work_allowed(self.emp_name, sunday), (True, "day_off"))
+        doc = self._entry(work_date=sunday).insert(ignore_permissions=True)     # no check-in on that Sunday
+        self.assertTrue(doc.name)
+
+    def test_holiday_in_the_employee_holiday_list_opens_the_day(self):
+        self.day_rule.stop(); self.day_off.stop()
+        from st_attendance_tracker.st_attendance_tracker.doctype.additional_work.additional_work import additional_work_allowed
+        from frappe.utils import add_days, getdate
+
+        weekday = next(add_days(today(), -i) for i in range(1, 8) if getdate(add_days(today(), -i)).weekday() == 2)   # a Wednesday
+        self.assertEqual(additional_work_allowed(self.emp_name, weekday), (False, ""))
+        with patch("hrms.hr.utils.get_holidays_for_employee", return_value=[frappe._dict(holiday_date=weekday)]):
+            self.assertEqual(additional_work_allowed(self.emp_name, weekday), (True, "day_off"))
+
+    def test_a_normal_working_day_still_needs_a_check_out(self):
+        self.day_rule.stop(); self.day_off.stop()
+        from st_attendance_tracker.st_attendance_tracker.doctype.additional_work.additional_work import additional_work_allowed
+        from frappe.utils import add_days, getdate
+
+        monday = next(add_days(today(), -i) for i in range(1, 8) if getdate(add_days(today(), -i)).weekday() == 0)
+        with patch("hrms.hr.utils.get_holidays_for_employee", return_value=[]):
+            self.assertEqual(additional_work_allowed(self.emp_name, monday), (False, ""))
+
+    def test_holiday_lookup_failure_does_not_open_the_day(self):
+        self.day_rule.stop(); self.day_off.stop()
+        from st_attendance_tracker.st_attendance_tracker.doctype.additional_work.additional_work import _is_day_off
+        from frappe.utils import add_days, getdate
+
+        weekday = next(add_days(today(), -i) for i in range(1, 8) if getdate(add_days(today(), -i)).weekday() == 3)
+        with patch("hrms.hr.utils.get_holidays_for_employee", side_effect=RuntimeError("no list")):
+            self.assertFalse(_is_day_off(self.emp_name, weekday))
 
     def test_day_context_reports_the_rule(self):
         self.day_rule.stop()
