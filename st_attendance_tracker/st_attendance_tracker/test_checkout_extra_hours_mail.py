@@ -137,7 +137,7 @@ class TestCheckoutExtraHoursMail(FrappeTestCase):
 
     def test_names_are_escaped(self):
         aw = frappe.get_doc({"doctype": "Additional Work", "employee": self.emp, "work_date": YESTERDAY, "hours_spent": 1,
-                             "project_name": "<script>alert(1)</script>", "description": "x", "status": "Done",
+                             "project_name": "<script>alert(1)</script> & Co", "description": "x", "status": "Done",
                              "login_time": "19:00:00", "logout_time": "20:00:00"})
         with patch("st_attendance_tracker.additional_work_mail.queue_additional_work_email"), patch(
             "st_attendance_tracker.st_attendance_tracker.doctype.additional_work.additional_work.additional_work_allowed",
@@ -146,5 +146,5 @@ class TestCheckoutExtraHoursMail(FrappeTestCase):
         self._day("6h", use=1)
         mine = self._mails()[0]["message"]
         self.assertNotIn("<script>alert(1)</script>", mine)
-        self.assertIn("&lt;script&gt;", mine)
+        self.assertIn("&amp; Co", mine)                         # Frappe 16 strips the tag at save; 15 keeps it, escaped
         self.assertNotIn("&amp;lt;", mine)                       # escaped once, not twice

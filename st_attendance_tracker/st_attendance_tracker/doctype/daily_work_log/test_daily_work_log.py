@@ -493,7 +493,8 @@ class TestQACheckinFull(FrappeTestCase):
             work_location="Office"
         )
         work_log = _get_work_log(self.emp_name, today())
-        self.assertIn("script", work_log.tasks[0].description)
+        # Frappe 16 strips the tag at save, 15 stores the text as typed; it is never altered into other markup.
+        self.assertIn(work_log.tasks[0].description, ("", xss))
 
     def test_2_9_sql_injection_in_task_description_safe(self):
         """TC-2.9: SQL-like input in task description does not cause errors."""
