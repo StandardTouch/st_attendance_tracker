@@ -93,8 +93,10 @@ class TestAdditionalWork(FrappeTestCase):
     def tearDownClass(cls):
         frappe.set_user("Administrator")
         frappe.db.sql("DELETE FROM `tabAdditional Work` WHERE employee IN (%s,%s)", (cls.emp_name, cls.other_name))
-        frappe.db.sql("DELETE FROM `tabDaily Task Log` WHERE employee=%s", (cls.emp_name,))
-        frappe.db.sql("DELETE FROM `tabDaily Task` WHERE employee=%s", (cls.emp_name,))
+        if frappe.db.table_exists("Daily Task Log"):  # legacy table, absent on fresh sites
+            frappe.db.sql("DELETE FROM `tabDaily Task Log` WHERE employee=%s", (cls.emp_name,))
+        if frappe.db.table_exists("Daily Task"):  # legacy table, absent on fresh sites
+            frappe.db.sql("DELETE FROM `tabDaily Task` WHERE employee=%s", (cls.emp_name,))
         frappe.db.sql("DELETE FROM `tabEmployee Checkin` WHERE employee=%s", (cls.emp_name,))
         frappe.db.sql("DELETE FROM `tabEmployee` WHERE name IN (%s,%s)", (cls.emp_name, cls.other_name))
         frappe.db.sql("DELETE FROM `tabUser` WHERE email IN (%s,%s)", (cls.emp_user, cls.other_user))
@@ -114,8 +116,10 @@ class TestAdditionalWork(FrappeTestCase):
     def tearDown(self):
         frappe.set_user("Administrator")
         frappe.db.sql("DELETE FROM `tabAdditional Work` WHERE employee IN (%s,%s)", (self.emp_name, self.other_name))
-        frappe.db.sql("DELETE FROM `tabDaily Task Log` WHERE employee=%s", (self.emp_name,))
-        frappe.db.sql("DELETE FROM `tabDaily Task` WHERE employee=%s", (self.emp_name,))
+        if frappe.db.table_exists("Daily Task Log"):  # legacy table, absent on fresh sites
+            frappe.db.sql("DELETE FROM `tabDaily Task Log` WHERE employee=%s", (self.emp_name,))
+        if frappe.db.table_exists("Daily Task"):  # legacy table, absent on fresh sites
+            frappe.db.sql("DELETE FROM `tabDaily Task` WHERE employee=%s", (self.emp_name,))
         frappe.db.sql("DELETE FROM `tabEmployee Checkin` WHERE employee=%s", (self.emp_name,))
         frappe.db.sql("DELETE t FROM `tabTask Entry` t JOIN `tabDaily Work Log` l ON l.name=t.parent WHERE l.employee=%s", (self.emp_name,))
         frappe.db.sql("DELETE FROM `tabDaily Work Log` WHERE employee=%s", (self.emp_name,))
