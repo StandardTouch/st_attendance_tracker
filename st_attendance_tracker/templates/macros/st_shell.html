@@ -1,0 +1,67 @@
+{#- Branded page shell: top bar + left rail (Create, mini calendar, page nav) around the page content.
+    Usage: {% call shell(st_shell, "Title", "tour JS", "docs url", rail_extra=html, nav_controls=true, views=true) %}…{% endcall %}
+    nav_controls: show Today / prev / next in the top bar (page listens for the "st:nav" event).
+    views: show the Day / Week / Month switch (page listens for "st:view"). -#}
+{% macro shell(ctx, title, tour_js=None, docs_url=None, rail_extra=None, nav_controls=False, views=False) %}
+<script>try{var t=window.localStorage.getItem('st.theme');if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<div class="st-app">
+  <header class="st-top">
+    <button type="button" class="st-icon-btn st-menu-btn" id="st-menu-btn" aria-label="Toggle navigation" aria-expanded="true" aria-controls="st-rail"><i class="ti ti-menu-2" aria-hidden="true"></i></button>
+    <a href="/daily-checkin" class="st-logo" aria-label="StandardTouch e-Solutions home">
+      <span class="st-logo-main"><b>Standard</b><i>Touch</i></span><small>e-Solutions</small>
+    </a>
+    {% if nav_controls %}
+    <button type="button" class="st-pill st-hide-s" data-st-nav="today">Today</button>
+    <button type="button" class="st-icon-btn st-show st-hide-s" data-st-nav="prev" aria-label="Previous"><i class="ti ti-chevron-left" aria-hidden="true"></i></button>
+    <button type="button" class="st-icon-btn st-show st-hide-s" data-st-nav="next" aria-label="Next"><i class="ti ti-chevron-right" aria-hidden="true"></i></button>
+    {% endif %}
+    <h1 class="st-title" id="st-title">{{ title }}</h1>
+    <span class="st-sp"></span>
+    {% if views %}
+    <div class="st-seg" id="st-views" role="group" aria-label="Calendar view">
+      <button type="button" data-st-view="day" aria-pressed="false">Day</button>
+      <button type="button" data-st-view="week" aria-pressed="true">Week</button>
+      <button type="button" data-st-view="month" aria-pressed="false">Month</button>
+    </div>
+    {% endif %}
+    {% if tour_js %}<button type="button" class="st-pill st-hide-s" onclick="{{ tour_js }}"><i class="ti ti-map-2" aria-hidden="true"></i><span>Tour</span></button>{% endif %}
+    <button type="button" class="st-icon-btn st-hide-s" id="st-theme-btn" aria-label="Switch theme" title="Switch theme"><i class="ti ti-moon" aria-hidden="true"></i></button>
+    <div class="wn-bell-wrap" id="wn-mount"></div>
+    <div class="st-user">
+      <button type="button" class="st-avatar" id="st-avatar" aria-haspopup="true" aria-expanded="false" aria-controls="st-user-menu" title="Account options">{{ ctx.initials }}</button>
+      <div class="st-menu" id="st-user-menu" role="menu" hidden>
+        {% if ctx.profile_url %}<a role="menuitem" href="{{ ctx.profile_url }}"><i class="ti ti-user" aria-hidden="true"></i>My Profile</a>{% endif %}
+        {% if docs_url %}<a role="menuitem" href="{{ docs_url }}" target="_blank" rel="noopener"><i class="ti ti-book-2" aria-hidden="true"></i>Docs</a>{% endif %}
+        {% for link in ctx.menu_links or [] %}<a role="menuitem" href="{{ link.href }}"{% if link.switch %} data-st-switch="{{ link.switch }}"{% endif %}><i class="ti {{ link.icon }}" aria-hidden="true"></i>{{ link.label }}</a>{% endfor %}
+        <a role="menuitem" href="/app"><i class="ti ti-layout-dashboard" aria-hidden="true"></i>Switch to Desk</a>
+        <a role="menuitem" href="/?cmd=web_logout"><i class="ti ti-logout" aria-hidden="true"></i>Logout</a>
+      </div>
+    </div>
+  </header>
+  <div class="st-body">
+    <aside class="st-rail" id="st-rail" aria-label="Pages">
+      {% if ctx.create_items %}
+      <div class="st-create-wrap">
+        <button type="button" class="st-create" id="st-create" aria-haspopup="true" aria-expanded="false" aria-controls="st-create-menu"><i class="ti ti-plus" aria-hidden="true"></i><span>Create</span></button>
+        <div class="st-menu st-create-menu" id="st-create-menu" role="menu" hidden>
+          {% for item in ctx.create_items %}<a role="menuitem" href="{{ item.href }}">{{ item.label }}</a>{% endfor %}
+        </div>
+      </div>
+      {% endif %}
+      <section class="st-mini" id="st-mini" aria-label="Calendar"></section>
+      <nav>
+        {% for item in ctx.nav %}
+        <a class="st-nav-item" href="{{ item.href }}"{% if item.active %} aria-current="page"{% endif %}><i class="ti {{ item.icon }}" aria-hidden="true"></i>{{ item.label }}</a>
+        {% endfor %}
+      </nav>
+      {% if rail_extra %}<div class="st-rail-extra">{{ rail_extra }}</div>{% endif %}
+    </aside>
+    <div class="st-scrim" id="st-scrim"></div>
+    <main class="st-main">
+      <div id="wn-banner-mount"></div>
+      {{ caller() }}
+    </main>
+  </div>
+  <div id="st-drawer"></div>
+</div>
+{% endmacro %}

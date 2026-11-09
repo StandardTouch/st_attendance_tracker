@@ -1,0 +1,1037 @@
+{% extends "templates/web.html" %}
+{% block title %}My History · {{ employee.employee_name }}{% endblock %}
+{% block head_include %}
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css">
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/whats_new.css">
+<style>
+:root {
+  --primary: #6366f1;
+  --primary-hover: #4f46e5;
+  --primary-light: #e0e7ff;
+  --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  --success: #10b981;
+  --success-bg: #ecfdf5;
+  --success-border: #a7f3d0;
+  --success-text: #047857;
+  --warning: #f59e0b;
+  --warning-bg: #fffbeb;
+  --warning-border: #fde68a;
+  --warning-text: #b45309;
+  --info: #3b82f6;
+  --info-bg: #eff6ff;
+  --info-border: #bfdbfe;
+  --info-text: #1d4ed8;
+  --danger: #ef4444;
+  --danger-bg: #fef2f2;
+  --danger-border: #fecaca;
+  --danger-text: #b91c1c;
+  --dark: #0f172a;
+  --dark-light: #1e293b;
+  
+  --bg-canvas: #f8fafc;
+  --bg-card: #ffffff;
+  --border: #e2e8f0;
+  --border-focus: #cbd5e1;
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --text-light: #94a3b8;
+  
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--bg-canvas);
+  color: var(--text-main);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.tnav {
+  height: 70px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.02);
+}
+
+.tnav-con {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 24px;
+  gap: 16px;
+  height: 100%;
+}
+
+.tnav-logo {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.5px;
+}
+
+.tnav-sep {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+}
+
+.tnav-bc {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.tnav-r {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+
+.tnav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  text-decoration: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
+}
+
+.tnav-btn:hover {
+  background: hsl(210, 40%, 98%);
+  border-color: var(--border-focus);
+  color: var(--text-main);
+  transform: translateY(-1px);
+}
+
+.tnav-btn i {
+  font-size: 16px;
+}
+
+.tnav-av {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--primary-gradient);
+  color: #ffffff;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.2);
+}
+
+.wrap {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.hero {
+  background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
+  color: #ffffff;
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(225, 29, 72, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.hero-eye {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 6px;
+}
+
+.hero-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  margin-bottom: 4px;
+}
+
+.hero-sub {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.day-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.day-card:hover {
+  border-color: var(--border-focus);
+  box-shadow: var(--shadow-md);
+}
+
+.day-card.open {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-md);
+}
+
+.day-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+}
+
+.day-date-box {
+  flex-shrink: 0;
+  background: #f8fafc;
+  border-radius: var(--radius-md);
+  padding: 8px 14px;
+  text-align: center;
+  min-width: 60px;
+  border: 1px solid var(--border);
+}
+
+.day-d {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1;
+  letter-spacing: -0.5px;
+}
+
+.day-m {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 4px;
+}
+
+.day-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.day-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.day-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.dm {
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+}
+
+.dm i {
+  font-size: 14px;
+  color: var(--text-light);
+}
+
+.day-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.day-badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.db-full {
+  background: var(--success-bg);
+  color: var(--success-text);
+  border: 1px solid var(--success-border);
+}
+
+.db-part {
+  background: var(--warning-bg);
+  color: var(--warning-text);
+  border: 1px solid var(--warning-border);
+}
+
+.db-no {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+  border: 1px solid var(--danger-border);
+}
+
+.db-late {
+  background: #fffbeb;
+  color: #d97706;
+  border: 1px solid #fde68a;
+}
+
+.day-chev {
+  font-size: 16px;
+  color: var(--text-light);
+  transition: transform 0.2s ease;
+}
+
+.day-card.open .day-chev {
+  transform: rotate(180deg);
+}
+
+.prog-mini {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 20px 16px;
+}
+
+.pm-trk {
+  flex: 1;
+  height: 6px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.pm-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #059669);
+  border-radius: 999px;
+}
+
+.pm-lbl {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.day-detail {
+  display: none;
+  border-top: 1px solid var(--border);
+  padding: 20px;
+  background: #fdfdfd;
+}
+
+.day-card.open .day-detail {
+  display: block;
+}
+
+.time-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.tc {
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+}
+
+.tc-l {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.tc-v {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.tc-v.g {
+  color: var(--success);
+}
+
+.tasks-lbl {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+}
+
+.task-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.task-row:last-child {
+  border-bottom: none;
+}
+
+.task-ico {
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.ico-g { color: var(--success); }
+.ico-a { color: var(--text-light); }
+.ico-b { color: var(--info); }
+
+.task-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.task-desc {
+  font-size: 13px;
+  color: var(--text-main);
+  line-height: 1.5;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.task-desc.dn {
+  text-decoration: line-through;
+  color: var(--text-light);
+}
+
+.task-pills {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.tp {
+  font-size: 10px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  padding: 2px 8px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+}
+
+.tp i {
+  font-size: 11px;
+  color: var(--text-light);
+}
+
+.stag {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.st-dn {
+  background: var(--success-bg);
+  color: var(--success-text);
+  border: 1px solid var(--success-border);
+}
+
+.st-ip {
+  background: var(--info-bg);
+  color: var(--info-text);
+  border: 1px solid var(--info-border);
+}
+
+.st-pe {
+  background: var(--warning-bg);
+  color: var(--warning-text);
+  border: 1px solid var(--warning-border);
+}
+
+.no-tasks {
+  font-size: 13px;
+  color: var(--text-light);
+  font-style: italic;
+  padding: 8px 0;
+}
+
+.load-more-btn {
+  width: 100%;
+  padding: 12px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s;
+  margin-top: 12px;
+}
+
+.load-more-btn:hover {
+  background: #f8fafc;
+  color: var(--text-main);
+  border-color: var(--border-focus);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 40px;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 2px dashed var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.empty-state i {
+  font-size: 40px;
+  color: var(--text-light);
+  display: block;
+  margin-bottom: 16px;
+}
+
+.empty-state p {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+footer.web-footer, .web-footer, footer[class*="footer"], .footer, .subscribe-section,
+form.row.mt-2, .mt-2.row:has(input[placeholder="Your email address..."]) {
+  display: none !important;
+}
+
+
+
+
+/* Premium Modern SaaS Overrides (With Light Colors) */
+body {
+    background: #f8fafc !important; /* Very soft slate background */
+    color: #0f172a !important;
+    font-family: 'Inter', system-ui, sans-serif !important;
+}
+
+/* Base reset with subtle glass feel */
+.tnav, .sidebar, .pg, .dept-card, .dp, .wl-wrap, .sb-card, .hcell {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02) !important;
+}
+
+.tnav { border-bottom: 1px solid #e2e8f0 !important; }
+.tnav-logo {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+}
+
+/* The Hero/Morning Card - Soft Pastel Glow */
+.ph, .hero {
+    background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%),
+                repeating-linear-gradient(45deg, rgba(79, 70, 229, 0.02) 0, rgba(79, 70, 229, 0.02) 1px, transparent 1px, transparent 10px) !important;
+    border: 1px solid #e0e7ff !important;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.05) !important;
+}
+.ph-title, .hero-title { color: #1e1b4b !important; }
+.ph-sub, .hero-sub { color: #4338ca !important; }
+.hero-eye { color: #4f46e5 !important; }
+.ph-time { color: #312e81 !important; }
+.ph-date { color: #4f46e5 !important; }
+
+/* Avatars */
+.ph-av { background: #e0e7ff !important; color: #4338ca !important; border: 1px solid #c7d2fe !important; }
+.sb-av, .tnav-av { background: #e0e7ff !important; color: #4338ca !important; border: 1px solid #c7d2fe !important; }
+
+/* Primary Buttons (Indigo) */
+.btn.red, .fbtn.red {
+    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%) !important;
+    color: #ffffff !important;
+    border: none !important;
+    box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25) !important;
+    font-weight: 500 !important;
+    border-radius: 6px !important;
+}
+.btn.red:hover, .fbtn.red:hover {
+    box-shadow: 0 6px 15px rgba(79, 70, 229, 0.4) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Secondary Buttons */
+.btn, .tnav-btn, .fbtn {
+    background: #ffffff !important;
+    color: #475569 !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 6px !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02) !important;
+    transition: all 0.2s ease !important;
+}
+.btn:hover, .tnav-btn:hover, .fbtn:hover {
+    background: #f8fafc !important;
+    color: #0f172a !important;
+    border-color: #94a3b8 !important;
+}
+
+/* Inputs */
+.tinp, .tsel, .date-inp, .wl-sel {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+    border-radius: 6px !important;
+}
+.tinp:focus, .tsel:focus, .date-inp:focus, .wl-sel:focus {
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2) !important;
+    outline: none !important;
+}
+
+/* Task Rows */
+.trow, .ec {
+    background: #ffffff !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    transition: background 0.15s ease !important;
+}
+.trow:hover, .ec:hover {
+    background: #f8fafc !important;
+}
+
+/* Typography Overrides */
+.sb-lbl, .ch, .tbar-t, .dp-lbl, .tc-l, .hl { color: #64748b !important; }
+.hv { color: #0f172a !important; }
+.sb-name, .dept-name, .dp-name { color: #0f172a !important; }
+.sb-link { color: #475569 !important; }
+.sb-link.on { background: #e0e7ff !important; color: #4338ca !important; border-radius: 6px !important;}
+
+/* Subtle Checkboxes */
+.tck {
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 4px !important;
+}
+.tck:hover { border-color: #6366f1 !important; background: #e0e7ff !important; }
+.tck.dn {
+    background: #10b981 !important;
+    border-color: #10b981 !important;
+}
+.tck.dn i { color: #ffffff !important; }
+
+/* Status Badges */
+.pc-in, .sbb-in { background: #ecfdf5 !important; color: #059669 !important; border: 1px solid #a7f3d0 !important; }
+.pc-ca { background: #fffbeb !important; color: #d97706 !important; border: 1px solid #fde68a !important; }
+.pc-eo, .sbb-eod { background: #eff6ff !important; color: #2563eb !important; border: 1px solid #bfdbfe !important; }
+.sbb-out { background: #f1f5f9 !important; color: #64748b !important; border: 1px solid #cbd5e1 !important; }
+.ttag { background: #f1f5f9 !important; border: 1px solid #e2e8f0 !important; color: #475569 !important; }
+
+/* Global Stats area */
+.gstats { background: #ffffff !important; border: 1px solid #e2e8f0 !important; }
+.gs { border-right: 1px solid #e2e8f0 !important; }
+.gs-n { color: #0f172a !important; }
+.gs-l { color: #64748b !important; }
+
+/* Project Headers */
+.pg-head { background: #f8fafc !important; border-bottom: 1px solid #e2e8f0 !important; }
+
+/* Scrollbar */
+::-webkit-scrollbar-thumb { background: #cbd5e1 !important; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8 !important; }
+
+/* Hide Frappe default headers and footers */
+.web-header, footer.web-footer, .web-footer, .navbar, .page-footer {
+    display: none !important;
+}
+body {
+    padding-top: 0 !important;
+    background: #f8fafc !important;
+}
+
+/* Custom Dropdown Profile Menu */
+.profile-dropdown {
+  position: absolute;
+  top: 38px;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  display: none;
+  flex-direction: column;
+  min-width: 170px;
+  z-index: 1000;
+  overflow: hidden;
+}
+.profile-dropdown.show {
+  display: flex;
+}
+.pd-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #334155;
+  text-decoration: none;
+  transition: background 0.15s;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+.pd-item:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+.pd-item i {
+  font-size: 15px;
+  color: #64748b;
+}
+
+/* Layout overrides to force full-width view */
+.layout-main-section-wrapper, .layout-main-section, .page-content, main {
+  padding: 0 !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+</style>
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_classic_layout.css?v=5">
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_classic.css?v=19">
+{% endblock %}
+{% block page_content %}
+{% from "st_attendance_tracker/templates/macros/classic_shell.html" import classic_nav, classic_sidebar, classic_mobnav %}
+{{ classic_nav(employee, 'My History', "STTour.start('my_history_v1', MY_HISTORY_TOUR_STEPS)", '/docs', None) }}
+<div class="cols cols-2">
+{{ classic_sidebar(st_shell, employee, 'history', {'recurring': recurring_count|default(0), 'backlog': backlog_count|default(0)}) }}
+<main class="main">
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-eye">Attendance history</div>
+    <div class="hero-title">{{ employee.employee_name }}</div>
+    <div class="hero-sub">{{ employee.department or 'No department' }} &nbsp;·&nbsp; Past attendance records</div>
+  </div>
+  <div id="history-list">
+    <div id="spinner" style="text-align:center;padding:48px;color:#9ca3af;font-size:13px">
+      <i class="ti ti-loader" style="font-size:22px;animation:spin .7s linear infinite" aria-hidden="true"></i>
+      <br><br>Loading history...
+    </div>
+  </div>
+  <button class="load-more-btn" id="load-more" style="display:none" onclick="loadMore()">Load more records</button>
+</div>
+</main>
+</div>
+{{ classic_mobnav(st_shell, 'history') }}
+<script src="/assets/st_attendance_tracker/js/dashboard_utils.js"></script>
+<script src="/assets/st_attendance_tracker/js/whats_new.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
+<script src="/assets/st_attendance_tracker/js/tour.js"></script>
+<script>
+var PAGE = 0;
+var LOADING = false;
+
+function parseDateParts(d) {
+  var dt = new Date(d + 'T00:00:00');
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  return { day: dt.getDate(), month: months[dt.getMonth()], weekday: days[dt.getDay()] };
+}
+
+function getBadge(log) {
+  if (!log.eod_done || !parseInt(log.eod_done)) return '<span class="day-badge db-no">No Checkout</span>';
+  if (log.is_late && parseInt(log.is_late)) return '<span class="day-badge db-late">Late</span>';
+  var total = parseInt(log.total_tasks) || 0;
+  var done  = parseInt(log.done_tasks)  || 0;
+  if (total > 0 && done >= total) return '<span class="day-badge db-full">All done</span>';
+  if (done > 0) return '<span class="day-badge db-part">Partial</span>';
+  return '<span class="day-badge db-part">Checked in</span>';
+}
+
+function getStag(s) {
+  if (s === 'Done')        return 'st-dn';
+  if (s === 'In Progress') return 'st-ip';
+  return 'st-pe';
+}
+
+function renderLog(log) {
+  var d = parseDateParts(log.date);
+  var total = parseInt(log.total_tasks) || 0;
+  var done  = parseInt(log.done_tasks)  || 0;
+  var pct   = total > 0 ? Math.round(done / total * 100) : 0;
+
+  var metas = [];
+  if (log.login_time)  metas.push('<span class="dm"><i class="ti ti-login" aria-hidden="true"></i>' + formatTimeHM(log.login_time) + '</span>');
+  if (log.logout_time) metas.push('<span class="dm"><i class="ti ti-logout" aria-hidden="true"></i>' + formatTimeHM(log.logout_time) + '</span>');
+  if (log.net_hours)   metas.push('<span class="dm"><i class="ti ti-clock" aria-hidden="true"></i>' + log.net_hours + '</span>');
+
+  return '<div class="day-card" data-date="' + esc(log.date) + '" onclick="toggleDay(this)">' +
+    '<div class="day-head">' +
+      '<div class="day-date-box"><div class="day-d">' + d.day + '</div><div class="day-m">' + d.month + '</div></div>' +
+      '<div class="day-info">' +
+        '<div class="day-title">' + d.weekday + ', ' + d.month + ' ' + d.day + ' &nbsp;' + getBadge(log) + '</div>' +
+        '<div class="day-meta">' + (metas.length ? metas.join('') : '<span class="dm">No time recorded</span>') + '</div>' +
+      '</div>' +
+      '<div class="day-right">' +
+        (total > 0 ? '<span class="dm" style="font-size:11px;font-weight:500">' + done + '/' + total + '</span>' : '') +
+        '<i class="ti ti-chevron-down day-chev" aria-hidden="true"></i>' +
+      '</div>' +
+    '</div>' +
+    (total > 0 ? '<div class="prog-mini"><div class="pm-trk"><div class="pm-fill" style="width:' + pct + '%"></div></div><span class="pm-lbl">' + done + ' / ' + total + ' tasks done</span></div>' : '') +
+    '<div class="day-detail" id="dd-' + esc(log.date) + '"><div style="text-align:center;padding:14px;color:#9ca3af;font-size:12px"><i class="ti ti-loader" style="animation:spin .7s linear infinite" aria-hidden="true"></i></div></div>' +
+  '</div>';
+}
+
+function toggleDay(card) {
+  var wasOpen = card.classList.contains('open');
+  document.querySelectorAll('.day-card.open').forEach(function(c) { c.classList.remove('open'); });
+  if (!wasOpen) {
+    card.classList.add('open');
+    loadDayDetail(card.dataset.date);
+  }
+}
+
+var DAY_DETAIL_CACHE = {};
+var DAY_DETAIL_LOADING = {};
+function loadDayDetail(date) {
+  var container = document.getElementById('dd-' + date);
+  if (!container) return;
+  if (DAY_DETAIL_CACHE[date] !== undefined) {
+    container.innerHTML = DAY_DETAIL_CACHE[date];
+    return;
+  }
+  if (DAY_DETAIL_LOADING[date]) return;
+  DAY_DETAIL_LOADING[date] = true;
+  frappe.call({
+    method: 'st_attendance_tracker.api.get_history_day_detail',
+    args: { date: date },
+    callback: function(r) {
+      DAY_DETAIL_LOADING[date] = false;
+      if (!r.message) { container.innerHTML = '<div style="font-size:12px;color:#9ca3af;padding:8px">Could not load details.</div>'; return; }
+      var data = r.message;
+      var ml = data.morning_log || {};
+      var el = data.eod_log    || {};
+      var tasks = data.tasks   || [];
+
+      var timeHtml =
+        '<div class="time-row">' +
+          '<div class="tc"><div class="tc-l">Login</div><div class="tc-v">' + (ml.login_time ? formatTimeHM(ml.login_time) : '—') + (ml.is_late ? ' <span style="color:#d97706;font-size:10px">Late</span>' : '') + '</div></div>' +
+          '<div class="tc"><div class="tc-l">Logout</div><div class="tc-v">' + (el.logout_time ? formatTimeHM(el.logout_time) : '—') + '</div></div>' +
+          '<div class="tc"><div class="tc-l">Net hours</div><div class="tc-v g">' + (el.net_hours || '—') + '</div></div>' +
+        '</div>';
+
+      var tasksHtml = '';
+      if (!tasks.length) {
+        tasksHtml = '<div class="no-tasks">No tasks recorded for this day.</div>';
+      } else {
+        tasksHtml = tasks.map(function(t) {
+          var pills = '';
+          if (t.estimated_time) pills += '<span class="tp"><i class="ti ti-clock" aria-hidden="true"></i>Est: ' + esc(t.estimated_time) + '</span>';
+          if (t.actual_time)    pills += '<span class="tp"><i class="ti ti-check" aria-hidden="true"></i>Time taken for task completion: ' + esc(t.actual_time) + '</span>';
+          if (t.project_name)   pills += '<span class="tp"><i class="ti ti-folder" aria-hidden="true"></i>' + esc(t.project_name) + '</span>';
+          if (t.is_carried)     pills += '<span class="tp"><i class="ti ti-history" aria-hidden="true"></i>Carried</span>';
+          return '<div class="task-row">' +
+            '<i class="ti ' + getTaskIcon(t.status) + ' task-ico" aria-hidden="true"></i>' +
+            '<div class="task-body">' +
+              '<div class="task-desc' + (t.status === 'Done' ? ' dn' : '') + '">' + esc(t.description) + '</div>' +
+              (pills ? '<div class="task-pills">' + pills + '</div>' : '') +
+            '</div>' +
+            '<span class="stag ' + getStag(t.status) + '">' + esc(t.status) + '</span>' +
+          '</div>';
+        }).join('');
+      }
+
+      container.innerHTML = timeHtml + '<div class="tasks-lbl">Tasks (' + tasks.length + ')</div>' + tasksHtml;
+      DAY_DETAIL_CACHE[date] = container.innerHTML;
+    },
+    error: function() {
+      DAY_DETAIL_LOADING[date] = false;
+      container.innerHTML = '<div style="font-size:12px;color:#b91c1c;padding:8px">Could not load details. <a href="#" class="retry-day">Retry</a></div>';
+      // Listener, not an inline onclick: `date` must never be spliced into JS source.
+      container.querySelector('.retry-day').addEventListener('click', function(e) { e.preventDefault(); loadDayDetail(date); });
+    }
+  });
+}
+
+function loadMore() {
+  PAGE++;
+  loadHistory(false);
+}
+
+function loadHistory(reset) {
+  if (LOADING) return;
+  LOADING = true;
+  if (reset) PAGE = 0;
+
+  frappe.call({
+    method: 'st_attendance_tracker.api.get_my_history',
+    args: { page: PAGE },
+    callback: function(r) {
+      LOADING = false;
+      var list = document.getElementById('history-list');
+      var sp = document.getElementById('spinner');
+      if (sp) sp.style.display = 'none';
+
+      if (!r || !r.message) {
+        if (reset) list.innerHTML = '<div class="empty-state"><i class="ti ti-calendar-off" aria-hidden="true"></i><p>Could not load history. Please refresh.</p></div>';
+        return;
+      }
+
+      var logs = r.message.logs || [];
+
+      if (logs.length === 0 && reset) {
+        list.innerHTML = '<div class="empty-state"><i class="ti ti-calendar-off" aria-hidden="true"></i><p>No attendance history yet.<br>Start by checking in today!</p></div>';
+        return;
+      }
+
+      if (reset) {
+        list.innerHTML = logs.map(renderLog).join('');
+      } else {
+        list.innerHTML += logs.map(renderLog).join('');
+      }
+
+      var btn = document.getElementById('load-more');
+      if (btn) btn.style.display = r.message.has_more ? 'block' : 'none';
+    },
+    error: function() {
+      LOADING = false;
+      var sp = document.getElementById('spinner');
+      if (sp) sp.style.display = 'none';
+      if (reset) {
+        document.getElementById('history-list').innerHTML =
+          '<div class="empty-state"><i class="ti ti-calendar-off" aria-hidden="true"></i><p>Could not load history. <a href="#" onclick="loadHistory(true);return false;">Retry</a></p></div>';
+      } else {
+        PAGE--; // undo the optimistic increment in loadMore() so Retry re-fetches the same page
+        var btn = document.getElementById('load-more');
+        if (btn) { btn.style.display = 'block'; btn.textContent = 'Could not load more — retry'; }
+      }
+    }
+  });
+}
+
+var MY_HISTORY_TOUR_STEPS = [
+  { element: '.hero', popover: { title: 'My History', description: 'A running record of your own attendance.', side: 'bottom' } },
+  { element: '#history-list', popover: { title: 'Past days', description: 'Click any day to expand its login/logout times and the tasks you logged.', side: 'top' } },
+  { element: '#load-more', popover: { title: 'Load more', description: 'Keep loading further back in time.', side: 'top' } }
+];
+
+frappe.ready(function(){
+  loadHistory(true); initWhatsNew();
+  {% if show_tour_my_history %}
+  setTimeout(function(){ STTour.start('my_history_v1', MY_HISTORY_TOUR_STEPS); }, 600);
+  {% endif %}
+});
+
+function toggleProfileDropdown(e) {
+  if (e) e.stopPropagation();
+  var dd = document.getElementById('profile-dropdown');
+  if (dd) {
+    dd.classList.toggle('show');
+  }
+}
+
+document.addEventListener('click', function(e) {
+  var dd = document.getElementById('profile-dropdown');
+  if (dd && dd.classList.contains('show')) {
+    if (!dd.contains(e.target)) {
+      dd.classList.remove('show');
+    }
+  }
+});
+</script>
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_classic.css?v=19">
+<script src="/assets/st_attendance_tracker/js/st_classic.js?v=8" data-new="/my-history"></script>
+{% endblock %}

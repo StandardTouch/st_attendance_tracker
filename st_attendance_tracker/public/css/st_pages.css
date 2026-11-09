@@ -1,0 +1,118 @@
+/* Artifact-style layout for Additional Work, Task Backlog and Recurring Tasks. Loads after each page's own CSS. */
+
+/* ── shared KPI tiles ── */
+.st-app .pg-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; padding: 16px 24px 0; }
+.st-app .pg-kpi { border: 1px solid var(--st-line); border-radius: 12px; padding: 10px 14px; background: var(--st-panel); }
+.st-app .pg-kpi small { display: block; color: var(--st-muted); font-weight: 600; }
+.st-app .pg-kpi b { font: 700 26px/1.2 var(--st-font-head); font-variant-numeric: tabular-nums; }
+
+/* ── Additional Work ── */
+.st-app .aw-table-head, .st-app .aw-hist-full {
+  display: grid; grid-template-columns: 108px 128px 64px 140px minmax(0, 1fr) 104px 36px; gap: 12px; align-items: center;
+}
+.st-app .aw-table-head { padding: 8px 12px; border-bottom: 1px solid var(--st-line); font: 600 11px var(--st-font-body); letter-spacing: .8px; text-transform: uppercase; color: var(--st-muted); }
+.st-app .aw-hist-full {
+  background: var(--st-panel); border: 0; border-bottom: 1px solid var(--st-line); border-radius: 0; box-shadow: none; padding: 10px 12px; margin: 0; transform: none;
+}
+.st-app .aw-hist-full:hover { background: var(--st-panel2); transform: none; box-shadow: none; border-color: var(--st-line); }
+.st-app .aw-hist-full .aw-c-desc { min-width: 0; overflow-wrap: anywhere; font-weight: 600; }
+.st-app .aw-hist-full .aw-c-desc small { display: block; color: var(--st-muted); font-weight: 500; }
+.st-app .aw-hist-full .aw-hf-status { justify-self: start; }
+.st-app .aw-hist-full .aw-hf-del { justify-self: end; cursor: pointer; }
+.st-app .aw-hist-full .aw-c-proj { color: var(--st-muted); overflow-wrap: anywhere; }
+.st-app .aw-hist-full .aw-c-hrs { font-variant-numeric: tabular-nums; font-weight: 600; }
+@media (max-width: 900px) {
+  .st-app .aw-table-head { display: none; }
+  .st-app .aw-hist-full { grid-template-columns: 1fr 1fr; }
+  .st-app .aw-hist-full .aw-c-desc { grid-column: 1 / -1; order: -1; }
+}
+
+/* ── Task Backlog ── */
+.st-app .ph { background: var(--st-panel); border: 0; border-bottom: 1px solid var(--st-line); border-radius: 0; box-shadow: none; padding: 8px 0 16px; }
+.st-app .ph::after { display: none; }
+.st-app .ph-av { background: var(--st-red-soft); color: var(--st-accent-text); border: 0; }
+.st-app .hstrip > * { background: var(--st-panel); border: 1px solid var(--st-line); border-radius: 12px; box-shadow: none; }
+.st-app .app-footer { box-shadow: none; border-top: 1px solid var(--st-line); border-radius: 0; background: var(--st-panel); }
+
+/* ── Recurring Tasks ── */
+.st-app .rt-card { border: 0; border-bottom: 1px solid var(--st-line); border-radius: 0; background: var(--st-panel); padding: 14px 4px; }
+.st-app #rt-list { background: var(--st-panel); }
+.st-app .rt-toggle.active { background: var(--st-ink); color: var(--st-on-ink); border-color: var(--st-ink); }
+.st-app .rt-week { margin-top: 8px; }
+.st-app .rt-week h3 { font-size: 16px; margin: 12px 0 10px; }
+.st-app .rt-week-grid { display: grid; grid-template-columns: repeat(7, minmax(110px, 1fr)); border: 1px solid var(--st-line); border-radius: 12px; overflow-x: auto; background: var(--st-panel); }
+.st-app .rt-week-day { border-left: 1px solid var(--st-line); padding: 8px; display: flex; flex-direction: column; gap: 4px; min-height: 110px; min-width: 0; }
+.st-app .rt-week-day:first-child { border-left: 0; }
+.st-app .rt-week-day.today { background: var(--st-panel2); }
+.st-app .rt-week-day > b { font: 600 11px var(--st-font-body); letter-spacing: .6px; color: var(--st-muted); }
+.st-app .rt-week-day.today > b { color: var(--st-accent-text); }
+.st-app .rt-wchip { background: var(--st-ink); color: var(--st-on-ink); border-radius: 4px; padding: 0 6px; height: 20px; line-height: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.st-app .rt-week-empty { color: var(--st-muted); font-size: 11px; }
+
+/* ── Additional Work: single entry form ── */
+.st-app .pg-modebar { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+.st-app .pg-card { border: 1px solid var(--st-line); border-radius: 12px; padding: 16px; background: var(--st-panel); margin-bottom: 20px; }
+.st-app .pg-card[hidden], .st-app #aw-multi[hidden] { display: none; }
+.st-app .pg-card-h { font-size: 16px; margin: 0 0 12px; }
+.st-app .pg-g4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.st-app .pg-full { grid-column: 1 / -1; }
+.st-app .pg-f { display: flex; flex-direction: column; gap: 4px; font: 600 12px var(--st-font-body); color: var(--st-muted); }
+.st-app .pg-f input, .st-app .pg-f select, .st-app .pg-f textarea {
+  height: 38px; border: 1px solid var(--st-line); border-radius: 8px; background: var(--st-panel); padding: 0 10px; font: 500 13px var(--st-font-body); color: var(--st-ink); min-width: 0; width: 100%;
+}
+.st-app .pg-f input[readonly] { background: var(--st-panel2); }
+.st-app .pg-actions { display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: 12px; }
+.st-app .pg-err { margin: 0 auto 0 0; color: var(--st-accent-text); font-weight: 600; }
+.st-app .pg-btn { height: 36px; padding: 0 18px; border-radius: 18px; border: 1px solid var(--st-line); background: transparent; font: 600 13px var(--st-font-body); color: var(--st-ink); cursor: pointer; }
+.st-app .pg-btn.primary { background: var(--st-red); border-color: var(--st-red); color: #fff; }
+.st-app .pg-btn.primary:hover { background: var(--st-red-dark); }
+.st-app .pg-btn:disabled { opacity: .5; cursor: not-allowed; }
+.st-app #aw-sidebar { display: none; }
+.st-app .cols { grid-template-columns: minmax(0, 1fr) !important; }
+
+/* ── Task Backlog / Recurring: page header and tables ── */
+.st-app .pg-pagehead { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 4px 0 16px; }
+.st-app .pg-pagehead h2 { font-size: 24px; line-height: 1.25; margin: 0; }
+.st-app .pg-pagehead p { margin: 2px 0 0; color: var(--st-muted); max-width: 60ch; }
+.st-app .pg-headbtns { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.st-app .pg-table table { border-collapse: collapse; width: 100%; }
+.st-app .pg-table th { font: 600 11px var(--st-font-body); letter-spacing: .8px; text-transform: uppercase; color: var(--st-muted); text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--st-line); white-space: nowrap; }
+.st-app .pg-table td { padding: 10px; border-bottom: 1px solid var(--st-line); vertical-align: middle; }
+.st-app .pg-table tr:hover td { background: var(--st-panel2); }
+.st-app .pg-table tr[draggable="true"] { cursor: grab; }
+.st-app .pg-sub { display: block; color: var(--st-muted); font-weight: 500; }
+.st-app .pg-actions-cell { white-space: nowrap; text-align: right; }
+.st-app .cols > .rp { display: none; }
+.st-app .cols.bl-cards-mode > .rp { display: block; }
+.st-app .cols.bl-cards-mode { grid-template-columns: minmax(0, 1fr) 320px !important; }
+@media (max-width: 1200px) { .st-app .cols.bl-cards-mode { grid-template-columns: minmax(0, 1fr) !important; } }
+
+/* Recurring table */
+.st-app .pg-days { display: flex; gap: 4px; }
+.st-app .pg-days button { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--st-line); background: transparent; font: 600 11px var(--st-font-body); color: var(--st-ink); cursor: pointer; }
+.st-app .pg-days button[aria-pressed="true"] { background: var(--st-ink); color: var(--st-on-ink); border-color: var(--st-ink); }
+.st-app .pg-sw { appearance: none; -webkit-appearance: none; background-image: none !important; width: 36px !important; height: 20px !important; min-width: 36px; box-shadow: none; border-radius: 10px; background: var(--st-stone); position: relative; margin: 0; cursor: pointer; border: 0; }
+.st-app .pg-sw::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: left .15s; }
+.st-app .pg-sw:checked { background: var(--st-red); }
+.st-app .pg-sw:checked::after { left: 18px; }
+.st-app #rt-table-view[hidden], .st-app #rt-cards[hidden], .st-app #bl-table-view[hidden], .st-app #bl-cards[hidden] { display: none; }
+.st-app .wrap { max-width: none; }
+.st-app .pg-actions-cell .cal-ibtn { display: inline-grid; vertical-align: middle; }
+.st-app .pg-actions-cell .cal-btn { vertical-align: middle; margin-right: 4px; }
+
+/* Additional Work: day context under the form */
+.st-app .pg-ctx { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+.st-app .pg-ctx-row { display: flex; gap: 8px; align-items: flex-start; font-size: 12px; font-weight: 500; color: var(--st-muted); }
+.st-app .pg-ctx-row i { font-size: 16px; flex: none; }
+.st-app .pg-ctx-row.warn { color: var(--st-ink); background: var(--st-panel2); border: 1px solid var(--st-line); border-radius: 8px; padding: 8px 10px; }
+.st-app .pg-ctx-row.ok { color: var(--st-ink); }
+.st-app .pg-ctx-row.err { color: var(--st-accent-text); font-weight: 600; }
+
+@media (max-width: 900px) { .st-app .pg-table table, .st-app .mg-table table { min-width: 720px; } }
+.st-app .pg-table td:first-child { min-width: 220px; }
+
+/* Several-tasks form on Additional Work: legacy inline white card and bare inputs break in dark theme */
+.st-app #aw-multi .wl-wrap { background: var(--st-panel) !important; border-color: var(--st-line) !important; box-shadow: none !important; }
+.st-app #aw-multi .wl-sel { background: var(--st-canvas); color: var(--st-ink); border: 1px solid var(--st-line); border-radius: 8px; color-scheme: light dark; }
+.st-app #aw-multi .ns-head, .st-app #aw-multi .ns-desc, .st-app #aw-multi .ns-ei, .st-app #aw-multi select { color: var(--st-ink); background: var(--st-canvas); border-color: var(--st-line); }
+.st-app #aw-multi .wl-note { background: var(--st-panel2, var(--st-hover)); color: var(--st-muted); border-radius: 8px; }

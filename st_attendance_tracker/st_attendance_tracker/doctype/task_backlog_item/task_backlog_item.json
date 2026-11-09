@@ -11,6 +11,8 @@
   "col_break_1",
   "project_name",
   "estimated_time",
+  "scheduled_for",
+  "start_time",
   "section_break_assign",
   "remarks",
   "assigned_by",
@@ -54,6 +56,18 @@
    "fieldtype": "Data",
    "label": "Estimated Time",
    "description": "e.g. 1h 30m, 45m, 30 (bare number = hours)"
+  },
+  {
+   "fieldname": "scheduled_for",
+   "fieldtype": "Date",
+   "label": "Scheduled For",
+   "description": "Empty = no day chosen yet. On this day the task is added to the check-in plan."
+  },
+  {
+   "fieldname": "start_time",
+   "fieldtype": "Time",
+   "label": "Scheduled Start",
+   "description": "Optional time of day for the calendar"
   },
   {
    "fieldname": "section_break_assign",

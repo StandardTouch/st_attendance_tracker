@@ -13,7 +13,8 @@ from datetime import timedelta
 
 import frappe
 from frappe.utils import today, getdate, now_datetime
-from st_attendance_tracker.api import _to_hhmm, _get_employees_on_leave, _get_hr_manager_emails
+from st_attendance_tracker.api import _to_ampm, _to_hhmm, _get_employees_on_leave, _get_hr_manager_emails
+from st_attendance_tracker.time_utils import get_checkout_cutoff
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -302,7 +303,7 @@ def send_eod_missing_report():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# EMPLOYEE CHECKOUT REMINDER — 10:30 PM
+# EMPLOYEE CHECKOUT REMINDER — 9:00 PM
 # ─────────────────────────────────────────────────────────────────────────────
 
 def send_employee_checkout_reminder():
@@ -314,6 +315,8 @@ def send_employee_checkout_reminder():
     if _skip_if_not_due((21, 0)) or _already_sent_today("last_checkout_reminder_date", date):
         return
     day_label = getdate(date).strftime("%A, %d %B %Y")
+    cutoff_minutes = get_checkout_cutoff()
+    cutoff_label = _to_ampm("%02d:%02d:00" % divmod(cutoff_minutes, 60))
 
     expected = _get_expected_employees(date)
     if not expected:
@@ -367,7 +370,7 @@ def send_employee_checkout_reminder():
               You checked in today — <strong>{day_label}</strong> — but haven't checked out yet.
             </p>
             <p style="font-size:13px;color:#444;line-height:1.6;margin:0 0 16px">
-              Please check out before 10:00 PM, or your attendance for today may be marked as absent.
+              Please check out before {cutoff_label}. After that, checkout is locked and you will need late checkout approval from HR.
             </p>
             <p style="font-size:13px;color:#444;line-height:1.6;margin:0 0 20px">
               If you are continuing to work beyond your regular hours, please check out now and log the remaining work under Additional Work.

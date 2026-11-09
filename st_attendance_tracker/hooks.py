@@ -27,19 +27,20 @@ doc_events = {
     "ST Attendance Settings": {
         "on_update": "st_attendance_tracker.api.clear_attendance_settings_cache",
     },
+    "Employee Checkin": {
+        "after_insert": "st_attendance_tracker.api.notify_external_checkin",
+    },
 }
 
-# ── Per-document permission checks ──────────────────────────────────────────────
-# Daily Work Log's DocPerm row grants Employee/agent access at the role level;
-# this narrows it to "your own record" per document, keyed on the `employee`
-# link field rather than the framework's `if_owner` (creation-time `owner`) —
-# a record created on an employee's behalf (e.g. by the task-assignment agent)
-# would otherwise lock the real employee out of their own record. Read paths
-# used by dashboards go through frappe.get_all, which bypasses this hook by
-# design, so this only ever gates direct document load/save/delete.
+
 has_permission = {
-    "Daily Work Log": "st_attendance_tracker.api.has_permission_daily_work_log",
+    "Daily Work Log": "st_attendance_tracker.permissions.has_permission_daily_work_log",
 }
+
+permission_query_conditions = {
+    "Daily Work Log": "st_attendance_tracker.permissions.daily_work_log_query_conditions",
+}
+
 
 # ── Scheduled Jobs ─────────────────────────────────────────────────────────────
 scheduler_events = {
@@ -58,11 +59,19 @@ scheduler_events = {
 
 # ── Web routes ─────────────────────────────────────────────────────────────────
 website_route_rules = [
-    {"from_route": "/daily-checkin",        "to_route": "daily_checkin"},
+    {"from_route": "/daily-checkin",        "to_route": "checkin_calendar"},
+    {"from_route": "/daily-checkin-classic", "to_route": "daily_checkin"},
     {"from_route": "/team-dashboard",       "to_route": "team_dashboard"},
     {"from_route": "/management-dashboard", "to_route": "management_dashboard"},
     {"from_route": "/my-history",           "to_route": "my_history"},
     {"from_route": "/recurring-tasks",      "to_route": "recurring_tasks"},
     {"from_route": "/additional-work",      "to_route": "additional_work"},
     {"from_route": "/task-backlog",         "to_route": "task_backlog"},
+    # Original layouts, branded; every page has a classic and a new design.
+    {"from_route": "/my-history-classic",           "to_route": "my_history_classic"},
+    {"from_route": "/recurring-tasks-classic",      "to_route": "recurring_tasks_classic"},
+    {"from_route": "/additional-work-classic",      "to_route": "additional_work_classic"},
+    {"from_route": "/task-backlog-classic",         "to_route": "task_backlog_classic"},
+    {"from_route": "/team-dashboard-classic",       "to_route": "team_dashboard_classic"},
+    {"from_route": "/management-dashboard-classic", "to_route": "management_dashboard_classic"},
 ]

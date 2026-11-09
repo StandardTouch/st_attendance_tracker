@@ -28,6 +28,14 @@
   "col_break_status",
   "locked_at",
   "was_reset_today",
+  "section_break_unlock",
+  "checkout_unlocked",
+  "unlock_requested_at",
+  "unlock_request_reason",
+  "col_break_unlock",
+  "unlocked_by",
+  "unlocked_at",
+  "unlock_reason",
   "section_break_tasks",
   "tasks"
  ],
@@ -172,6 +180,55 @@
    "label": "Was Reset Today",
    "read_only": 1,
    "description": "Set when the employee resets a same-day check-in — replaces checking for a cancelled (docstatus=2) Morning Check-In log under the old submit/cancel model."
+  },
+  {
+   "fieldname": "section_break_unlock",
+   "fieldtype": "Section Break",
+   "label": "Late Checkout Approval"
+  },
+  {
+   "fieldname": "checkout_unlocked",
+   "fieldtype": "Check",
+   "label": "Checkout Unlocked",
+   "default": "0",
+   "read_only": 1,
+   "description": "Set by HR Manager to allow checkout after the cutoff time for this date."
+  },
+  {
+   "fieldname": "unlock_requested_at",
+   "fieldtype": "Datetime",
+   "label": "Unlock Requested At",
+   "read_only": 1
+  },
+  {
+   "fieldname": "unlock_request_reason",
+   "fieldtype": "Small Text",
+   "label": "Unlock Request Reason",
+   "read_only": 1
+  },
+  {
+   "fieldname": "col_break_unlock",
+   "fieldtype": "Column Break",
+   "label": ""
+  },
+  {
+   "fieldname": "unlocked_by",
+   "fieldtype": "Link",
+   "label": "Unlocked By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "unlocked_at",
+   "fieldtype": "Datetime",
+   "label": "Unlocked At",
+   "read_only": 1
+  },
+  {
+   "fieldname": "unlock_reason",
+   "fieldtype": "Small Text",
+   "label": "Unlock Reason",
+   "read_only": 1
   },
   {
    "fieldname": "section_break_tasks",

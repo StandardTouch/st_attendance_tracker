@@ -1,0 +1,71 @@
+{#- Shared chrome for the classic (original layout) pages: top bar, left navigation, phone bottom bar.
+    Every classic page renders these so navigation looks and behaves the same everywhere.
+    ctx is the page's st_shell context (used only for role-based links). -#}
+
+{% macro classic_nav(employee, crumb, tour_js=None, docs_url=None, date=None) %}
+<nav class="tnav">
+  <div class="tnav-con">
+    <button type="button" class="tnav-burger" id="cl-burger" aria-label="Open menu" aria-expanded="false" aria-controls="cl-drawer"><i class="ti ti-menu-2" aria-hidden="true"></i></button>
+    <a href="/daily-checkin-classic" class="tnav-logo" style="text-decoration:none"><b>Standard</b><i>Touch</i></a>
+    <span class="tnav-sep"></span>
+    <span class="tnav-bc">{{ crumb }}</span>
+    <div class="tnav-r">
+      {% if date %}<span class="tnav-date">{{ date }}</span>{% endif %}
+      {% if docs_url %}<a href="{{ docs_url }}" target="_blank" rel="noopener" class="tnav-btn"><i class="ti ti-book-2" aria-hidden="true"></i>Docs</a>{% endif %}
+      {% if tour_js %}<button type="button" class="tnav-btn" onclick="{{ tour_js }}"><i class="ti ti-map-2" aria-hidden="true"></i>Tour</button>{% endif %}
+      <div class="wn-bell-wrap" id="wn-mount"></div>
+      <div class="tnav-av" onclick="toggleProfileDropdown(event)" style="cursor:pointer;" title="Account Options">{{ (employee.employee_name or 'U')[:2].upper() }}</div>
+      <div class="profile-dropdown" id="profile-dropdown">
+        {% if employee.name %}<a href="/app/employee/{{ employee.name }}" class="pd-item"><i class="ti ti-user" aria-hidden="true"></i>My Profile</a>{% endif %}
+        <a href="/app" class="pd-item"><i class="ti ti-layout-dashboard" aria-hidden="true"></i>Switch to Desk</a>
+        <a href="/?cmd=web_logout" class="pd-item"><i class="ti ti-logout" aria-hidden="true"></i>Logout</a>
+      </div>
+    </div>
+  </div>
+</nav>
+<div id="wn-banner-mount"></div>
+{% endmacro %}
+
+{% macro _links(ctx) %}{# (key, label, route, icon, mobile label, audience) #}
+  {% set keys = (ctx.nav or []) | map(attribute='key') | list %}
+  {% set rows = [
+    ('today', 'Today', '/daily-checkin-classic', 'ti-check', 'Today', ''),
+    ('history', 'My history', '/my-history-classic', 'ti-history', 'History', ''),
+    ('recurring', 'Recurring', '/recurring-tasks-classic', 'ti-repeat', 'Recurring', ''),
+    ('backlog', 'Task Backlog', '/task-backlog-classic', 'ti-list-details', 'Backlog', ''),
+    ('additional', 'Additional work', '/additional-work-classic', 'ti-briefcase', 'Additional Work', ''),
+    ('team', 'My team', '/team-dashboard-classic', 'ti-users', 'Team', 'team'),
+    ('management', 'Management Dashboard', '/management-dashboard-classic', 'ti-building', 'Management', 'management'),
+  ] %}
+  {{ caller(rows | selectattr(5, 'in', ['', 'team' if 'team' in keys else '', 'management' if 'management' in keys else '']) | list) }}
+{% endmacro %}
+
+{% macro classic_sidebar(ctx, employee, active, counts=None, badge_cls=None, badge_text=None) %}
+{% call(rows) _links(ctx) %}
+<aside class="sidebar" id="cl-drawer" aria-label="Pages">
+  <button type="button" class="cl-close" id="cl-close" aria-label="Close menu"><i class="ti ti-x" aria-hidden="true"></i></button>
+  <div class="sb-top">
+    <div class="sb-card" style="align-items: flex-start;">
+      <div class="sb-av" style="margin-top: 2px;">{{ (employee.employee_name or 'U')[:2].upper() }}</div>
+      <div style="flex: 1; min-width: 0;">
+        <div class="sb-name" style="word-break: break-word; font-size: 13px; font-weight: 700; color: var(--text-main); line-height: 1.35;">{{ employee.employee_name }}</div>
+        <div class="sb-dept" style="word-break: break-word; font-size: 11px; color: var(--text-muted); margin-top: 2px;{% if badge_text %} margin-bottom: 8px;{% endif %}">{{ employee.department or 'No department' }}</div>
+        {% if badge_text %}<span class="sb-badge {{ badge_cls }}" style="margin-left: 0; display: inline-block;">{{ badge_text }}</span>{% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="sb-sec">
+    <div class="sb-lbl">Navigation</div>
+    {% for key, label, href, icon, _m, _a in rows %}
+    <a href="{{ href }}" class="sb-link{% if key == active %} on{% endif %}"{% if key == active %} aria-current="page"{% endif %}><i class="ti {{ icon }}" aria-hidden="true"></i>{{ label }}{% if counts and counts.get(key) %}<span class="sb-cnt">{{ counts.get(key) }}</span>{% endif %}</a>
+    {% endfor %}
+  </div>
+</aside>
+{% endcall %}
+{% endmacro %}
+
+{#- Phones use the left navigation as a slide-in menu opened from the top-bar hamburger (no bottom bar). -#}
+{% macro classic_mobnav(ctx, active) %}
+<div class="cl-scrim" id="cl-scrim"></div>
+<script src="/assets/st_attendance_tracker/js/st_classic_menu.js?v=1"></script>
+{% endmacro %}

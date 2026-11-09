@@ -1,0 +1,814 @@
+{% extends "templates/web.html" %}
+{% block title %}Recurring Tasks · {{ employee.employee_name }}{% endblock %}
+{% block head_include %}
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css">
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/whats_new.css">
+<style>
+:root {
+  --primary: #6366f1;
+  --primary-hover: #4f46e5;
+  --primary-light: #e0e7ff;
+  --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  --success: #10b981;
+  --success-bg: #ecfdf5;
+  --success-border: #a7f3d0;
+  --success-text: #047857;
+  --warning: #f59e0b;
+  --warning-bg: #fffbeb;
+  --warning-border: #fde68a;
+  --warning-text: #b45309;
+  --info: #3b82f6;
+  --info-bg: #eff6ff;
+  --info-border: #bfdbfe;
+  --info-text: #1d4ed8;
+  --danger: #ef4444;
+  --danger-bg: #fef2f2;
+  --danger-border: #fecaca;
+  --danger-text: #b91c1c;
+  --dark: #0f172a;
+  --dark-light: #1e293b;
+
+  --bg-canvas: #f8fafc;
+  --bg-card: #ffffff;
+  --border: #e2e8f0;
+  --border-focus: #cbd5e1;
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --text-light: #94a3b8;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--bg-canvas);
+  color: var(--text-main);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.tnav {
+  height: 70px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.02);
+}
+
+.tnav-con {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 24px;
+  gap: 16px;
+  height: 100%;
+}
+
+.tnav-logo {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.5px;
+}
+
+.tnav-sep {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+}
+
+.tnav-bc {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.tnav-r {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+
+.tnav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  text-decoration: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
+}
+
+.tnav-btn:hover {
+  background: hsl(210, 40%, 98%);
+  border-color: var(--border-focus);
+  color: var(--text-main);
+  transform: translateY(-1px);
+}
+
+.tnav-btn i {
+  font-size: 16px;
+}
+
+.tnav-av {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--primary-gradient);
+  color: #ffffff;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.2);
+}
+
+.wrap {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.hero {
+  background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
+  color: #ffffff;
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(225, 29, 72, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.hero-eye {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 6px;
+}
+
+.hero-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  margin-bottom: 4px;
+}
+
+.hero-sub {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.hero-left { position: relative; z-index: 2; }
+
+.add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 700;
+  background: #ffffff;
+  color: var(--dark);
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s;
+  position: relative;
+  z-index: 2;
+}
+
+.add-btn:hover { transform: translateY(-1px); }
+
+.rt-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.rt-ico {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  color: var(--primary-hover);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 18px;
+}
+
+.rt-body { flex: 1; min-width: 0; }
+
+.rt-desc {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 6px;
+  word-break: break-word;
+}
+
+.rt-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+
+.rt-pill {
+  font-size: 10px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  padding: 3px 9px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+}
+
+.rt-pill i { font-size: 11px; color: var(--text-light); }
+
+.rt-days { display: flex; gap: 4px; flex-wrap: wrap; }
+
+.rt-day {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 7px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: #f1f5f9;
+  color: var(--text-light);
+  border: 1px solid var(--border);
+}
+
+.rt-day.on {
+  background: var(--info-bg);
+  color: var(--info-text);
+  border: 1px solid var(--info-border);
+}
+
+.rt-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.rt-toggle {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.rt-toggle.active { background: var(--success-bg); color: var(--success-text); border-color: var(--success-border); }
+.rt-toggle.inactive { background: hsl(210, 40%, 94%); color: var(--text-muted); border-color: var(--border); }
+
+.rt-actions { display: flex; gap: 6px; }
+
+.rt-act-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: #ffffff;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.rt-act-btn:hover { background: #f8fafc; color: var(--text-main); border-color: var(--border-focus); }
+.rt-act-btn.danger:hover { background: var(--danger-bg); color: var(--danger-text); border-color: var(--danger-border); }
+
+.empty-state {
+  text-align: center;
+  padding: 60px 40px;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 2px dashed var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.empty-state i {
+  font-size: 40px;
+  color: var(--text-light);
+  display: block;
+  margin-bottom: 16px;
+}
+
+.empty-state p { font-size: 14px; color: var(--text-muted); }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── MODAL ── */
+.rt-ov {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(8px);
+  z-index: 9000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.rt-ov.show { display: flex; }
+
+.rt-mo {
+  background: var(--bg-card);
+  border-radius: var(--radius-xl);
+  padding: 32px;
+  max-width: 460px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-xl);
+  border: 1px solid var(--border);
+  animation: modalScale 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalScale {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.rt-mt {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 20px;
+}
+
+.rt-field { margin-bottom: 16px; }
+
+.rt-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.rt-field input[type="text"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--text-main);
+}
+
+.rt-field input[type="text"]:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+}
+
+.rt-daygrid { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.rt-day-chk {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+}
+
+.rt-day-chk input { margin: 0; }
+
+.rt-day-chk.checked {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  color: var(--primary-hover);
+}
+
+.rt-active-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.rt-active-row label { font-size: 13px; font-weight: 600; color: var(--text-main); }
+
+.rt-modal-actions { display: flex; gap: 10px; }
+
+.rt-mb {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.rt-mb.pr { background: var(--primary); color: #ffffff; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2); }
+.rt-mb.pr:hover { background: var(--primary-hover); }
+.rt-mb.sc { background: hsl(210, 40%, 94%); color: var(--text-muted); }
+.rt-mb.sc:hover { background: hsl(210, 40%, 90%); }
+
+.rt-err { font-size: 12px; color: var(--danger-text); margin-bottom: 12px; display: none; }
+
+footer.web-footer, .web-footer, footer[class*="footer"], .footer, .subscribe-section,
+form.row.mt-2, .mt-2.row:has(input[placeholder="Your email address..."]) {
+  display: none !important;
+}
+
+/* Premium Modern SaaS Overrides (With Light Colors) */
+body { background: #f8fafc !important; color: #0f172a !important; font-family: 'Inter', system-ui, sans-serif !important; }
+.tnav { background: rgba(255, 255, 255, 0.95) !important; border: 1px solid #e2e8f0 !important; border-bottom: 1px solid #e2e8f0 !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02) !important; }
+.tnav-logo { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; }
+.tnav-av { background: #e0e7ff !important; color: #4338ca !important; border: 1px solid #c7d2fe !important; }
+.btn, .tnav-btn { background: #ffffff !important; color: #475569 !important; border: 1px solid #cbd5e1 !important; border-radius: 6px !important; box-shadow: 0 1px 2px rgba(0,0,0,0.02) !important; transition: all 0.2s ease !important; }
+.btn:hover, .tnav-btn:hover { background: #f8fafc !important; color: #0f172a !important; border-color: #94a3b8 !important; }
+::-webkit-scrollbar-thumb { background: #cbd5e1 !important; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8 !important; }
+.web-header, footer.web-footer, .web-footer, .navbar, .page-footer { display: none !important; }
+body { padding-top: 0 !important; }
+.layout-main-section-wrapper, .layout-main-section, .page-content, main { padding: 0 !important; max-width: 100% !important; margin: 0 !important; }
+
+.profile-dropdown {
+  position: absolute;
+  top: 38px;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  display: none;
+  flex-direction: column;
+  min-width: 170px;
+  z-index: 1000;
+  overflow: hidden;
+}
+.profile-dropdown.show { display: flex; }
+.pd-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #334155;
+  text-decoration: none;
+  transition: background 0.15s;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+.pd-item:hover { background: #f1f5f9; color: #0f172a; }
+.pd-item i { font-size: 15px; color: #64748b; }
+</style>
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_classic_layout.css?v=5">
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_classic.css?v=19">
+{% endblock %}
+{% block page_content %}
+{% from "st_attendance_tracker/templates/macros/classic_shell.html" import classic_nav, classic_sidebar, classic_mobnav %}
+{{ classic_nav(employee, 'Recurring Tasks', "STTour.start('recurring_tasks_v1', RECURRING_TASKS_TOUR_STEPS)", '/docs', None) }}
+<div class="cols cols-2">
+{{ classic_sidebar(st_shell, employee, 'recurring', {'recurring': recurring_count|default(0), 'backlog': backlog_count|default(0)}) }}
+<main class="main">
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-left">
+      <div class="hero-eye">Automation</div>
+      <div class="hero-title">Recurring Tasks</div>
+      <div class="hero-sub">Pick which days a task should regenerate on — leave every day unchecked for it to repeat daily.</div>
+    </div>
+    <button class="add-btn" onclick="openModal()"><i class="ti ti-plus" aria-hidden="true"></i>Add recurring task</button>
+  </div>
+  <div id="rt-list">
+    <div id="rt-spinner" style="text-align:center;padding:48px;color:#9ca3af;font-size:13px">
+      <i class="ti ti-loader" style="font-size:22px;animation:spin .7s linear infinite" aria-hidden="true"></i>
+      <br><br>Loading recurring tasks...
+    </div>
+  </div>
+</div>
+
+<div class="rt-ov" id="rt-ov">
+  <div class="rt-mo">
+    <div class="rt-mt" id="rt-modal-title">Add recurring task</div>
+    <div class="rt-err" id="rt-err"></div>
+    <div class="rt-field">
+      <label>Task description *</label>
+      <input type="text" id="rt-desc" placeholder="e.g. Daily Scrum Standup">
+    </div>
+    <div class="rt-field">
+      <label>Project name <span style="font-weight:400;color:var(--text-light)">(optional)</span></label>
+      <input type="text" id="rt-proj" placeholder="e.g. Website Revamp">
+    </div>
+    <div class="rt-field">
+      <label>Estimated time <span style="font-weight:400;color:var(--text-light)">(optional)</span></label>
+      <input type="text" id="rt-est" placeholder="e.g. 1h 30m, 45m">
+    </div>
+    <div class="rt-field">
+      <label>Repeats on</label>
+      <div class="rt-daygrid" id="rt-daygrid">
+        <label class="rt-day-chk" data-day="Monday"><input type="checkbox" value="Monday">Mon</label>
+        <label class="rt-day-chk" data-day="Tuesday"><input type="checkbox" value="Tuesday">Tue</label>
+        <label class="rt-day-chk" data-day="Wednesday"><input type="checkbox" value="Wednesday">Wed</label>
+        <label class="rt-day-chk" data-day="Thursday"><input type="checkbox" value="Thursday">Thu</label>
+        <label class="rt-day-chk" data-day="Friday"><input type="checkbox" value="Friday">Fri</label>
+        <label class="rt-day-chk" data-day="Saturday"><input type="checkbox" value="Saturday">Sat</label>
+      </div>
+    </div>
+    <div class="rt-active-row">
+      <input type="checkbox" id="rt-active" checked>
+      <label for="rt-active">Active</label>
+    </div>
+    <div class="rt-modal-actions">
+      <button class="rt-mb sc" onclick="closeModal()">Cancel</button>
+      <button class="rt-mb pr" id="rt-save-btn" onclick="saveTask()">Save</button>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+{{ classic_mobnav(st_shell, 'recurring') }}
+<script src="/assets/st_attendance_tracker/js/dashboard_utils.js"></script>
+<script src="/assets/st_attendance_tracker/js/whats_new.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
+<script src="/assets/st_attendance_tracker/js/tour.js"></script>
+<script>
+var ROWS = {};
+var EDIT_NAME = null;
+
+function dayAbbr(d){ return {Monday:'Mon',Tuesday:'Tue',Wednesday:'Wed',Thursday:'Thu',Friday:'Fri',Saturday:'Sat'}[d] || d; }
+
+function renderCard(row){
+  var pills = '';
+  if (row.project_name) pills += '<span class="rt-pill"><i class="ti ti-folder" aria-hidden="true"></i>' + esc(row.project_name) + '</span>';
+  if (row.estimated_time) pills += '<span class="rt-pill"><i class="ti ti-clock" aria-hidden="true"></i>' + esc(row.estimated_time) + '</span>';
+
+  var allDays = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var days = row.days || [];
+  var dayHtml = days.length
+    ? allDays.map(function(d){ return '<span class="rt-day' + (days.indexOf(d)!==-1?' on':'') + '">' + dayAbbr(d) + '</span>'; }).join('')
+    : '<span class="rt-day on" style="text-transform:none">Every day</span>';
+
+  var isActive = row.is_active && parseInt(row.is_active);
+  return '<div class="rt-card" data-name="' + esc(row.name) + '">' +
+    '<div class="rt-ico"><i class="ti ti-repeat" aria-hidden="true"></i></div>' +
+    '<div class="rt-body">' +
+      '<div class="rt-desc">' + esc(row.description) + '</div>' +
+      (pills ? '<div class="rt-pills">' + pills + '</div>' : '') +
+      '<div class="rt-days">' + dayHtml + '</div>' +
+    '</div>' +
+    '<div class="rt-right">' +
+      '<span class="rt-toggle ' + (isActive?'active':'inactive') + '" onclick="toggleActive(\'' + esc(row.name) + '\')">' + (isActive?'Active':'Inactive') + '</span>' +
+      '<div class="rt-actions">' +
+        '<button class="rt-act-btn" title="Edit" onclick="openModal(ROWS[\'' + esc(row.name) + '\'])"><i class="ti ti-pencil" aria-hidden="true"></i></button>' +
+        '<button class="rt-act-btn danger" title="Delete" onclick="deleteTask(\'' + esc(row.name) + '\')"><i class="ti ti-trash" aria-hidden="true"></i></button>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function loadRecurringTasks(){
+  var list = document.getElementById('rt-list');
+  frappe.call({
+    method: 'st_attendance_tracker.api.get_recurring_tasks',
+    callback: function(r){
+      var rows = (r && r.message) || [];
+      ROWS = {};
+      rows.forEach(function(row){ ROWS[row.name] = row; });
+      if (!rows.length){
+        list.innerHTML = '<div class="empty-state"><i class="ti ti-repeat-off" aria-hidden="true"></i><p>No recurring tasks yet.<br>Add one to have it auto-populate into your daily check-in.</p></div>';
+        return;
+      }
+      list.innerHTML = rows.map(renderCard).join('');
+    },
+    error: function(){
+      list.innerHTML = '<div class="empty-state"><i class="ti ti-alert-triangle" aria-hidden="true"></i><p>Could not load recurring tasks. <a href="#" onclick="loadRecurringTasks();return false;">Retry</a></p></div>';
+    }
+  });
+}
+
+function openModal(row){
+  EDIT_NAME = row ? row.name : null;
+  document.getElementById('rt-modal-title').textContent = row ? 'Edit recurring task' : 'Add recurring task';
+  document.getElementById('rt-err').style.display = 'none';
+  document.getElementById('rt-desc').value = row ? row.description : '';
+  document.getElementById('rt-proj').value = row ? (row.project_name || '') : '';
+  document.getElementById('rt-est').value = row ? (row.estimated_time || '') : '';
+  document.getElementById('rt-active').checked = row ? !!parseInt(row.is_active) : true;
+  var days = row ? (row.days || []) : [];
+  document.querySelectorAll('#rt-daygrid .rt-day-chk').forEach(function(lbl){
+    var chk = lbl.querySelector('input');
+    chk.checked = days.indexOf(lbl.dataset.day) !== -1;
+    lbl.classList.toggle('checked', chk.checked);
+  });
+  document.getElementById('rt-ov').classList.add('show');
+}
+
+function closeModal(){
+  document.getElementById('rt-ov').classList.remove('show');
+}
+
+document.querySelectorAll('#rt-daygrid .rt-day-chk').forEach(function(lbl){
+  lbl.addEventListener('click', function(){
+    setTimeout(function(){ lbl.classList.toggle('checked', lbl.querySelector('input').checked); }, 0);
+  });
+});
+
+document.getElementById('rt-ov').addEventListener('click', function(e){
+  if (e.target === document.getElementById('rt-ov')) closeModal();
+});
+
+function saveTask(){
+  var desc = document.getElementById('rt-desc').value.trim();
+  var errEl = document.getElementById('rt-err');
+  if (!desc){
+    errEl.textContent = 'Task description is required.';
+    errEl.style.display = 'block';
+    return;
+  }
+  var days = [];
+  document.querySelectorAll('#rt-daygrid .rt-day-chk input:checked').forEach(function(chk){ days.push(chk.value); });
+
+  var btn = document.getElementById('rt-save-btn');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  frappe.call({
+    method: 'st_attendance_tracker.api.save_recurring_task',
+    args: {
+      name: EDIT_NAME,
+      description: desc,
+      project_name: document.getElementById('rt-proj').value.trim(),
+      estimated_time: document.getElementById('rt-est').value.trim(),
+      recurring_days: JSON.stringify(days),
+      is_active: document.getElementById('rt-active').checked ? 1 : 0,
+    },
+    callback: function(r){
+      btn.disabled = false;
+      btn.textContent = 'Save';
+      if (r.message && r.message.success){
+        closeModal();
+        loadRecurringTasks();
+      }
+    },
+    error: function(r){
+      btn.disabled = false;
+      btn.textContent = 'Save';
+      errEl.textContent = (r && r.message) || 'Could not save. Please try again.';
+      errEl.style.display = 'block';
+    }
+  });
+}
+
+function toggleActive(name){
+  var row = ROWS[name];
+  if (!row) return;
+  frappe.call({
+    method: 'st_attendance_tracker.api.save_recurring_task',
+    args: {
+      name: row.name,
+      description: row.description,
+      project_name: row.project_name || '',
+      estimated_time: row.estimated_time || '',
+      recurring_days: JSON.stringify(row.days || []),
+      is_active: (row.is_active && parseInt(row.is_active)) ? 0 : 1,
+    },
+    callback: function(r){ if (r.message && r.message.success) loadRecurringTasks(); },
+    error: function(){ /* silent — card just won't update, employee can retry */ }
+  });
+}
+
+function deleteTask(name){
+  if (!confirm('Delete this recurring task? This only removes the template — any already-generated tasks in your check-in stay as they are.')) return;
+  frappe.call({
+    method: 'st_attendance_tracker.api.delete_recurring_task',
+    args: { name: name },
+    callback: function(r){ if (r.message && r.message.success) loadRecurringTasks(); },
+    error: function(){ alert('Could not delete this recurring task. Please try again.'); }
+  });
+}
+
+var RECURRING_TASKS_TOUR_STEPS = [
+  { element: '.hero', popover: { title: 'Recurring Tasks', description: 'Templates that auto-regenerate on your Daily Check-In every workday, so you never re-type the same task.', side: 'bottom' } },
+  { element: '.add-btn', popover: { title: 'Add one', description: 'Create a template and pick which days it should regenerate on — leave every day unchecked to repeat daily.', side: 'bottom' } },
+  { element: '#rt-list', popover: { title: 'Your templates', description: 'Edit, deactivate, or delete a template here — deactivating stops it from generating new tasks without deleting its history.', side: 'top' } }
+];
+
+frappe.ready(function(){
+  loadRecurringTasks(); initWhatsNew();
+  {% if show_tour_recurring_tasks %}
+  setTimeout(function(){ STTour.start('recurring_tasks_v1', RECURRING_TASKS_TOUR_STEPS); }, 600);
+  {% endif %}
+});
+
+function toggleProfileDropdown(e) {
+  if (e) e.stopPropagation();
+  var dd = document.getElementById('profile-dropdown');
+  if (dd) { dd.classList.toggle('show'); }
+}
+
+document.addEventListener('click', function(e) {
+  var dd = document.getElementById('profile-dropdown');
+  if (dd && dd.classList.contains('show')) {
+    if (!dd.contains(e.target)) { dd.classList.remove('show'); }
+  }
+});
+</script>
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_classic.css?v=19">
+<script src="/assets/st_attendance_tracker/js/st_classic.js?v=8" data-new="/recurring-tasks"></script>
+{% endblock %}

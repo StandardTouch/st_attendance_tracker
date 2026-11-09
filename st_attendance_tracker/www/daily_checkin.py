@@ -1,10 +1,13 @@
 import frappe
+
+from st_attendance_tracker.ui_shell import get_shell_context, redirect_for_design
 from frappe.utils import today, now_datetime, getdate, get_datetime
 from st_attendance_tracker.api import (
     _to_hhmm, _to_ampm, _format_hours, _is_half_day_leave_today, _is_team_leader,
-    _attach_task_files, _resolve_active_checkin_date, _get_work_log, _task_entry_dict,
-    _get_attendance_settings,
+    _attach_task_files, _resolve_active_checkin_date, _get_work_log, _task_entry_dict, _get_morning_draft,
+    _get_attendance_settings, _get_previous_working_date, _get_unclosed_previous_day,
 )
+from st_attendance_tracker.time_utils import get_checkout_cutoff, is_checkout_locked
 
 
 def get_context(context):
@@ -16,6 +19,8 @@ def get_context(context):
     if frappe.session.user == "Guest":
         frappe.local.flags.redirect_location = "/login?redirect-to=/daily-checkin"
         raise frappe.Redirect
+
+    redirect_for_design()
 
     # Management role has no Employee record and never checks in/out —
     # redirect straight to the management dashboard. HR Manager DOES check
@@ -52,13 +57,23 @@ def get_context(context):
     # carry forward any missed Pending/In-Progress tasks to today's date.
     today_log = _get_work_log(employee.name, actual_today)
     if not (today_log and today_log.morning_submitted):
-        from st_attendance_tracker.api import _safety_rollover, _ensure_recurring_tasks
+        from st_attendance_tracker.api import _safety_rollover, _ensure_recurring_tasks, _pull_scheduled_backlog
         _safety_rollover(employee.name, actual_today)
         _ensure_recurring_tasks(employee.name, actual_today)
+        _pull_scheduled_backlog(employee.name, actual_today)
 
     work_log = _get_work_log(employee.name, date)
     morning_log = bool(work_log and work_log.morning_submitted)
     eod_log = bool(work_log and work_log.eod_submitted)
+
+    # Pre-fill the (pre-checkout) lunch checkbox/time inputs from whatever
+    # was last saved on this Daily Work Log — via autosave_eod_progress()
+    # mid-day, or from a prior EOD submission on a reopened late-checkout
+    # day. Computed unconditionally (not gated on eod_submitted) so a
+    # refresh redisplays the real DB value instead of always resetting to
+    # the unchecked/14:00-15:00 defaults.
+    lunch_from_input = _to_hhmm(work_log.lunch_from) if work_log and work_log.lunch_from else ""
+    lunch_to_input = _to_hhmm(work_log.lunch_to) if work_log and work_log.lunch_to else ""
 
     login_time_val  = ""
     net_hours_val   = ""
@@ -183,6 +198,21 @@ def get_context(context):
 
     has_reset_today = bool(work_log and work_log.was_reset_today)
 
+    # Checkout window: today's log after the cutoff, or an older open log
+    # the resolver skipped (shown as a banner so the employee can ask HR).
+    checkout_locked = bool(
+        morning_log and not eod_log and is_checkout_locked(date, work_log.checkout_unlocked)
+    )
+    missed_checkout = frappe.db.get_value("Daily Work Log", {
+        "employee": employee.name,
+        "morning_submitted": 1,
+        "eod_submitted": 0,
+        "checkout_unlocked": 0,
+        "date": _get_previous_working_date(employee.name, actual_today),
+    }, ["date", "unlock_requested_at"], as_dict=True)
+    cutoff_minutes = get_checkout_cutoff()
+
+    context.checkin_blocked = bool(missed_checkout and _get_unclosed_previous_day(employee.name, actual_today))
     context.no_cache = 1
     context.employee = employee
     context.date = date
@@ -203,10 +233,16 @@ def get_context(context):
     context.recurring_tasks = recurring_tasks
     context.carried_count = sum(1 for t in tasks if t.get("is_carried"))
     context.login_time = login_time_val
+    # Unsent check-in plan saved from another device (or an earlier visit); only the classic page's own kind.
+    draft = None if morning_log else _get_morning_draft()
+    context.morning_draft = draft if draft and draft.get("kind") == "classic" else None
     context.logout_time = logout_time_val
     context.net_hours = net_hours_val
     context.lunch_from = lunch_from_val
     context.lunch_to   = lunch_to_val
+    context.lunch_from_input = lunch_from_input
+    context.lunch_to_input = lunch_to_input
+    context.include_lunch = bool(lunch_from_input)
     context.work_location = work_location_val
     context.is_team_leader = is_team_leader
     context.is_hr_manager = is_hr_manager
@@ -220,7 +256,13 @@ def get_context(context):
     context.has_reset_today = has_reset_today
     context.working_hours = working_hours_val
     context.title = "Daily Check-In"
+    context.st_shell = get_shell_context("checkin", employee)
     context.is_late_checkout = is_late_checkout
+    context.checkout_locked = checkout_locked
+    context.checkout_unlock_requested = bool(checkout_locked and work_log.unlock_requested_at)
+    context.checkout_cutoff_label = _to_ampm("%02d:%02d:00" % divmod(cutoff_minutes, 60))
+    context.missed_checkout = missed_checkout
+    context.missed_checkout_label = getdate(missed_checkout.date).strftime("%A, %d %B %Y") if missed_checkout else ""
     context.checkout_date_label = date_obj.strftime("%A, %d %B %Y")
 
     tours_seen = frappe.db.get_value("ST Tour Seen", frappe.session.user, "tours_seen") or ""

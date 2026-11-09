@@ -1,0 +1,19 @@
+dialog.st-dsg { position: fixed; inset: 0; margin: auto; height: fit-content; max-height: calc(100vh - 32px); overflow: auto; width: min(520px, calc(100vw - 32px)); padding: 24px; border: 0; border-radius: 16px; background: var(--st-panel, #fff); color: var(--st-ink, #111112); box-shadow: 0 14px 44px rgba(0, 0, 0, .3); font-family: var(--st-font-body, 'Montserrat', system-ui, sans-serif); }
+dialog.st-dsg::backdrop { background: rgba(0, 0, 0, .5); }
+.st-dsg h3 { margin: 0 0 6px; font: 600 18px var(--st-font-head, 'Poppins', sans-serif); }
+.st-dsg p { margin: 0 0 16px; color: var(--st-muted, #5E5F63); font-size: 13px; }
+.st-dsg-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 8px; }
+.st-dsg-opt { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 16px; text-align: left; border: 2px solid var(--st-line, #E3E3E5); border-radius: 12px; background: var(--st-panel2, #F8F8F9); color: inherit; font: inherit; cursor: pointer; }
+.st-dsg-opt i { font-size: 24px; color: var(--st-muted, #5E5F63); }
+.st-dsg-opt b { font: 600 14px var(--st-font-head, 'Poppins', sans-serif); }
+.st-dsg-opt span { font-size: 12px; color: var(--st-muted, #5E5F63); line-height: 1.4; }
+.st-dsg-opt[aria-checked="true"] { border-color: #ED1D24; background: var(--st-red-soft, #FDE8E9); }
+.st-dsg-opt[aria-checked="true"] i { color: #ED1D24; }
+.st-dsg-opt:focus-visible { outline: 2px solid #ED1D24; outline-offset: 2px; }
+.st-dsg .st-dsg-err { color: #C4151B; font-weight: 600; margin: 0; min-height: 0; }
+.st-dsg .st-dsg-err:empty { display: none; }
+.st-dsg-act { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+.st-dsg-btn { height: 38px; padding: 0 20px; border: 1px solid var(--st-line, #E3E3E5); border-radius: 999px; background: var(--st-panel, #fff); color: inherit; font: 600 13px var(--st-font-body, 'Montserrat', sans-serif); cursor: pointer; }
+.st-dsg-btn.pri { background: #ED1D24; border-color: #ED1D24; color: #fff; }
+.st-dsg-btn:disabled { opacity: .5; cursor: default; }
+@media (max-width: 480px) { .st-dsg-opts { grid-template-columns: 1fr; } }

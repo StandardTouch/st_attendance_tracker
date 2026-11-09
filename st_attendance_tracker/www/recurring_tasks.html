@@ -8,12 +8,13 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css">
 <link rel="stylesheet" href="/assets/st_attendance_tracker/css/whats_new.css">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --primary: #6366f1;
-  --primary-hover: #4f46e5;
-  --primary-light: #e0e7ff;
-  --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  --primary: #ED1D24;
+  --primary-hover: #C4151B;
+  --primary-light: #FDE8E9;
+  --primary-gradient: linear-gradient(135deg, #ED1D24 0%, #ED1D24 100%);
   --success: #10b981;
   --success-bg: #ecfdf5;
   --success-border: #a7f3d0;
@@ -446,7 +447,7 @@ body {
 .rt-field input[type="text"]:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+  box-shadow: 0 0 0 2px rgba(237, 29, 36, 0.15);
 }
 
 .rt-daygrid { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -513,12 +514,6 @@ form.row.mt-2, .mt-2.row:has(input[placeholder="Your email address..."]) {
 }
 
 /* Premium Modern SaaS Overrides (With Light Colors) */
-body { background: #f8fafc !important; color: #0f172a !important; font-family: 'Inter', system-ui, sans-serif !important; }
-.tnav { background: rgba(255, 255, 255, 0.95) !important; border: 1px solid #e2e8f0 !important; border-bottom: 1px solid #e2e8f0 !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02) !important; }
-.tnav-logo { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; }
-.tnav-av { background: #e0e7ff !important; color: #4338ca !important; border: 1px solid #c7d2fe !important; }
-.btn, .tnav-btn { background: #ffffff !important; color: #475569 !important; border: 1px solid #cbd5e1 !important; border-radius: 6px !important; box-shadow: 0 1px 2px rgba(0,0,0,0.02) !important; transition: all 0.2s ease !important; }
-.btn:hover, .tnav-btn:hover { background: #f8fafc !important; color: #0f172a !important; border-color: #94a3b8 !important; }
 ::-webkit-scrollbar-thumb { background: #cbd5e1 !important; }
 ::-webkit-scrollbar-thumb:hover { background: #94a3b8 !important; }
 .web-header, footer.web-footer, .web-footer, .navbar, .page-footer { display: none !important; }
@@ -556,45 +551,34 @@ body { padding-top: 0 !important; }
 .pd-item:hover { background: #f1f5f9; color: #0f172a; }
 .pd-item i { font-size: 15px; color: #64748b; }
 </style>
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_brand.css?v=22">
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_calendar.css?v=19">
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_pages.css?v=8">
 {% endblock %}
 {% block page_content %}
-<nav class="tnav">
-  <div class="tnav-con">
-    <a href="/daily-checkin" class="tnav-logo" style="text-decoration:none;cursor:pointer">ST Tracker</a>
-    <span class="tnav-sep"></span>
-    <span class="tnav-bc">Recurring Tasks</span>
-    <div class="tnav-r">
-      <a href="/daily-checkin" class="tnav-btn"><i class="ti ti-check" aria-hidden="true"></i>My check-in</a>
-      <a href="/task-backlog" class="tnav-btn"><i class="ti ti-list-details" aria-hidden="true"></i>Backlog</a>
-      <a href="/my-history" class="tnav-btn"><i class="ti ti-history" aria-hidden="true"></i>History</a>
-      <button type="button" class="tnav-btn" onclick="STTour.start('recurring_tasks_v1', RECURRING_TASKS_TOUR_STEPS)"><i class="ti ti-map-2" aria-hidden="true"></i>Tour</button>
-      <div class="wn-bell-wrap" id="wn-mount"></div>
-      <div class="tnav-av" onclick="toggleProfileDropdown(event)" style="cursor:pointer;" title="Account Options">{{ employee.employee_name[:2].upper() }}</div>
-      <div class="profile-dropdown" id="profile-dropdown">
-        <a href="/app/employee/{{ employee.name }}" class="pd-item"><i class="ti ti-user" aria-hidden="true"></i>My Profile</a>
-        <a href="/app" class="pd-item"><i class="ti ti-layout-dashboard" aria-hidden="true"></i>Switch to Desk</a>
-        <a href="/?cmd=web_logout" class="pd-item"><i class="ti ti-logout" aria-hidden="true"></i>Logout</a>
-      </div>
-    </div>
-  </div>
-</nav>
-<div id="wn-banner-mount"></div>
+{% from "st_attendance_tracker/templates/macros/st_shell.html" import shell %}
+{% call shell(st_shell, "Recurring Tasks", "STTour.start('recurring_tasks_v1', RECURRING_TASKS_TOUR_STEPS)") %}
 <div class="wrap">
-  <div class="hero">
-    <div class="hero-left">
-      <div class="hero-eye">Automation</div>
-      <div class="hero-title">Recurring Tasks</div>
-      <div class="hero-sub">Pick which days a task should regenerate on — leave every day unchecked for it to repeat daily.</div>
+  <div class="pg-pagehead">
+    <div><h2>Recurring tasks</h2><p>Templates create tasks on the days you pick. Leave every day unselected to repeat daily.</p></div>
+    <div class="pg-headbtns">
+      <div class="st-seg" role="group" aria-label="Recurring view"><button type="button" data-rt-view="table" aria-pressed="true">Table</button><button type="button" data-rt-view="cards" aria-pressed="false">Cards</button></div>
+      <button type="button" class="cal-btn primary" id="rt-new" onclick="openModal()">New template</button>
     </div>
-    <button class="add-btn" onclick="openModal()"><i class="ti ti-plus" aria-hidden="true"></i>Add recurring task</button>
   </div>
+  <div class="pg-table" id="rt-table-view"><div class="cal-xs"><table><thead><tr><th>Template</th><th>Repeats on</th><th>Estimate</th><th>Active</th><th></th></tr></thead><tbody id="rt-rows"><tr><td colspan="5"><div class="cal-empty">Loading templates…</div></td></tr></tbody></table></div></div>
+  <div id="rt-cards" hidden>
   <div id="rt-list">
     <div id="rt-spinner" style="text-align:center;padding:48px;color:#9ca3af;font-size:13px">
       <i class="ti ti-loader" style="font-size:22px;animation:spin .7s linear infinite" aria-hidden="true"></i>
       <br><br>Loading recurring tasks...
     </div>
   </div>
+  </div>
+  <div class="rt-week" id="rt-week"></div>
 </div>
+
+{% endcall %}
 
 <div class="rt-ov" id="rt-ov">
   <div class="rt-mo">
@@ -634,6 +618,7 @@ body { padding-top: 0 !important; }
   </div>
 </div>
 
+<script src="/assets/st_attendance_tracker/js/st_shell.js?v=11"></script>
 <script src="/assets/st_attendance_tracker/js/dashboard_utils.js"></script>
 <script src="/assets/st_attendance_tracker/js/whats_new.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
@@ -673,6 +658,95 @@ function renderCard(row){
   '</div>';
 }
 
+var TABLE_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+function renderRecurringTable(rows){
+  var body = document.getElementById('rt-rows');
+  if (!body) return;
+  if (!rows.length){
+    body.innerHTML = '<tr><td colspan="5"><div class="cal-empty">No recurring tasks yet. Create a template to have it fill your daily check-in.</div></td></tr>';
+    return;
+  }
+  body.innerHTML = rows.map(function(r){
+    var days = r.days || [];
+    var btns = TABLE_DAYS.map(function(d){
+      return '<button type="button" data-day="' + d + '" aria-pressed="' + (days.indexOf(d) !== -1) + '" aria-label="' + d + '">' + d.charAt(0) + '</button>';
+    }).join('');
+    return '<tr data-name="' + esc(r.name) + '"><td><b style="overflow-wrap:anywhere">' + esc(r.description) + '</b>' + (r.project_name ? '<small class="pg-sub">' + esc(r.project_name) + '</small>' : '') + '</td>' +
+      '<td><div class="pg-days" role="group" aria-label="Repeats on">' + btns + '</div>' + (days.length ? '' : '<small class="pg-sub">Every day</small>') + '</td>' +
+      '<td>' + (r.estimated_time ? esc(r.estimated_time) : '—') + '</td>' +
+      '<td><input type="checkbox" class="pg-sw" data-act="active" aria-label="Active"' + (parseInt(r.is_active) ? ' checked' : '') + '></td>' +
+      '<td class="pg-actions-cell"><button type="button" class="cal-ibtn" data-act="edit" title="Edit" aria-label="Edit template"><i class="ti ti-pencil" aria-hidden="true"></i></button>' +
+      '<button type="button" class="cal-ibtn" data-act="del" title="Delete" aria-label="Delete template"><i class="ti ti-trash" aria-hidden="true"></i></button></td></tr>';
+  }).join('');
+}
+
+function saveTemplateDays(name, days){
+  var row = ROWS[name];
+  if (!row) return;
+  var before = row.days;
+  row.days = days;
+  renderRecurringTable(Object.keys(ROWS).map(function(k){ return ROWS[k]; }));
+  frappe.call({
+    method: 'st_attendance_tracker.api.save_recurring_task',
+    args: { name: name, description: row.description, project_name: row.project_name || '', estimated_time: row.estimated_time || '',
+            recurring_days: JSON.stringify(days), is_active: parseInt(row.is_active) ? 1 : 0 },
+    callback: function(){ loadRecurringTasks(); },
+    error: function(){ row.days = before; loadRecurringTasks(); }
+  });
+}
+
+document.addEventListener('click', function(e){
+  var tr = e.target.closest('#rt-rows tr[data-name]');
+  if (!tr) return;
+  var name = tr.dataset.name, row = ROWS[name];
+  var dayBtn = e.target.closest('[data-day]');
+  if (dayBtn && row){
+    var d = dayBtn.dataset.day, days = (row.days || []).slice(), i = days.indexOf(d);
+    if (i === -1) days.push(d); else days.splice(i, 1);
+    saveTemplateDays(name, TABLE_DAYS.filter(function(x){ return days.indexOf(x) !== -1; }));
+    return;
+  }
+  var act = e.target.closest('[data-act]');
+  if (!act || !row) return;
+  if (act.dataset.act === 'edit') openModal(row);
+  else if (act.dataset.act === 'del') deleteTask(name);
+});
+document.addEventListener('change', function(e){
+  var sw = e.target.closest('#rt-rows [data-act="active"]');
+  if (sw) toggleActive(sw.closest('tr').dataset.name);
+});
+document.querySelectorAll('[data-rt-view]').forEach(function(b){
+  b.addEventListener('click', function(){
+    var cards = b.dataset.rtView === 'cards';
+    document.getElementById('rt-table-view').hidden = cards;
+    document.getElementById('rt-cards').hidden = !cards;
+    document.querySelectorAll('[data-rt-view]').forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+  });
+});
+// The table needs sideways scrolling on a phone; start on the card view there.
+if (window.matchMedia('(max-width: 700px)').matches) {
+  var rtCards = document.querySelector('[data-rt-view="cards"]'); if (rtCards) rtCards.click();
+}
+
+var WEEK_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+// "This week" strip: where each active template lands. An empty day list means every day.
+function renderWeekPreview(rows){
+  var box = document.getElementById('rt-week');
+  if (!box) return;
+  var now = new Date(), start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay());
+  var cols = WEEK_NAMES.map(function(name, i){
+    var d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+    var chips = rows.filter(function(r){
+      return parseInt(r.is_active) && (!(r.days || []).length || r.days.indexOf(name) !== -1);
+    }).map(function(r){ return '<span class="rt-wchip" title="' + esc(r.description) + '">' + esc(r.description) + '</span>'; }).join('');
+    var isToday = d.toDateString() === now.toDateString();
+    return '<div class="rt-week-day' + (isToday ? ' today' : '') + '"><b>' + name.slice(0, 3).toUpperCase() + ' ' + d.getDate() + '</b>' + (chips || '<span class="rt-week-empty">Nothing</span>') + '</div>';
+  }).join('');
+  box.innerHTML = '<h3>This week</h3><div class="rt-week-grid">' + cols + '</div>';
+}
+
 function loadRecurringTasks(){
   var list = document.getElementById('rt-list');
   frappe.call({
@@ -682,10 +756,13 @@ function loadRecurringTasks(){
       ROWS = {};
       rows.forEach(function(row){ ROWS[row.name] = row; });
       if (!rows.length){
+        renderRecurringTable([]); renderWeekPreview([]);
         list.innerHTML = '<div class="empty-state"><i class="ti ti-repeat-off" aria-hidden="true"></i><p>No recurring tasks yet.<br>Add one to have it auto-populate into your daily check-in.</p></div>';
         return;
       }
       list.innerHTML = rows.map(renderCard).join('');
+      renderWeekPreview(rows);
+      renderRecurringTable(rows);
     },
     error: function(){
       list.innerHTML = '<div class="empty-state"><i class="ti ti-alert-triangle" aria-hidden="true"></i><p>Could not load recurring tasks. <a href="#" onclick="loadRecurringTasks();return false;">Retry</a></p></div>';
@@ -795,29 +872,17 @@ function deleteTask(name){
 }
 
 var RECURRING_TASKS_TOUR_STEPS = [
-  { element: '.hero', popover: { title: 'Recurring Tasks', description: 'Templates that auto-regenerate on your Daily Check-In every workday, so you never re-type the same task.', side: 'bottom' } },
-  { element: '.add-btn', popover: { title: 'Add one', description: 'Create a template and pick which days it should regenerate on — leave every day unchecked to repeat daily.', side: 'bottom' } },
-  { element: '#rt-list', popover: { title: 'Your templates', description: 'Edit, deactivate, or delete a template here — deactivating stops it from generating new tasks without deleting its history.', side: 'top' } }
+  { element: '.pg-pagehead h2', popover: { title: 'Recurring Tasks', description: 'Templates that fill your Daily Check-In on the days you pick, so you never retype the same task.', side: 'bottom' } },
+  { element: '#rt-new', popover: { title: 'New template', description: 'Create a template and pick which days it should repeat on. Leave every day unselected for a daily task.', side: 'bottom' } },
+  { element: '#rt-rows', popover: { title: 'Your templates', description: 'Tap a day to change when it repeats. Switch a template off to stop it without deleting it.', side: 'top' } }
 ];
 
 frappe.ready(function(){
   loadRecurringTasks(); initWhatsNew();
+  if (window.location.hash === '#new') openModal();
   {% if show_tour_recurring_tasks %}
   setTimeout(function(){ STTour.start('recurring_tasks_v1', RECURRING_TASKS_TOUR_STEPS); }, 600);
   {% endif %}
-});
-
-function toggleProfileDropdown(e) {
-  if (e) e.stopPropagation();
-  var dd = document.getElementById('profile-dropdown');
-  if (dd) { dd.classList.toggle('show'); }
-}
-
-document.addEventListener('click', function(e) {
-  var dd = document.getElementById('profile-dropdown');
-  if (dd && dd.classList.contains('show')) {
-    if (!dd.contains(e.target)) { dd.classList.remove('show'); }
-  }
 });
 </script>
 {% endblock %}

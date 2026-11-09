@@ -8,12 +8,13 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css">
 <link rel="stylesheet" href="/assets/st_attendance_tracker/css/whats_new.css">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --primary: #6366f1;
-  --primary-hover: #4f46e5;
-  --primary-light: #e0e7ff;
-  --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  --primary: #ED1D24;
+  --primary-hover: #C4151B;
+  --primary-light: #FDE8E9;
+  --primary-gradient: linear-gradient(135deg, #ED1D24 0%, #ED1D24 100%);
   --success: #10b981;
   --success-bg: #ecfdf5;
   --success-border: #a7f3d0;
@@ -408,7 +409,7 @@ body {
 .av-b { background: var(--info-bg); color: var(--info-text); border: 1px solid var(--info-border); }
 .av-a { background: var(--warning-bg); color: var(--warning-text); border: 1px solid var(--warning-border); }
 .av-r { background: var(--danger-bg); color: var(--danger-text); border: 1px solid var(--danger-border); }
-.av-p { background: #faf5ff; color: #7c3aed; border: 1px solid #e9d5ff; }
+.av-p { background: #faf5ff; color: #C4151B; border: 1px solid #e9d5ff; }
 
 .mc-info {
   flex: 1;
@@ -880,7 +881,7 @@ body {
 
 .tnav { border-bottom: 1px solid #e2e8f0 !important; }
 .tnav-logo {
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+    background: linear-gradient(135deg, #C4151B 0%, #C4151B 100%) !important;
     -webkit-background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
 }
@@ -889,22 +890,22 @@ body {
 .ph, .hero {
     background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%),
                 repeating-linear-gradient(45deg, rgba(79, 70, 229, 0.02) 0, rgba(79, 70, 229, 0.02) 1px, transparent 1px, transparent 10px) !important;
-    border: 1px solid #e0e7ff !important;
-    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.05) !important;
+    border: 1px solid #FDE8E9 !important;
+    box-shadow: 0 4px 15px rgba(237, 29, 36, 0.05) !important;
 }
-.ph-title, .hero-title { color: #1e1b4b !important; }
-.ph-sub, .hero-sub { color: #4338ca !important; }
-.hero-eye { color: #4f46e5 !important; }
-.ph-time { color: #312e81 !important; }
-.ph-date { color: #4f46e5 !important; }
+.ph-title, .hero-title { color: #111112 !important; }
+.ph-sub, .hero-sub { color: #B5121A !important; }
+.hero-eye { color: #C4151B !important; }
+.ph-time { color: #111112 !important; }
+.ph-date { color: #C4151B !important; }
 
 /* Avatars */
-.ph-av { background: #e0e7ff !important; color: #4338ca !important; border: 1px solid #c7d2fe !important; }
-.sb-av, .tnav-av { background: #e0e7ff !important; color: #4338ca !important; border: 1px solid #c7d2fe !important; }
+.ph-av { background: #FDE8E9 !important; color: #B5121A !important; border: 1px solid #F5B8BB !important; }
+.sb-av, .tnav-av { background: #FDE8E9 !important; color: #B5121A !important; border: 1px solid #F5B8BB !important; }
 
 /* Primary Buttons (Indigo) */
 .btn.red, .fbtn.red {
-    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%) !important;
+    background: linear-gradient(135deg, #C4151B 0%, #ED1D24 100%) !important;
     color: #ffffff !important;
     border: none !important;
     box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25) !important;
@@ -939,8 +940,8 @@ body {
     border-radius: 6px !important;
 }
 .tinp:focus, .tsel:focus, .date-inp:focus, .wl-sel:focus {
-    border-color: #6366f1 !important;
-    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2) !important;
+    border-color: #ED1D24 !important;
+    box-shadow: 0 0 0 2px rgba(237, 29, 36, 0.2) !important;
     outline: none !important;
 }
 
@@ -959,14 +960,14 @@ body {
 .hv { color: #0f172a !important; }
 .sb-name, .dept-name, .dp-name { color: #0f172a !important; }
 .sb-link { color: #475569 !important; }
-.sb-link.on { background: #e0e7ff !important; color: #4338ca !important; border-radius: 6px !important;}
+.sb-link.on { background: #FDE8E9 !important; color: #B5121A !important; border-radius: 6px !important;}
 
 /* Subtle Checkboxes */
 .tck {
     border: 1px solid #cbd5e1 !important;
     border-radius: 4px !important;
 }
-.tck:hover { border-color: #6366f1 !important; background: #e0e7ff !important; }
+.tck:hover { border-color: #ED1D24 !important; background: #FDE8E9 !important; }
 .tck.dn {
     background: #10b981 !important;
     border-color: #10b981 !important;
@@ -999,31 +1000,53 @@ body {
   max-width: 100% !important;
   margin: 0 !important;
 }
+/* ── Phones and tablets: single column, wrapping stats, detail panel below the list (was hidden or squeezed) ── */
+@media (max-width: 900px) {
+  .mgrid, .grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .mgrid > *, .grid > * { min-width: 0; }
+  .gstats, .stat-strip { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) !important; }
+  .rp { display: block !important; position: static !important; width: auto !important; max-height: none !important; }
+  .dp { position: static !important; }
+  .hero-top { flex-wrap: wrap; gap: 12px; }
+  .hero-controls { flex-wrap: wrap; width: 100%; }
+}
+@media (max-width: 600px) {
+  .gstats, .stat-strip { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .emp-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .dp-stats, .tg, .sg { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .assign-row { grid-template-columns: 1fr !important; }
+  .fc { flex: 0 0 auto; }
+}
 </style>
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_brand.css?v=22">
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_calendar.css?v=19">
 {% endblock %}
 {% block page_content %}
-<nav class="tnav">
-  <div class="tnav-con">
-    <a href="/daily-checkin" class="tnav-logo" style="text-decoration:none;cursor:pointer">ST Tracker</a>
-    <span class="tnav-sep"></span>
-    <span class="tnav-bc">Team Dashboard</span>
-    <div class="tnav-r">
-      <a href="/daily-checkin" class="tnav-btn"><i class="ti ti-check" aria-hidden="true"></i>My check-in</a>
-      <a href="/team-leader-guide" target="_blank" class="tnav-btn"><i class="ti ti-book-2" aria-hidden="true"></i>Docs</a>
-      <a href="/my-history" class="tnav-btn"><i class="ti ti-history" aria-hidden="true"></i>History</a>
-      <a href="/recurring-tasks" class="tnav-btn"><i class="ti ti-repeat" aria-hidden="true"></i>Recurring</a>
-      <button type="button" class="tnav-btn" onclick="STTour.start('team_dashboard_v1', TEAM_DASHBOARD_TOUR_STEPS)"><i class="ti ti-map-2" aria-hidden="true"></i>Tour</button>
-      <div class="wn-bell-wrap" id="wn-mount"></div>
-      <div class="tnav-av" onclick="toggleProfileDropdown(event)" style="cursor:pointer;" title="Account Options">{{ employee.employee_name[:2].upper() }}</div>
-      <div class="profile-dropdown" id="profile-dropdown">
-        <a href="/app/employee/{{ employee.name }}" class="pd-item"><i class="ti ti-user" aria-hidden="true"></i>My Profile</a>
-        <a href="/app" class="pd-item"><i class="ti ti-layout-dashboard" aria-hidden="true"></i>Switch to Desk</a>
-        <a href="/?cmd=web_logout" class="pd-item"><i class="ti ti-logout" aria-hidden="true"></i>Logout</a>
-      </div>
-    </div>
+{% from "st_attendance_tracker/templates/macros/st_shell.html" import shell %}
+<script>window.ST_TEAM = {"today": {{ date | tojson }}}; window.ST_SHELL_DATE = window.ST_TEAM.today;</script>
+{% call shell(st_shell, "Team Dashboard", "STTour.start('team_dashboard_v1', TEAM_DASHBOARD_TOUR_STEPS)", "/team-leader-guide", None, True, False) %}
+<div class="tm-bar">
+  <div class="st-seg" role="group" aria-label="Team view">
+    <button type="button" data-team-view="week" aria-pressed="true">Week</button>
+    <button type="button" data-team-view="list" aria-pressed="false">List</button>
   </div>
-</nav>
-<div id="wn-banner-mount"></div>
+</div>
+<div id="tm-week">
+  <div class="tm-bar" style="padding-top:12px">
+    <div class="tm-tools">
+      <input id="tm-q" type="search" placeholder="Search team" aria-label="Search team">
+      <select id="tm-filter" aria-label="Filter by today's status">
+        <option value="all">All statuses</option><option value="checked_in">Checked in</option><option value="late">Late</option>
+        <option value="eod_done">Checked out</option><option value="missing">Missing</option><option value="leave">On leave</option>
+      </select>
+    </div>
+    <span class="cal-hint" style="margin:0">Click a name or a day to open the record. Filters use today's status.</span>
+  </div>
+  <div class="tm-kpis" id="tm-kpis"></div>
+  <div class="tm-scroll"><div class="tm-matrix" id="tm-matrix"></div></div>
+</div>
+<dialog id="tm-pick" class="cal-dlg"></dialog>
+<div id="tm-list-view" hidden>
 <div class="wrap">
   <div class="hero">
     <div class="hero-top">
@@ -1073,6 +1096,8 @@ body {
     </div>
   </div>
 </div>
+</div>
+{% endcall %}
 <div class="assign-ov" id="assign-ov" style="display:none">
   <div class="assign-modal">
     <div class="assign-head">
@@ -1178,14 +1203,14 @@ body {
 
 /* Stat strip and date selector adjustments for light theme hero banner */
 .hero .stat-strip {
-    background: rgba(99, 102, 241, 0.04) !important;
-    border: 1px solid #c7d2fe !important;
+    background: rgba(237, 29, 36, 0.04) !important;
+    border: 1px solid #F5B8BB !important;
 }
 .hero .stat-cell {
-    border-right: 1px solid #c7d2fe !important;
+    border-right: 1px solid #F5B8BB !important;
 }
 .hero .stat-n {
-    color: #1e1b4b !important;
+    color: #111112 !important;
 }
 .hero .stat-n.g { color: #047857 !important; }
 .hero .stat-n.r { color: #b91c1c !important; }
@@ -1193,18 +1218,18 @@ body {
 .hero .stat-n.b { color: #1d4ed8 !important; }
 
 .hero .stat-l {
-    color: #4f46e5 !important;
+    color: #C4151B !important;
     opacity: 0.8 !important;
 }
 
 .hero .date-lbl {
-    color: #4f46e5 !important;
+    color: #C4151B !important;
     opacity: 0.8 !important;
 }
 .hero .date-inp {
     background: #ffffff !important;
-    border: 1px solid #c7d2fe !important;
-    color: #1e1b4b !important;
+    border: 1px solid #F5B8BB !important;
+    color: #111112 !important;
 }
 
 /* Base reset with subtle glass feel */
@@ -1216,7 +1241,7 @@ body {
 
 .tnav { border-bottom: 1px solid #e2e8f0 !important; }
 .tnav-logo {
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+    background: linear-gradient(135deg, #C4151B 0%, #C4151B 100%) !important;
     -webkit-background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
 }
@@ -1225,22 +1250,22 @@ body {
 .ph, .hero {
     background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%),
                 repeating-linear-gradient(45deg, rgba(79, 70, 229, 0.02) 0, rgba(79, 70, 229, 0.02) 1px, transparent 1px, transparent 10px) !important;
-    border: 1px solid #e0e7ff !important;
-    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.05) !important;
+    border: 1px solid #FDE8E9 !important;
+    box-shadow: 0 4px 15px rgba(237, 29, 36, 0.05) !important;
 }
-.ph-title, .hero-title { color: #1e1b4b !important; }
-.ph-sub, .hero-sub { color: #4338ca !important; }
-.hero-eye { color: #4f46e5 !important; }
-.ph-time { color: #312e81 !important; }
-.ph-date { color: #4f46e5 !important; }
+.ph-title, .hero-title { color: #111112 !important; }
+.ph-sub, .hero-sub { color: #B5121A !important; }
+.hero-eye { color: #C4151B !important; }
+.ph-time { color: #111112 !important; }
+.ph-date { color: #C4151B !important; }
 
 /* Avatars */
-.ph-av { background: #e0e7ff !important; color: #4338ca !important; border: 1px solid #c7d2fe !important; }
-.sb-av, .tnav-av { background: #e0e7ff !important; color: #4338ca !important; border: 1px solid #c7d2fe !important; }
+.ph-av { background: #FDE8E9 !important; color: #B5121A !important; border: 1px solid #F5B8BB !important; }
+.sb-av, .tnav-av { background: #FDE8E9 !important; color: #B5121A !important; border: 1px solid #F5B8BB !important; }
 
 /* Primary Buttons (Indigo) */
 .btn.red, .fbtn.red {
-    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%) !important;
+    background: linear-gradient(135deg, #C4151B 0%, #ED1D24 100%) !important;
     color: #ffffff !important;
     border: none !important;
     box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25) !important;
@@ -1275,8 +1300,8 @@ body {
     border-radius: 6px !important;
 }
 .tinp:focus, .tsel:focus, .date-inp:focus, .wl-sel:focus {
-    border-color: #6366f1 !important;
-    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2) !important;
+    border-color: #ED1D24 !important;
+    box-shadow: 0 0 0 2px rgba(237, 29, 36, 0.2) !important;
     outline: none !important;
 }
 
@@ -1295,14 +1320,14 @@ body {
 .hv { color: #0f172a !important; }
 .sb-name, .dept-name, .dp-name { color: #0f172a !important; }
 .sb-link { color: #475569 !important; }
-.sb-link.on { background: #e0e7ff !important; color: #4338ca !important; border-radius: 6px !important;}
+.sb-link.on { background: #FDE8E9 !important; color: #B5121A !important; border-radius: 6px !important;}
 
 /* Subtle Checkboxes */
 .tck {
     border: 1px solid #cbd5e1 !important;
     border-radius: 4px !important;
 }
-.tck:hover { border-color: #6366f1 !important; background: #e0e7ff !important; }
+.tck:hover { border-color: #ED1D24 !important; background: #FDE8E9 !important; }
 .tck.dn {
     background: #10b981 !important;
     border-color: #10b981 !important;
@@ -1338,6 +1363,9 @@ body {
 ::-webkit-scrollbar-thumb:hover { background: #94a3b8 !important; }
 
 </style>
+<script src="/assets/st_attendance_tracker/js/st_shell.js?v=11"></script>
+<script src="/assets/st_attendance_tracker/js/st_employee_drawer.js?v=5"></script>
+<script src="/assets/st_attendance_tracker/js/st_team_week.js?v=5"></script>
 <script src="/assets/st_attendance_tracker/js/dashboard_utils.js"></script>
 <script src="/assets/st_attendance_tracker/js/whats_new.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
@@ -1475,6 +1503,7 @@ async function submitAssignTask(){
       }, 3);
       closeAssignModal();
       loadTeam();
+      window.dispatchEvent(new CustomEvent('st:team-changed'));
     }
   } catch (e) {
     frappe.show_alert({ message: (e && e.message) || 'Could not assign task.', indicator: 'red' }, 4);
@@ -1569,10 +1598,9 @@ document.querySelectorAll('.fc').forEach(function(chip){
 });
 
 var TEAM_DASHBOARD_TOUR_STEPS = [
-  { element: '.hero', popover: { title: 'Team snapshot', description: "See who's checked in, checkout status, missing, and late — at a glance.", side: 'bottom' } },
-  { element: '.filter-bar', popover: { title: 'Filter', description: 'Narrow the list down by status.', side: 'bottom' } },
-  { element: '#member-list', popover: { title: 'Your team', description: 'Click any card to see that person\'s tasks and time details.', side: 'right' } },
-  { element: '.rp', popover: { title: 'Details', description: "Details for whoever you pick show up here.", side: 'left' } }
+  { element: '#tm-kpis', popover: { title: 'Team snapshot', description: "See who's checked in, checked out, missing, and late for today.", side: 'bottom' } },
+  { element: '#tm-matrix', popover: { title: 'Your team this week', description: 'Each row is a person, each column a day. Click a name or a day to see their tasks and time details.', side: 'top' } },
+  { element: '#tm-q', popover: { title: 'Find someone', description: 'Search by name or filter by today\'s status.', side: 'bottom' } }
 ];
 
 frappe.ready(function(){
@@ -1604,23 +1632,6 @@ frappe.ready(function(){
         frappe.show_alert({ message: data.employee_name + ' added ' + label, indicator: 'green' }, 3);
       }
     });
-  }
-});
-
-function toggleProfileDropdown(e) {
-  if (e) e.stopPropagation();
-  var dd = document.getElementById('profile-dropdown');
-  if (dd) {
-    dd.classList.toggle('show');
-  }
-}
-
-document.addEventListener('click', function(e) {
-  var dd = document.getElementById('profile-dropdown');
-  if (dd && dd.classList.contains('show')) {
-    if (!dd.contains(e.target)) {
-      dd.classList.remove('show');
-    }
   }
 });
 </script>

@@ -1,12 +1,15 @@
 import frappe
 from frappe.utils import today
 from st_attendance_tracker.api import _is_team_leader
+from st_attendance_tracker.ui_shell import get_shell_context, redirect_for_design
 
 
 def get_context(context):
     if frappe.session.user == "Guest":
         frappe.local.flags.redirect_location = "/login?redirect-to=/team-dashboard"
         raise frappe.Redirect
+
+    redirect_for_design()
 
     employee = frappe.db.get_value(
         "Employee", {"user_id": frappe.session.user, "status": "Active"},
@@ -26,6 +29,7 @@ def get_context(context):
     context.employee = employee
     context.date = today()
     context.title = "Team Dashboard"
+    context.st_shell = get_shell_context("team", employee)
 
     tours_seen = frappe.db.get_value("ST Tour Seen", frappe.session.user, "tours_seen") or ""
     context.show_tour_team_dashboard = "team_dashboard_v1" not in tours_seen.split(",")

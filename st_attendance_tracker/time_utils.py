@@ -185,3 +185,27 @@ def resolve_zero_diff_minutes(date_str):
     if date_diff(today(), date_str) == 1:
         return 24 * 60
     return 0
+
+
+DEFAULT_CHECKOUT_CUTOFF = "22:00:00"
+
+
+def get_checkout_cutoff():
+    """Checkout cutoff time-of-day from ST Attendance Settings, as minutes
+    since midnight. Falls back to 22:00 if the setting is blank."""
+    value = frappe.db.get_single_value("ST Attendance Settings", "checkout_cutoff_time")
+    return time_to_minutes(value or DEFAULT_CHECKOUT_CUTOFF)
+
+
+def is_checkout_locked(log_date, unlocked, now=None, cutoff_minutes=None):
+    """True when checkout for `log_date` is closed: the cutoff time on that
+    date has passed and HR has not unlocked it. Any past date is therefore
+    locked once its own cutoff has passed, not just today."""
+    if unlocked:
+        return False
+    if now is None:
+        now = frappe.utils.now_datetime()
+    if cutoff_minutes is None:
+        cutoff_minutes = get_checkout_cutoff()
+    cutoff = frappe.utils.get_datetime(log_date) + _datetime.timedelta(minutes=cutoff_minutes)
+    return now > cutoff

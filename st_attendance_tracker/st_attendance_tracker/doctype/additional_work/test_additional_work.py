@@ -1,12 +1,28 @@
 """Additional Work — doctype, ownership (BOLA), and self-service API tests."""
+from unittest.mock import patch
+
 import frappe
 from frappe.utils import today, add_days
 from frappe.tests.utils import FrappeTestCase
 
-from st_attendance_tracker.api import (
-    get_additional_work, save_additional_work, delete_additional_work,
-    submit_morning_log, submit_eod_log,
-)
+from st_attendance_tracker.api import get_additional_work, submit_morning_log, submit_eod_log
+
+
+# Additional Work create/edit/delete moved from whitelisted wrappers to Frappe's own document API
+# (the page calls frappe.client.insert / frappe.client.delete). These helpers do the same thing,
+# permission-checked and without ignore_permissions, so the tests exercise the real path.
+def save_additional_work(name=None, **fields):
+    if name:
+        doc = frappe.get_doc("Additional Work", name)
+        doc.update(fields)
+        doc.save()
+    else:
+        doc = frappe.get_doc({"doctype": "Additional Work", **fields}).insert()
+    return {"success": True, "name": doc.name}
+
+
+def delete_additional_work(name):
+    frappe.delete_doc("Additional Work", name)
 
 
 def _make_employee(suffix, dept_name, user_email, roles=None):
@@ -85,6 +101,10 @@ class TestAdditionalWork(FrappeTestCase):
 
     def setUp(self):
         frappe.set_user("Administrator")
+        # These tests are about ownership, hours and overlaps; the "day must be closed" rule has its own tests below.
+        self.day_rule = patch("st_attendance_tracker.st_attendance_tracker.doctype.additional_work.additional_work.additional_work_allowed", return_value=(True, "checked_out"))
+        self.day_rule.start()
+        self.addCleanup(self.day_rule.stop)
 
     def tearDown(self):
         frappe.set_user("Administrator")
@@ -92,6 +112,8 @@ class TestAdditionalWork(FrappeTestCase):
         frappe.db.sql("DELETE FROM `tabDaily Task Log` WHERE employee=%s", (self.emp_name,))
         frappe.db.sql("DELETE FROM `tabDaily Task` WHERE employee=%s", (self.emp_name,))
         frappe.db.sql("DELETE FROM `tabEmployee Checkin` WHERE employee=%s", (self.emp_name,))
+        frappe.db.sql("DELETE t FROM `tabTask Entry` t JOIN `tabDaily Work Log` l ON l.name=t.parent WHERE l.employee=%s", (self.emp_name,))
+        frappe.db.sql("DELETE FROM `tabDaily Work Log` WHERE employee=%s", (self.emp_name,))
         frappe.db.commit()
 
     # ── Doctype validation ───────────────────────────────────────────────
@@ -270,3 +292,84 @@ class TestAdditionalWork(FrappeTestCase):
             ["net_hours", "working_hours", "docstatus"], as_dict=True,
         )
         self.assertEqual(eod_before, eod_after)
+
+    def _entry(self, **extra):
+        return frappe.get_doc({"doctype": "Additional Work", "employee": self.emp_name, "work_date": today(),
+                               "login_time": "19:00:00", "logout_time": "20:00:00", "hours_spent": "1h",
+                               "description": "rule test", "status": "Done", **extra})
+
+    def _log(self, **fields):
+        frappe.get_doc({"doctype": "Daily Work Log", "employee": self.emp_name, "date": today(), **fields}).insert(ignore_permissions=True)
+
+    def test_blocked_before_checkout_and_without_a_check_in(self):
+        self.day_rule.stop()
+        with self.assertRaises(frappe.ValidationError):
+            self._entry().insert(ignore_permissions=True)
+
+    def test_blocked_while_checked_in_but_not_checked_out(self):
+        self.day_rule.stop()
+        self._log(morning_submitted=1, login_time="09:30:00")
+        with self.assertRaises(frappe.ValidationError):
+            self._entry().insert(ignore_permissions=True)
+
+    def test_allowed_after_checkout(self):
+        self.day_rule.stop()
+        self._log(morning_submitted=1, eod_submitted=1, login_time="09:30:00", logout_time="18:00:00")
+        self.assertTrue(self._entry().insert(ignore_permissions=True).name)
+
+    def test_allowed_on_a_leave_day(self):
+        self.day_rule.stop()
+        with patch("st_attendance_tracker.api._get_employees_on_leave", return_value={self.emp_name}):
+            self.assertTrue(self._entry().insert(ignore_permissions=True).name)
+
+    def test_half_day_leave_does_not_open_the_day(self):
+        """A half-day leave still has a working half, so check-out is still required."""
+        from st_attendance_tracker.st_attendance_tracker.doctype.daily_work_log.test_daily_work_log import (
+            _make_approved_half_day_leave,
+        )
+
+        self.day_rule.stop()
+        leave = _make_approved_half_day_leave(self.emp_name, today())
+        try:
+            with self.assertRaises(frappe.ValidationError):
+                self._entry().insert(ignore_permissions=True)
+        finally:
+            frappe.db.delete("Leave Application", {"name": leave})
+
+    def test_full_day_leave_application_opens_the_day(self):
+        from st_attendance_tracker.st_attendance_tracker.doctype.daily_work_log.test_daily_work_log import (
+            _make_approved_half_day_leave,
+        )
+
+        self.day_rule.stop()
+        leave = _make_approved_half_day_leave(self.emp_name, today())
+        frappe.db.set_value("Leave Application", leave, "half_day", 0)
+        try:
+            self.assertTrue(self._entry().insert(ignore_permissions=True).name)
+        finally:
+            frappe.db.delete("Leave Application", {"name": leave})
+
+    def test_editing_an_existing_entry_is_not_blocked(self):
+        self.day_rule.stop()
+        doc = self._entry()
+        with patch("st_attendance_tracker.api._get_employees_on_leave", return_value={self.emp_name}):
+            doc.insert(ignore_permissions=True)
+        doc.reload(); doc.remarks = "later note"
+        doc.save(ignore_permissions=True)  # the day is not closed, but this is not a new entry or a new day
+        self.assertEqual(doc.remarks, "later note")
+
+    def test_day_context_reports_the_rule(self):
+        self.day_rule.stop()
+        from st_attendance_tracker.calendar_api import get_day_context
+
+        frappe.set_user(self.emp_user)
+        ctx = get_day_context(today())
+        self.assertFalse(ctx["can_log"])
+        self.assertIn("check out", ctx["blocked_message"])
+
+
+def tearDownModule():
+    # HRMS creates a User Permission for every Employee user, and these tests delete their employees
+    # with raw SQL, so the permissions would pile up in the site database run after run.
+    frappe.db.sql("DELETE FROM `tabUser Permission` WHERE user LIKE %s", ("%@test.example.com",))
+    frappe.db.commit()

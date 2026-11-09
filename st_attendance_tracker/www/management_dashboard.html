@@ -8,12 +8,13 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css">
 <link rel="stylesheet" href="/assets/st_attendance_tracker/css/whats_new.css">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --primary: #6366f1;
-  --primary-hover: #4f46e5;
-  --primary-light: #e0e7ff;
-  --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  --primary: #ED1D24;
+  --primary-hover: #C4151B;
+  --primary-light: #FDE8E9;
+  --primary-gradient: linear-gradient(135deg, #ED1D24 0%, #ED1D24 100%);
   --success: #10b981;
   --success-bg: #ecfdf5;
   --success-border: #a7f3d0;
@@ -421,7 +422,7 @@ body {
 }
 
 .di0 { background: #eff6ff; color: #2563eb; }
-.di1 { background: #faf5ff; color: #7c3aed; }
+.di1 { background: #faf5ff; color: #C4151B; }
 .di2 { background: #f0fdf4; color: #15803d; }
 .di3 { background: #fffbeb; color: #d97706; }
 .di4 { background: #fef2f2; color: #dc2626; }
@@ -525,7 +526,7 @@ body {
 .av-b { background: var(--info-bg); color: var(--info-text); border: 1px solid var(--info-border); }
 .av-a { background: var(--warning-bg); color: var(--warning-text); border: 1px solid var(--warning-border); }
 .av-r { background: var(--danger-bg); color: var(--danger-text); border: 1px solid var(--danger-border); }
-.av-p { background: #faf5ff; color: #7c3aed; border: 1px solid #e9d5ff; }
+.av-p { background: #faf5ff; color: #C4151B; border: 1px solid #e9d5ff; }
 
 .ec-name {
   font-family: 'Plus Jakarta Sans', sans-serif;
@@ -601,6 +602,18 @@ body {
   top: 84px;
   box-shadow: var(--shadow-sm);
 }
+
+.lcr-row { padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+.lcr-row:last-child { border-bottom: 0; }
+.lcr-name { font-weight: 700; color: var(--text); }
+.lcr-meta { color: var(--text-light); margin-top: 2px; }
+.lcr-reason { margin-top: 4px; color: var(--text); overflow-wrap: anywhere; }
+.lcr-act { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.lcr-act input { flex: 1 1 140px; min-width: 0; height: 32px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--radius-md); font-size: 12px; }
+.lcr-act button { height: 32px; padding: 0 12px; border: 0; border-radius: var(--radius-md); background: #EE1C29; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; }
+.lcr-act button:disabled { opacity: .6; cursor: default; }
+.lcr-act input:focus-visible, .lcr-act button:focus-visible { outline: 2px solid #EE1C29; outline-offset: 1px; }
+.lcr-msg { text-align: center; color: var(--text-light); font-size: 12px; padding: 16px 0; }
 
 .dp-hero {
   background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
@@ -905,7 +918,7 @@ body {
 
 .tnav { border-bottom: 1px solid #e2e8f0 !important; }
 .tnav-logo {
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+    background: linear-gradient(135deg, #C4151B 0%, #C4151B 100%) !important;
     -webkit-background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
 }
@@ -914,22 +927,22 @@ body {
 .ph, .hero {
     background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%),
                 repeating-linear-gradient(45deg, rgba(79, 70, 229, 0.02) 0, rgba(79, 70, 229, 0.02) 1px, transparent 1px, transparent 10px) !important;
-    border: 1px solid #e0e7ff !important;
-    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.05) !important;
+    border: 1px solid #FDE8E9 !important;
+    box-shadow: 0 4px 15px rgba(237, 29, 36, 0.05) !important;
 }
-.ph-title, .hero-info .title { color: #1e1b4b !important; }
-.ph-sub, .hero-info .sub { color: #4338ca !important; }
-.hero-info .eye { color: #4f46e5 !important; }
-.ph-time { color: #312e81 !important; }
-.ph-date { color: #4f46e5 !important; }
+.ph-title, .hero-info .title { color: #111112 !important; }
+.ph-sub, .hero-info .sub { color: #B5121A !important; }
+.hero-info .eye { color: #C4151B !important; }
+.ph-time { color: #111112 !important; }
+.ph-date { color: #C4151B !important; }
 
 /* Avatars */
-.ph-av { background: #e0e7ff !important; color: #4338ca !important; border: 1px solid #c7d2fe !important; }
-.sb-av, .tnav-av { background: #e0e7ff !important; color: #4338ca !important; border: 1px solid #c7d2fe !important; }
+.ph-av { background: #FDE8E9 !important; color: #B5121A !important; border: 1px solid #F5B8BB !important; }
+.sb-av, .tnav-av { background: #FDE8E9 !important; color: #B5121A !important; border: 1px solid #F5B8BB !important; }
 
 /* Primary Buttons (Indigo) */
 .btn.red, .fbtn.red {
-    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%) !important;
+    background: linear-gradient(135deg, #C4151B 0%, #ED1D24 100%) !important;
     color: #ffffff !important;
     border: none !important;
     box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25) !important;
@@ -964,8 +977,8 @@ body {
     border-radius: 6px !important;
 }
 .tinp:focus, .tsel:focus, .date-inp:focus, .wl-sel:focus {
-    border-color: #6366f1 !important;
-    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2) !important;
+    border-color: #ED1D24 !important;
+    box-shadow: 0 0 0 2px rgba(237, 29, 36, 0.2) !important;
     outline: none !important;
 }
 
@@ -985,14 +998,14 @@ body {
 .sb-name, .dept-name, .dp-name { color: #0f172a !important; }
 .dp-hero .dp-name { color: #ffffff !important; }
 .sb-link { color: #475569 !important; }
-.sb-link.on { background: #e0e7ff !important; color: #4338ca !important; border-radius: 6px !important;}
+.sb-link.on { background: #FDE8E9 !important; color: #B5121A !important; border-radius: 6px !important;}
 
 /* Subtle Checkboxes */
 .tck {
     border: 1px solid #cbd5e1 !important;
     border-radius: 4px !important;
 }
-.tck:hover { border-color: #6366f1 !important; background: #e0e7ff !important; }
+.tck:hover { border-color: #ED1D24 !important; background: #FDE8E9 !important; }
 .tck.dn {
     background: #10b981 !important;
     border-color: #10b981 !important;
@@ -1029,31 +1042,64 @@ body {
   max-width: 100% !important;
   margin: 0 !important;
 }
+/* ── Phones and tablets: single column, wrapping stats, detail panel below the list (was hidden or squeezed) ── */
+@media (max-width: 900px) {
+  .mgrid, .grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .mgrid > *, .grid > * { min-width: 0; }
+  .gstats, .stat-strip { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) !important; }
+  .rp { display: block !important; position: static !important; width: auto !important; max-height: none !important; }
+  .dp { position: static !important; }
+  .hero-top { flex-wrap: wrap; gap: 12px; }
+  .hero-controls { flex-wrap: wrap; width: 100%; }
+}
+@media (max-width: 600px) {
+  .gstats, .stat-strip { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .emp-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .dp-stats, .tg, .sg { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .assign-row { grid-template-columns: 1fr !important; }
+  .fc { flex: 0 0 auto; }
+}
 </style>
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_brand.css?v=22">
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_calendar.css?v=19">
 {% endblock %}
 {% block page_content %}
-<nav class="tnav">
-  <div class="tnav-con">
-    <span class="tnav-logo">ST Tracker</span>
-    <span class="tnav-sep"></span>
-    <span class="tnav-bc">Management</span>
-    <div class="tnav-r">
-      <a href="/daily-checkin" class="tnav-btn"><i class="ti ti-user" aria-hidden="true"></i>My check-in</a>
-      <a href="/hr-manager-guide" target="_blank" class="tnav-btn"><i class="ti ti-book-2" aria-hidden="true"></i>Docs</a>
-      <button type="button" class="tnav-btn" onclick="STTour.start('management_dashboard_v1', MANAGEMENT_DASHBOARD_TOUR_STEPS)"><i class="ti ti-map-2" aria-hidden="true"></i>Tour</button>
-      <div class="wn-bell-wrap" id="wn-mount"></div>
-      <div class="tnav-av" onclick="toggleProfileDropdown(event)" style="cursor:pointer;" title="Account Options">{{ employee.employee_name[:2].upper() }}</div>
-      <div class="profile-dropdown" id="profile-dropdown">
-        {% if employee.name %}
-        <a href="/app/employee/{{ employee.name }}" class="pd-item"><i class="ti ti-user" aria-hidden="true"></i>My Profile</a>
-        {% endif %}
-        <a href="/app" class="pd-item"><i class="ti ti-layout-dashboard" aria-hidden="true"></i>Switch to Desk</a>
-        <a href="/?cmd=web_logout" class="pd-item"><i class="ti ti-logout" aria-hidden="true"></i>Logout</a>
-      </div>
-    </div>
+{% from "st_attendance_tracker/templates/macros/st_shell.html" import shell %}
+<script>window.ST_MGMT = {"today": {{ date | tojson }}}; window.ST_SHELL_DATE = window.ST_MGMT.today;</script>
+{% call shell(st_shell, "Management Dashboard", "STTour.start('management_dashboard_v1', MANAGEMENT_DASHBOARD_TOUR_STEPS)", "/hr-manager-guide", None, True, False) %}
+<div class="tm-bar">
+  <div class="st-seg" role="group" aria-label="Management view">
+    <button type="button" data-mg-view="overview" aria-pressed="true">Overview</button>
+    <button type="button" data-mg-view="departments" aria-pressed="false">Departments</button>
   </div>
-</nav>
-<div id="wn-banner-mount"></div>
+</div>
+<div id="mg-overview">
+  <div class="cal-page" id="mg-page" style="height:calc(100vh - 118px)">
+    <section class="cal-main" id="mg-body" style="overflow:auto" aria-label="Company overview">
+      <div class="tm-kpis" id="mg-kpis"></div>
+      <div class="mg-grid">
+        <div class="mg-card"><h4>Share of employees checked in</h4><div id="mg-chart"></div></div>
+        <div class="mg-card"><h4>By department</h4><div id="mg-depts-bars"></div></div>
+      </div>
+      <div class="tm-bar" style="padding-top:0">
+        <h4 style="margin:0;font-size:15px">Employees</h4>
+        <div class="tm-tools">
+          <input id="mg-q" type="search" placeholder="Search employees" aria-label="Search employees">
+          <select id="mg-dept" aria-label="Department"><option value="">All departments</option></select>
+          <select id="mg-status" aria-label="Status">
+            <option value="all">All statuses</option><option value="checked_in">Checked in</option><option value="late">Late</option>
+            <option value="eod_done">Checked out</option><option value="missing">Missing</option><option value="leave">On leave</option>
+          </select>
+        </div>
+      </div>
+      <div class="mg-table"><div class="cal-xs"><table><thead><tr><th>Employee</th><th>Department</th><th>Status</th><th>Check-in</th><th>Check-out</th><th>Net hours</th><th>Extra hours</th><th>Tasks</th></tr></thead><tbody id="mg-rows"></tbody></table></div></div>
+    </section>
+    <aside class="cal-side" id="mg-side" data-st-collapsible="leaderboard" aria-label="Checkout leaderboard">
+      <h3>Checkout leaderboard</h3><div id="mg-lb"></div>
+    </aside>
+  </div>
+</div>
+<div id="mg-depts-view" hidden>
 <div class="wrap">
   <div class="hero">
     <div class="hero-top">
@@ -1087,8 +1133,23 @@ body {
       <div id="dept-list"><div id="loading"><i class="ti ti-loader" style="font-size:22px;animation:spin .7s linear infinite" aria-hidden="true"></i><br><br>Loading...</div></div>
     </div>
     <div style="position: sticky; top: 84px; display: flex; flex-direction: column; gap: 20px;">
+      {% if is_hr_manager %}
+      <div class="dp" id="lcr-panel" style="position: static;">
+        <div class="dp-hero" style="background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%);">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <i class="ti ti-lock-open" style="font-size: 20px; color: #fecaca;" aria-hidden="true"></i>
+            <div class="dp-name" style="font-size: 15px;">Late Checkout Requests</div>
+          </div>
+          <div class="dp-dept" style="color: rgba(255, 255, 255, 0.7); margin-top: 4px;">Approve to let one employee check out for one date</div>
+        </div>
+        <div class="dp-body" id="lcr-body" style="max-height: 320px; overflow-y: auto; padding: 16px;" aria-live="polite">
+          <div class="lcr-msg">Loading...</div>
+        </div>
+      </div>
+      {% endif %}
+
       <div class="dp" id="leaderboard-panel" style="position: static;">
-        <div class="dp-hero" style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);">
+        <div class="dp-hero" style="background: linear-gradient(135deg, #111112 0%, #111112 100%);">
           <div style="display: flex; align-items: center; gap: 8px;">
             <i class="ti ti-trophy" style="font-size: 20px; color: #fbbf24;"></i>
             <div class="dp-name" style="font-size: 15px;">Hours Leaderboard</div>
@@ -1108,6 +1169,11 @@ body {
     </div>
   </div>
 </div>
+</div>
+{% endcall %}
+<script src="/assets/st_attendance_tracker/js/st_shell.js?v=11"></script>
+<script src="/assets/st_attendance_tracker/js/st_employee_drawer.js?v=4"></script>
+<script src="/assets/st_attendance_tracker/js/st_mgmt_overview.js?v=2"></script>
 <script src="/assets/st_attendance_tracker/js/dashboard_utils.js"></script>
 <script src="/assets/st_attendance_tracker/js/whats_new.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
@@ -1251,9 +1317,9 @@ function renderLeaderboard(rankings){
 
   body.innerHTML = rankings.map(function(r, idx){
     var rankNum = idx + 1;
-    var rankBadge = '<div style="width: 24px; height: 24px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #475569;">#' + rankNum + '</div>';
+    var rankBadge = '<div style="width: 24px; height: 24px; border-radius: 50%; background: var(--st-panel2,#f1f5f9); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--st-muted,#475569);">#' + rankNum + '</div>';
     if(rankNum === 1) rankBadge = '<div style="width: 24px; height: 24px; border-radius: 50%; background: #fef3c7; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #d97706;"><i class="ti ti-trophy" style="font-size:12px;color:#d97706" aria-hidden="true"></i></div>';
-    else if(rankNum === 2) rankBadge = '<div style="width: 24px; height: 24px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #475569;"><i class="ti ti-medal" style="font-size:12px;color:#475569" aria-hidden="true"></i></div>';
+    else if(rankNum === 2) rankBadge = '<div style="width: 24px; height: 24px; border-radius: 50%; background: var(--st-panel2,#f1f5f9); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--st-muted,#475569);"><i class="ti ti-medal" style="font-size:12px;color:var(--st-muted,#475569)" aria-hidden="true"></i></div>';
     else if(rankNum === 3) rankBadge = '<div style="width: 24px; height: 24px; border-radius: 50%; background: #ffedd5; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #ea580c;"><i class="ti ti-medal" style="font-size:12px;color:#ea580c" aria-hidden="true"></i></div>';
 
     var hoursStr = r.net_hours;
@@ -1267,16 +1333,16 @@ function renderLeaderboard(rankings){
     } else if (r.is_half_day) {
       otBadge = '<span class="day-badge db-part" style="font-size: 8px; padding: 2px 6px; margin-top: 4px; display: inline-block;">Half-Day</span>';
     } else {
-      otBadge = '<span class="day-badge db-no" style="font-size: 8px; padding: 2px 6px; margin-top: 4px; display: inline-block; background:#f1f5f9; color:#475569; border-color:#cbd5e1;">Regular</span>';
+      otBadge = '<span class="day-badge db-no" style="font-size: 8px; padding: 2px 6px; margin-top: 4px; display: inline-block; background:var(--st-panel2,#f1f5f9); color:var(--st-muted,#475569); border-color:var(--st-line,#cbd5e1);">Regular</span>';
     }
 
     var timeRange = r.login_time + ' – ' + r.logout_time;
 
-    return '<div style="display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid #f1f5f9;">' +
+    return '<div style="display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--st-line,#f1f5f9);">' +
       rankBadge +
       '<div style="flex: 1; min-width: 0;">' +
-        '<div style="font-size: 13px; font-weight: 600; color: #0f172a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + esc(r.employee_name) + '</div>' +
-        '<div style="font-size: 11px; color: #64748b;">' + timeRange + '</div>' +
+        '<div style="font-size: 13px; font-weight: 600; color: var(--st-ink,#0f172a); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + esc(r.employee_name) + '</div>' +
+        '<div style="font-size: 11px; color: var(--st-muted,#64748b);">' + timeRange + '</div>' +
       '</div>' +
       '<div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end;">' +
         '<div style="font-size: 13px; font-weight: 700; color: #047857;">' + hoursStr + '</div>' +
@@ -1316,9 +1382,56 @@ function resetDetailPanel(){
     '<div class="dp-body"><div class="empty-dp"><i class="ti ti-user-search" aria-hidden="true"></i><p>Click any employee to view their tasks and time details</p></div></div>';
 }
 
+function loadLateCheckoutRequests(){
+  var body = document.getElementById('lcr-body');
+  if(!body) return;
+  frappe.call({
+    method:'st_attendance_tracker.api.get_late_checkout_requests',
+    callback:function(r){ renderLateCheckoutRequests(r.message||[]); },
+    error:function(){ body.replaceChildren(lcrMsg('Could not load requests.')); }
+  });
+}
+function lcrMsg(text){
+  var d = document.createElement('div'); d.className = 'lcr-msg'; d.textContent = text; return d;
+}
+function renderLateCheckoutRequests(rows){
+  var body = document.getElementById('lcr-body');
+  if(!rows.length){ body.replaceChildren(lcrMsg('No pending requests.')); return; }
+  body.replaceChildren.apply(body, rows.map(function(row){
+    var el = document.createElement('div'); el.className = 'lcr-row';
+    var name = document.createElement('div'); name.className = 'lcr-name'; name.textContent = row.employee_name || row.employee;
+    var meta = document.createElement('div'); meta.className = 'lcr-meta';
+    meta.textContent = (row.department || '') + (row.department ? ' · ' : '') + 'Checkout for ' + row.date;
+    var reason = document.createElement('div'); reason.className = 'lcr-reason';
+    reason.textContent = row.reason ? 'Reason: ' + row.reason : 'No reason given';
+    var act = document.createElement('div'); act.className = 'lcr-act';
+    var input = document.createElement('input'); input.type = 'text'; input.maxLength = 200;
+    input.placeholder = 'Approval note (optional)';
+    input.setAttribute('aria-label', 'Approval note for ' + (row.employee_name || row.employee));
+    var btn = document.createElement('button'); btn.type = 'button'; btn.textContent = 'Approve';
+    btn.onclick = function(){ approveLateCheckout(row, input, btn); };
+    act.append(input, btn);
+    el.append(name, meta, reason, act);
+    return el;
+  }));
+}
+function approveLateCheckout(row, input, btn){
+  var note = input.value.trim();
+  btn.disabled = true;
+  frappe.call({
+    method:'st_attendance_tracker.api.unlock_late_checkout',
+    type:'POST',
+    args:{ employee: row.employee, date: row.date, reason: note },
+    callback:function(){ loadLateCheckoutRequests(); },
+    error:function(){ btn.disabled = false; btn.textContent = 'Retry'; }
+  });
+}
+
+
 var LOAD_ALL_GEN = 0;
 function loadAll(date){
   var gen = ++LOAD_ALL_GEN;
+  loadLateCheckoutRequests();
   resetDetailPanel();
   document.getElementById('dept-list').innerHTML='<div id="loading" style="text-align:center;padding:48px;color:#9ca3af;font-size:13px"><i class="ti ti-loader" style="font-size:22px;animation:spin .7s linear infinite" aria-hidden="true"></i><br><br>Loading...</div>';
   frappe.call({
@@ -1342,11 +1455,10 @@ function loadAll(date){
 }
 
 var MANAGEMENT_DASHBOARD_TOUR_STEPS = [
-  { element: '.gstats', popover: { title: 'Company overview', description: 'Total employees, checked in, checkout done, missing, and on leave — for the selected date.', side: 'bottom' } },
-  { element: '.filter-bar', popover: { title: 'Filter departments', description: 'Narrow every department card down by status.', side: 'bottom' } },
-  { element: '#dept-list', popover: { title: 'Departments', description: 'Click any employee card to see their tasks and time for the day.', side: 'right' } },
-  { element: '#detail-panel', popover: { title: 'Employee detail', description: 'Details for whoever you pick show up here.', side: 'left' } },
-  { element: '#leaderboard-body', popover: { title: 'Checkout leaderboard', description: 'Everyone who has submitted checkout for the date, ranked by net hours.', side: 'left' } }
+  { element: '#mg-kpis', popover: { title: 'Company overview', description: 'Total employees, checked in, checked out, on leave and missing for the selected date.', side: 'bottom' } },
+  { element: '#mg-chart', popover: { title: 'This week', description: 'Share of employees who checked in each day. The selected day is red.', side: 'bottom' } },
+  { element: '#mg-rows', popover: { title: 'Employees', description: 'Click any employee to see their tasks and time for the day.', side: 'top' } },
+  { element: '#mg-side', popover: { title: 'Checkout leaderboard', description: 'Everyone who has submitted checkout for the date, ranked by net hours.', side: 'left' } }
 ];
 
 frappe.ready(function(){
@@ -1354,23 +1466,6 @@ frappe.ready(function(){
   {% if show_tour_management_dashboard %}
   setTimeout(function(){ STTour.start('management_dashboard_v1', MANAGEMENT_DASHBOARD_TOUR_STEPS); }, 600);
   {% endif %}
-});
-
-function toggleProfileDropdown(e) {
-  if (e) e.stopPropagation();
-  var dd = document.getElementById('profile-dropdown');
-  if (dd) {
-    dd.classList.toggle('show');
-  }
-}
-
-document.addEventListener('click', function(e) {
-  var dd = document.getElementById('profile-dropdown');
-  if (dd && dd.classList.contains('show')) {
-    if (!dd.contains(e.target)) {
-      dd.classList.remove('show');
-    }
-  }
 });
 </script>
 {% endblock %}

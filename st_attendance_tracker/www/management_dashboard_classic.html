@@ -1,0 +1,1457 @@
+{% extends "templates/web.html" %}
+{% block title %}Management Dashboard{% endblock %}
+{% block head_include %}
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css">
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/whats_new.css">
+<style>
+:root {
+  --primary: #6366f1;
+  --primary-hover: #4f46e5;
+  --primary-light: #e0e7ff;
+  --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  --success: #10b981;
+  --success-bg: #ecfdf5;
+  --success-border: #a7f3d0;
+  --success-text: #047857;
+  --warning: #f59e0b;
+  --warning-bg: #fffbeb;
+  --warning-border: #fde68a;
+  --warning-text: #b45309;
+  --info: #3b82f6;
+  --info-bg: #eff6ff;
+  --info-border: #bfdbfe;
+  --info-text: #1d4ed8;
+  --danger: #ef4444;
+  --danger-bg: #fef2f2;
+  --danger-border: #fecaca;
+  --danger-text: #b91c1c;
+  --dark: #0f172a;
+  --dark-light: #1e293b;
+  
+  --bg-canvas: #f8fafc;
+  --bg-card: #ffffff;
+  --border: #e2e8f0;
+  --border-focus: #cbd5e1;
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --text-light: #94a3b8;
+  
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--bg-canvas);
+  color: var(--text-main);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.tnav {
+  height: 64px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  display: flex;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.tnav-con {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 24px;
+  gap: 16px;
+  height: 100%;
+}
+
+.tnav-logo {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.5px;
+}
+
+.tnav-sep {
+  width: 1px;
+  height: 16px;
+  background: var(--border);
+}
+
+.tnav-bc {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.tnav-r {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+
+.tnav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: #ffffff;
+  text-decoration: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+  box-shadow: var(--shadow-sm);
+}
+
+.tnav-btn:hover {
+  background: #f8fafc;
+  border-color: var(--border-focus);
+  color: var(--text-main);
+  transform: translateY(-1px);
+}
+
+.tnav-btn i {
+  font-size: 14px;
+}
+
+.tnav-av {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--primary-gradient);
+  color: #ffffff;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+}
+
+/* wrap */
+.wrap {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* hero */
+.hero {
+  background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
+  color: #ffffff;
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(225, 29, 72, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.hero-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-info .eye {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 6px;
+}
+
+.hero-info .title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+}
+
+.hero-info .sub {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.65);
+  margin-top: 4px;
+}
+
+.hero-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ctrl-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+  backdrop-filter: blur(4px);
+}
+
+.ctrl-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.ctrl-btn i {
+  font-size: 14px;
+}
+
+.date-inp {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-md);
+  padding: 8px 14px;
+  font-size: 13px;
+  color: #ffffff;
+  font-family: inherit;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  backdrop-filter: blur(4px);
+}
+
+.date-inp:focus {
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.date-inp::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: 0.6;
+}
+
+/* global stats */
+.gstats {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+  position: relative;
+  z-index: 2;
+  backdrop-filter: blur(4px);
+}
+
+.gs {
+  padding: 14px 16px;
+  text-align: center;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.gs:last-child {
+  border-right: none;
+}
+
+.gs-n {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1;
+  letter-spacing: -0.5px;
+}
+
+.gs-n.g { color: var(--success); }
+.gs-n.r { color: #f43f5e; }
+.gs-n.a { color: var(--warning); }
+.gs-n.b { color: var(--info); }
+
+.gs-l {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 6px;
+}
+
+.gs-bar {
+  height: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.gs-fill {
+  height: 100%;
+  border-radius: 999px;
+}
+
+/* main grid */
+.mgrid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 20px;
+  align-items: start;
+}
+
+/* filter */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.fc {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: var(--shadow-sm);
+}
+
+.fc:hover {
+  background: #f8fafc;
+  color: var(--text-main);
+  border-color: var(--border-focus);
+}
+
+.fc.on {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+}
+
+/* dept card */
+.dept-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.dept-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.dept-ico {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.di0 { background: #eff6ff; color: #2563eb; }
+.di1 { background: #faf5ff; color: #7c3aed; }
+.di2 { background: #f0fdf4; color: #15803d; }
+.di3 { background: #fffbeb; color: #d97706; }
+.di4 { background: #fef2f2; color: #dc2626; }
+.di5 { background: #f0fdfa; color: #0f766e; }
+
+.dept-ico i {
+  font-size: 18px;
+}
+
+.dept-name {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.dept-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.dept-prog {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.dp-trk {
+  width: 64px;
+  height: 6px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.dp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #059669);
+  border-radius: 999px;
+}
+
+.dp-lbl {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+/* emp grid */
+.emp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0;
+  background: transparent;
+}
+
+.ec {
+  background: #ffffff;
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.ec:hover {
+  background: #f8fafc;
+}
+
+.ec.sel {
+  background: var(--primary-light);
+  border-left-color: var(--primary);
+}
+
+.ec-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.ec-av {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.av-g { background: var(--success-bg); color: var(--success-text); border: 1px solid var(--success-border); }
+.av-b { background: var(--info-bg); color: var(--info-text); border: 1px solid var(--info-border); }
+.av-a { background: var(--warning-bg); color: var(--warning-text); border: 1px solid var(--warning-border); }
+.av-r { background: var(--danger-bg); color: var(--danger-text); border: 1px solid var(--danger-border); }
+.av-p { background: #faf5ff; color: #7c3aed; border: 1px solid #e9d5ff; }
+
+.ec-name {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-main);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ec-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dot-g { background: var(--success); }
+.dot-a { background: var(--warning); }
+.dot-r { background: var(--danger); }
+.dot-x { background: var(--text-light); }
+
+.ec-time {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.ec-prog {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ecp-t {
+  flex: 1;
+  height: 4px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.ecp-f {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--success);
+}
+
+.ecp-l {
+  font-size: 10px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+/* detail panel */
+.dp {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  position: sticky;
+  top: 84px;
+  box-shadow: var(--shadow-sm);
+}
+
+.lcr-row { padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+.lcr-row:last-child { border-bottom: 0; }
+.lcr-name { font-weight: 700; color: var(--text); }
+.lcr-meta { color: var(--text-light); margin-top: 2px; }
+.lcr-reason { margin-top: 4px; color: var(--text); overflow-wrap: anywhere; }
+.lcr-act { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.lcr-act input { flex: 1 1 140px; min-width: 0; height: 32px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--radius-md); font-size: 12px; }
+.lcr-act button { height: 32px; padding: 0 12px; border: 0; border-radius: var(--radius-md); background: #EE1C29; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; }
+.lcr-act button:disabled { opacity: .6; cursor: default; }
+.lcr-act input:focus-visible, .lcr-act button:focus-visible { outline: 2px solid #EE1C29; outline-offset: 1px; }
+.lcr-msg { text-align: center; color: var(--text-light); font-size: 12px; padding: 16px 0; }
+
+.dp-hero {
+  background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
+  padding: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.dp-hero-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.dp-av {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.dp-name {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.3px;
+}
+
+.dp-dept {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 2px;
+}
+
+.dp-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.dps {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  padding: 10px 8px;
+  text-align: center;
+}
+
+.dps-n {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.dps-n.g { color: var(--success); }
+.dps-n.a { color: var(--warning); }
+
+.dps-l {
+  font-size: 9px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+
+.dp-body {
+  padding: 20px;
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+.dp-sec {
+  margin-bottom: 20px;
+}
+
+.dp-sec:last-child {
+  margin-bottom: 0;
+}
+
+.dp-lbl {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 4px;
+}
+
+.tg {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.tc {
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+}
+
+.tc-l {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.tc-v {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.tc-v.g {
+  color: var(--success);
+}
+
+.task-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.task-row:last-child {
+  border-bottom: none;
+}
+
+.task-ico {
+  font-size: 15px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.ico-g { color: var(--success); }
+.ico-a { color: var(--text-light); }
+.ico-b { color: var(--info); }
+
+.task-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.task-desc {
+  font-size: 13px;
+  color: var(--text-main);
+  line-height: 1.5;
+}
+
+.task-desc.dn {
+  text-decoration: line-through;
+  color: var(--text-light);
+}
+
+.task-pills {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.tp {
+  font-size: 10px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  padding: 2px 8px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+}
+
+.tp i {
+  font-size: 11px;
+  color: var(--text-light);
+}
+
+.stag {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.empty-dp {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-light);
+}
+
+.empty-dp i {
+  font-size: 32px;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.empty-dp p {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+#loading {
+  text-align: center;
+  padding: 48px;
+  color: var(--text-light);
+  font-size: 13px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Hide Frappe default headers and footers */
+.web-header, .navbar, footer.web-footer, .web-footer, footer[class*="footer"], .footer, .subscribe-section,
+form.row.mt-2, .mt-2.row:has(input[placeholder="Your email address..."]) {
+  display: none !important;
+}
+body {
+  padding-top: 0 !important;
+  background: #f8fafc !important;
+}
+
+/* Custom Dropdown Profile Menu */
+.profile-dropdown {
+  position: absolute;
+  top: 38px;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  display: none;
+  flex-direction: column;
+  min-width: 170px;
+  z-index: 1000;
+  overflow: hidden;
+}
+.profile-dropdown.show {
+  display: flex;
+}
+.pd-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #334155;
+  text-decoration: none;
+  transition: background 0.15s;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+.pd-item:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+.pd-item i {
+  font-size: 15px;
+  color: #64748b;
+}
+
+
+
+
+/* Premium Modern SaaS Overrides (With Light Colors) */
+body {
+    background: #f8fafc !important; /* Very soft slate background */
+    color: #0f172a !important;
+    font-family: 'Inter', system-ui, sans-serif !important;
+}
+
+/* Base reset with subtle glass feel */
+.tnav, .sidebar, .pg, .dept-card, .dp, .wl-wrap, .sb-card, .hcell {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02) !important;
+}
+
+.tnav { border-bottom: 1px solid #e2e8f0 !important; }
+.tnav-logo {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+}
+
+/* The Hero/Morning Card - Soft Pastel Glow */
+.ph, .hero {
+    background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%),
+                repeating-linear-gradient(45deg, rgba(79, 70, 229, 0.02) 0, rgba(79, 70, 229, 0.02) 1px, transparent 1px, transparent 10px) !important;
+    border: 1px solid #e0e7ff !important;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.05) !important;
+}
+.ph-title, .hero-info .title { color: #1e1b4b !important; }
+.ph-sub, .hero-info .sub { color: #4338ca !important; }
+.hero-info .eye { color: #4f46e5 !important; }
+.ph-time { color: #312e81 !important; }
+.ph-date { color: #4f46e5 !important; }
+
+/* Avatars */
+.ph-av { background: #e0e7ff !important; color: #4338ca !important; border: 1px solid #c7d2fe !important; }
+.sb-av, .tnav-av { background: #e0e7ff !important; color: #4338ca !important; border: 1px solid #c7d2fe !important; }
+
+/* Primary Buttons (Indigo) */
+.btn.red, .fbtn.red {
+    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%) !important;
+    color: #ffffff !important;
+    border: none !important;
+    box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25) !important;
+    font-weight: 500 !important;
+    border-radius: 6px !important;
+}
+.btn.red:hover, .fbtn.red:hover {
+    box-shadow: 0 6px 15px rgba(79, 70, 229, 0.4) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Secondary Buttons */
+.btn, .tnav-btn, .fbtn, .ctrl-btn {
+    background: #ffffff !important;
+    color: #475569 !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 6px !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02) !important;
+    transition: all 0.2s ease !important;
+}
+.btn:hover, .tnav-btn:hover, .fbtn:hover, .ctrl-btn:hover {
+    background: #f8fafc !important;
+    color: #0f172a !important;
+    border-color: #94a3b8 !important;
+}
+
+/* Inputs */
+.tinp, .tsel, .date-inp, .wl-sel {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+    border-radius: 6px !important;
+}
+.tinp:focus, .tsel:focus, .date-inp:focus, .wl-sel:focus {
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2) !important;
+    outline: none !important;
+}
+
+/* Task Rows */
+.trow, .ec {
+    background: #ffffff !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    transition: background 0.15s ease !important;
+}
+.trow:hover, .ec:hover {
+    background: #f8fafc !important;
+}
+
+/* Typography Overrides */
+.sb-lbl, .ch, .tbar-t, .dp-lbl, .tc-l, .hl { color: #64748b !important; }
+.hv { color: #0f172a !important; }
+.sb-name, .dept-name, .dp-name { color: #0f172a !important; }
+.dp-hero .dp-name { color: #ffffff !important; }
+.sb-link { color: #475569 !important; }
+.sb-link.on { background: #e0e7ff !important; color: #4338ca !important; border-radius: 6px !important;}
+
+/* Subtle Checkboxes */
+.tck {
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 4px !important;
+}
+.tck:hover { border-color: #6366f1 !important; background: #e0e7ff !important; }
+.tck.dn {
+    background: #10b981 !important;
+    border-color: #10b981 !important;
+}
+.tck.dn i { color: #ffffff !important; }
+
+/* Status Badges */
+.pc-in, .sbb-in { background: #ecfdf5 !important; color: #059669 !important; border: 1px solid #a7f3d0 !important; }
+.pc-ca { background: #fffbeb !important; color: #d97706 !important; border: 1px solid #fde68a !important; }
+.pc-eo, .sbb-eod { background: #eff6ff !important; color: #2563eb !important; border: 1px solid #bfdbfe !important; }
+.sbb-out { background: #f1f5f9 !important; color: #64748b !important; border: 1px solid #cbd5e1 !important; }
+.ttag { background: #f1f5f9 !important; border: 1px solid #e2e8f0 !important; color: #475569 !important; }
+
+/* Global Stats area */
+.gstats { background: #ffffff !important; border: 1px solid #e2e8f0 !important; }
+.gs { border-right: 1px solid #e2e8f0 !important; }
+.gs-n { color: #0f172a !important; }
+.gs-n.g { color: #047857 !important; }
+.gs-n.r { color: #b91c1c !important; }
+.gs-n.a { color: #b45309 !important; }
+.gs-n.b { color: #1d4ed8 !important; }
+.gs-l { color: #64748b !important; }
+
+/* Project Headers */
+.pg-head { background: #f8fafc !important; border-bottom: 1px solid #e2e8f0 !important; }
+
+/* Scrollbar */
+::-webkit-scrollbar-thumb { background: #cbd5e1 !important; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8 !important; }
+
+/* Layout overrides to force full-width view */
+.layout-main-section-wrapper, .layout-main-section, .page-content, main {
+  padding: 0 !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+/* ── Phones and tablets: single column, wrapping stats, detail panel below the list (was hidden or squeezed) ── */
+@media (max-width: 900px) {
+  .mgrid, .grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .mgrid > *, .grid > * { min-width: 0; }
+  .gstats, .stat-strip { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) !important; }
+  .rp { display: block !important; position: static !important; width: auto !important; max-height: none !important; }
+  .dp { position: static !important; }
+  .hero-top { flex-wrap: wrap; gap: 12px; }
+  .hero-controls { flex-wrap: wrap; width: 100%; }
+}
+@media (max-width: 600px) {
+  .gstats, .stat-strip { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .emp-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .dp-stats, .tg, .sg { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .assign-row { grid-template-columns: 1fr !important; }
+  .fc { flex: 0 0 auto; }
+}
+</style>
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_classic_layout.css?v=5">
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_classic.css?v=19">
+{% endblock %}
+{% block page_content %}
+{% from "st_attendance_tracker/templates/macros/classic_shell.html" import classic_nav, classic_sidebar, classic_mobnav %}
+{{ classic_nav(employee, 'Management', "STTour.start('management_dashboard_v1', MANAGEMENT_DASHBOARD_TOUR_STEPS)", '/hr-manager-guide', None) }}
+<div class="cols cols-2">
+{{ classic_sidebar(st_shell, employee, 'management', {'recurring': recurring_count|default(0), 'backlog': backlog_count|default(0)}) }}
+<main class="main">
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-top">
+      <div class="hero-info">
+        <div class="eye">Management Dashboard</div>
+        <div class="title">Company Attendance Overview</div>
+        <div class="sub">StandardTouch e-Solutions</div>
+      </div>
+      <div class="hero-controls">
+        <input type="date" class="date-inp" id="sel-date" value="{{ date }}" onchange="loadAll(this.value)">
+        <button class="ctrl-btn" onclick="loadAll(document.getElementById('sel-date').value)"><i class="ti ti-refresh" aria-hidden="true"></i>Refresh</button>
+      </div>
+    </div>
+    <div class="gstats">
+      <div class="gs"><div class="gs-n" id="g-total">—</div><div class="gs-l">Total</div><div class="gs-bar"><div class="gs-fill" style="background:#EE1C29;width:100%"></div></div></div>
+      <div class="gs"><div class="gs-n g" id="g-in">—</div><div class="gs-l">Checked in</div><div class="gs-bar"><div class="gs-fill" id="gb-in" style="background:#4ade80"></div></div></div>
+      <div class="gs"><div class="gs-n b" id="g-eod">—</div><div class="gs-l">Checkout done</div><div class="gs-bar"><div class="gs-fill" id="gb-eod" style="background:#60a5fa"></div></div></div>
+      <div class="gs"><div class="gs-n r" id="g-miss">—</div><div class="gs-l">Missing</div><div class="gs-bar"><div class="gs-fill" id="gb-miss" style="background:#f87171"></div></div></div>
+      <div class="gs"><div class="gs-n a" id="g-leave">—</div><div class="gs-l">On leave</div><div class="gs-bar"><div class="gs-fill" id="gb-leave" style="background:#fbbf24"></div></div></div>
+    </div>
+  </div>
+  <div class="mgrid">
+    <div>
+      <div class="filter-bar">
+        <span class="fc on" data-f="all">All</span>
+        <span class="fc" data-f="missing">Missing</span>
+        <span class="fc" data-f="late">Late</span>
+        <span class="fc" data-f="leave">On leave</span>
+        <span class="fc" data-f="eod_done">Checkout done</span>
+      </div>
+      <div id="dept-list"><div id="loading"><i class="ti ti-loader" style="font-size:22px;animation:spin .7s linear infinite" aria-hidden="true"></i><br><br>Loading...</div></div>
+    </div>
+    <div style="position: sticky; top: 84px; display: flex; flex-direction: column; gap: 20px;">
+      {% if is_hr_manager %}
+      <div class="dp" id="lcr-panel" style="position: static;">
+        <div class="dp-hero" style="background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%);">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <i class="ti ti-lock-open" style="font-size: 20px; color: #fecaca;" aria-hidden="true"></i>
+            <div class="dp-name" style="font-size: 15px;">Late Checkout Requests</div>
+          </div>
+          <div class="dp-dept" style="color: rgba(255, 255, 255, 0.7); margin-top: 4px;">Approve to let one employee check out for one date</div>
+        </div>
+        <div class="dp-body" id="lcr-body" style="max-height: 320px; overflow-y: auto; padding: 16px;" aria-live="polite">
+          <div class="lcr-msg">Loading...</div>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="dp" id="leaderboard-panel" style="position: static;">
+        <div class="dp-hero" style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <i class="ti ti-trophy" style="font-size: 20px; color: #fbbf24;"></i>
+            <div class="dp-name" style="font-size: 15px;">Hours Leaderboard</div>
+          </div>
+          <div class="dp-dept" style="color: rgba(255, 255, 255, 0.7); margin-top: 4px;">Employees ranked by net hours worked</div>
+        </div>
+        <div class="dp-body" id="leaderboard-body" style="max-height: 320px; overflow-y: auto; padding: 16px;">
+          <div style="text-align: center; color: var(--text-light); font-size: 12px; padding: 16px 0;">No checkout logs submitted yet for this date.</div>
+        </div>
+      </div>
+
+      <div class="dp" id="detail-panel" style="position: static;">
+        <div class="dp-body">
+          <div class="empty-dp"><i class="ti ti-user-search" aria-hidden="true"></i><p>Click any employee to view their tasks and time details</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</main>
+</div>
+{{ classic_mobnav(st_shell, 'management') }}
+<script src="/assets/st_attendance_tracker/js/dashboard_utils.js"></script>
+<script src="/assets/st_attendance_tracker/js/whats_new.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
+<script src="/assets/st_attendance_tracker/js/tour.js"></script>
+<script>
+var ALL_DEPTS = [];
+var CUR_FILTER = 'all';
+var SEL_EMP = null;
+var STANDARD_WORKDAY_MINUTES = 480;
+
+function getInitials(n){ var p=(n||'').split(' ').filter(Boolean); return p.length>=2?(p[0][0]+p[1][0]).toUpperCase():n.slice(0,2).toUpperCase(); }
+function getAv(n){ var cls=['av-g','av-b','av-a','av-p','av-r'], s=0; for(var i=0;i<n.length;i++) s+=n.charCodeAt(i); return cls[s%cls.length]; }
+function getDot(status){ var m={checked_in:'dot-g',late:'dot-a',missing:'dot-r',leave:'dot-x',eod_done:'dot-g'}; return m[status]||'dot-x'; }
+function getDotLabel(status){ var m={checked_in:'Checked in',late:'Late',missing:'Missing',leave:'On leave',eod_done:'Checkout done'}; return m[status]||status; }
+function getStag(s){ if(s==='Done') return 'st-dn'; if(s==='In Progress') return 'st-ip'; return 'st-pe'; }
+function isPendingTask(t){ return ['Pending','In Progress','Rolled Over'].indexOf(t.status)!==-1; }
+var DEPT_ICONS = ['ti-code','ti-users','ti-speakerphone','ti-tools','ti-truck','ti-building-factory'];
+
+function renderDepts(){
+  var list = document.getElementById('dept-list');
+  var depts = ALL_DEPTS;
+  if(!depts.length){ list.innerHTML='<div style="text-align:center;padding:40px;color:#9ca3af;font-size:13px">No departments found.</div>'; return; }
+
+  list.innerHTML = depts.map(function(dept, idx){
+    var emps = dept.employees||[];
+    var filtered = CUR_FILTER==='all' ? emps : emps.filter(function(e){ return e.status===CUR_FILTER || (CUR_FILTER==='leave'&&e.status==='leave'); });
+    var checkedIn = emps.filter(function(e){ return ['checked_in','late','eod_done'].includes(e.status); }).length;
+    var pct = emps.length>0?Math.round(checkedIn/emps.length*100):0;
+    var iconCls = ['di0','di1','di2','di3','di4','di5'][idx%6];
+    var icon = DEPT_ICONS[idx%DEPT_ICONS.length];
+
+    var empCells = filtered.map(function(emp){
+      var selCls = SEL_EMP===emp.name?' sel':'';
+      var timeStr = emp.login_time ? esc(emp.login_time) : (emp.status==='leave'?'On leave':'Not in');
+      var done=emp.done_tasks||0, tot=emp.total_tasks||0, ep=tot>0?Math.round(done/tot*100):0;
+      return '<div class="ec'+selCls+'" data-emp="'+esc(emp.name)+'" onclick="selectEmp(this,\''+esc(emp.name)+'\')">'+
+        '<div class="ec-top"><div class="ec-av '+getAv(emp.employee_name)+'">'+getInitials(emp.employee_name)+'</div>'+
+        '<span class="ec-name">'+esc(emp.employee_name)+'</span></div>'+
+        '<div class="ec-status"><span class="dot '+getDot(emp.status)+'"></span><span style="color:#374151">'+getDotLabel(emp.status)+'</span></div>'+
+        '<div class="ec-time">'+timeStr+'</div>'+
+        (tot>0?'<div class="ec-prog"><div class="ecp-t"><div class="ecp-f" style="width:'+ep+'%"></div></div><span class="ecp-l">'+done+'/'+tot+'</span></div>':'')+
+      '</div>';
+    }).join('');
+
+    return '<div class="dept-card">'+
+      '<div class="dept-head">'+
+        '<div class="dept-ico '+iconCls+'"><i class="ti '+icon+'" aria-hidden="true"></i></div>'+
+        '<div><div class="dept-name">'+esc(dept.department)+'</div><div class="dept-meta">'+emps.length+' employees</div></div>'+
+        '<div class="dept-prog"><div class="dp-trk"><div class="dp-fill" style="width:'+pct+'%"></div></div><span class="dp-lbl">'+checkedIn+'/'+emps.length+'</span></div>'+
+      '</div>'+
+      (filtered.length?'<div class="emp-grid">'+empCells+'</div>':'<div style="padding:12px 16px;font-size:12px;color:#9ca3af;font-style:italic">No employees match this filter.</div>')+
+    '</div>';
+  }).join('');
+}
+
+var SEL_EMP_GEN = 0;
+function selectEmp(cell, empName){
+  document.querySelectorAll('.ec').forEach(function(c){ c.classList.remove('sel'); });
+  cell.classList.add('sel');
+  SEL_EMP = empName;
+  var gen = ++SEL_EMP_GEN;
+
+  var panel = document.getElementById('detail-panel');
+  panel.innerHTML='<div class="dp-body"><div style="text-align:center;padding:32px;color:#9ca3af;font-size:13px"><i class="ti ti-loader" style="font-size:18px;animation:spin .7s linear infinite" aria-hidden="true"></i></div></div>';
+
+  frappe.call({
+    method:'st_attendance_tracker.api.get_employee_task_detail',
+    args:{ employee_name:empName, date:document.getElementById('sel-date').value },
+    callback:function(r){ if(gen === SEL_EMP_GEN && r.message) renderDetail(r.message); },
+    error:function(){
+      if(gen !== SEL_EMP_GEN) return;
+      document.getElementById('detail-panel').innerHTML =
+        '<div class="dp-body"><div style="text-align:center;padding:32px;color:#b91c1c;font-size:13px">Could not load employee details. <a href="#" onclick="selectEmp(document.querySelector(\'.ec.sel\'),\''+esc(empName)+'\');return false;">Retry</a></div></div>';
+    }
+  });
+}
+
+function renderDetail(data){
+  var emp=data.employee||{}, ml=data.morning_log||{}, el=data.eod_log||{}, tasks=data.tasks||[];
+  var done=tasks.filter(function(t){ return t.status==='Done'; }).length;
+  var pend=tasks.filter(isPendingTask).length;
+
+  var taskRows='';
+  if(!tasks.length) taskRows='<div style="font-size:12px;color:#9ca3af;font-style:italic;padding:8px 0">No tasks recorded for this date.</div>';
+  else taskRows=tasks.map(function(t){
+    var pills='';
+    if(t.estimated_time) pills+='<span class="tp"><i class="ti ti-clock" aria-hidden="true"></i>'+esc(t.estimated_time)+'</span>';
+    if(t.actual_time) pills+='<span class="tp"><i class="ti ti-check" aria-hidden="true"></i>'+esc(t.actual_time)+'</span>';
+    if(t.is_carried) pills+='<span class="tp"><i class="ti ti-history" aria-hidden="true"></i>Carried</span>';
+    var atts=(t.attachments||[]).map(function(f){
+      return '<a class="tp" target="_blank" href="/api/method/st_attendance_tracker.api.view_task_attachment?file_name='+encodeURIComponent(f.name)+'&task_name='+encodeURIComponent(t.name)+'"><i class="ti ti-paperclip" aria-hidden="true"></i>'+esc(f.file_name)+'</a>';
+    }).join('');
+    return '<div class="task-row">'+
+      '<i class="ti '+getTaskIcon(t.status)+' task-ico" aria-hidden="true"></i>'+
+      '<div class="task-body">'+
+        '<div class="task-desc'+(t.status==='Done'?' dn':'')+'">'+esc(t.description)+'</div>'+
+        (pills?'<div class="task-pills">'+pills+'</div>':'')+
+        (atts?'<div class="task-pills">'+atts+'</div>':'')+
+      '</div>'+
+      '<span class="stag '+getStag(t.status)+'">'+esc(t.status)+'</span>'+
+    '</div>';
+  }).join('');
+
+  document.getElementById('detail-panel').innerHTML=
+    '<div class="dp-hero">'+
+      '<div class="dp-hero-row">'+
+        '<div class="dp-av">'+getInitials(emp.employee_name||'')+'</div>'+
+        '<div><div class="dp-name">'+esc(emp.employee_name)+'</div>'+
+        '<div class="dp-dept">'+esc(emp.department)+(emp.designation?' · '+esc(emp.designation):'')+'</div></div>'+
+      '</div>'+
+      '<div class="dp-stats">'+
+        '<div class="dps"><div class="dps-n g">'+done+'</div><div class="dps-l">Completed</div></div>'+
+        '<div class="dps"><div class="dps-n a">'+pend+'</div><div class="dps-l">Pending</div></div>'+
+        '<div class="dps"><div class="dps-n">'+tasks.length+'</div><div class="dps-l">Total</div></div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="dp-body">'+
+      '<div class="dp-sec">'+
+        '<div class="dp-lbl">Time</div>'+
+        '<div class="tg">'+
+          '<div class="tc"><div class="tc-l">Login</div><div class="tc-v">'+(ml.login_time?formatTimeHM(ml.login_time):'—')+(ml.is_late?' <span style="color:#d97706;font-size:10px">Late</span>':'')+'</div></div>'+
+          '<div class="tc"><div class="tc-l">Logout</div><div class="tc-v">'+(el.logout_time?formatTimeHM(el.logout_time):'—')+'</div></div>'+
+          '<div class="tc"><div class="tc-l">Lunch</div><div class="tc-v" style="font-size:12px">'+(el.lunch_from?formatTimeHM(el.lunch_from)+'–'+formatTimeHM(el.lunch_to):'—')+'</div></div>' +
+          '<div class="tc"><div class="tc-l">Net hours</div><div class="tc-v g">'+(el.net_hours||'—')+'</div></div>' +
+        '</div>'+
+      '</div>'+
+      '<div class="dp-sec">'+
+        '<div class="dp-lbl">Tasks ('+tasks.length+')</div>'+
+        taskRows+
+      '</div>'+
+    '</div>';
+}
+
+function renderLeaderboard(rankings){
+  var body = document.getElementById('leaderboard-body');
+  if(!body) return;
+  if(!rankings || !rankings.length){
+    body.innerHTML = '<div style="text-align: center; color: var(--text-light); font-size: 12px; padding: 16px 0;">No checkout logs submitted yet for this date.</div>';
+    return;
+  }
+
+  body.innerHTML = rankings.map(function(r, idx){
+    var rankNum = idx + 1;
+    var rankBadge = '<div style="width: 24px; height: 24px; border-radius: 50%; background: var(--st-panel2,#f1f5f9); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--st-muted,#475569);">#' + rankNum + '</div>';
+    if(rankNum === 1) rankBadge = '<div style="width: 24px; height: 24px; border-radius: 50%; background: #fef3c7; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #d97706;"><i class="ti ti-trophy" style="font-size:12px;color:#d97706" aria-hidden="true"></i></div>';
+    else if(rankNum === 2) rankBadge = '<div style="width: 24px; height: 24px; border-radius: 50%; background: var(--st-panel2,#f1f5f9); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--st-muted,#475569);"><i class="ti ti-medal" style="font-size:12px;color:var(--st-muted,#475569)" aria-hidden="true"></i></div>';
+    else if(rankNum === 3) rankBadge = '<div style="width: 24px; height: 24px; border-radius: 50%; background: #ffedd5; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #ea580c;"><i class="ti ti-medal" style="font-size:12px;color:#ea580c" aria-hidden="true"></i></div>';
+
+    var hoursStr = r.net_hours;
+    var otBadge = '';
+    if(r.net_minutes > STANDARD_WORKDAY_MINUTES) {
+      var otMin = r.net_minutes - STANDARD_WORKDAY_MINUTES;
+      var oth = Math.floor(otMin / 60);
+      var otm = otMin % 60;
+      var otStr = '+' + oth + 'h' + (otm > 0 ? ' ' + otm + 'm' : '') + ' OT';
+      otBadge = '<span class="day-badge db-full" style="font-size: 8px; padding: 2px 6px; margin-top: 4px; display: inline-block;">' + otStr + '</span>';
+    } else if (r.is_half_day) {
+      otBadge = '<span class="day-badge db-part" style="font-size: 8px; padding: 2px 6px; margin-top: 4px; display: inline-block;">Half-Day</span>';
+    } else {
+      otBadge = '<span class="day-badge db-no" style="font-size: 8px; padding: 2px 6px; margin-top: 4px; display: inline-block; background:var(--st-panel2,#f1f5f9); color:var(--st-muted,#475569); border-color:var(--st-line,#cbd5e1);">Regular</span>';
+    }
+
+    var timeRange = r.login_time + ' – ' + r.logout_time;
+
+    return '<div style="display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--st-line,#f1f5f9);">' +
+      rankBadge +
+      '<div style="flex: 1; min-width: 0;">' +
+        '<div style="font-size: 13px; font-weight: 600; color: var(--st-ink,#0f172a); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + esc(r.employee_name) + '</div>' +
+        '<div style="font-size: 11px; color: var(--st-muted,#64748b);">' + timeRange + '</div>' +
+      '</div>' +
+      '<div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end;">' +
+        '<div style="font-size: 13px; font-weight: 700; color: #047857;">' + hoursStr + '</div>' +
+        otBadge +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function updateGlobal(summary){
+  var s=summary||{}, tot=Math.max(s.total||1,1);
+  document.getElementById('g-total').textContent=s.total||0;
+  document.getElementById('g-in').textContent=s.checked_in||0;
+  document.getElementById('g-eod').textContent=s.eod_done||0;
+  document.getElementById('g-miss').textContent=s.missing||0;
+  document.getElementById('g-leave').textContent=s.on_leave||0;
+  document.getElementById('gb-in').style.width=Math.round((s.checked_in||0)/tot*100)+'%';
+  document.getElementById('gb-eod').style.width=Math.round((s.eod_done||0)/tot*100)+'%';
+  document.getElementById('gb-miss').style.width=Math.round((s.missing||0)/tot*100)+'%';
+  document.getElementById('gb-leave').style.width=Math.round((s.on_leave||0)/tot*100)+'%';
+}
+
+document.querySelectorAll('.fc').forEach(function(chip){
+  chip.addEventListener('click',function(){
+    document.querySelectorAll('.fc').forEach(function(c){ c.classList.remove('on'); });
+    chip.classList.add('on');
+    CUR_FILTER=chip.dataset.f;
+    renderDepts();
+  });
+});
+
+function resetDetailPanel(){
+  SEL_EMP = null;
+  SEL_EMP_GEN++; // invalidate any in-flight selectEmp() request
+  document.querySelectorAll('.ec.sel').forEach(function(c){ c.classList.remove('sel'); });
+  document.getElementById('detail-panel').innerHTML =
+    '<div class="dp-body"><div class="empty-dp"><i class="ti ti-user-search" aria-hidden="true"></i><p>Click any employee to view their tasks and time details</p></div></div>';
+}
+
+function loadLateCheckoutRequests(){
+  var body = document.getElementById('lcr-body');
+  if(!body) return;
+  frappe.call({
+    method:'st_attendance_tracker.api.get_late_checkout_requests',
+    callback:function(r){ renderLateCheckoutRequests(r.message||[]); },
+    error:function(){ body.replaceChildren(lcrMsg('Could not load requests.')); }
+  });
+}
+function lcrMsg(text){
+  var d = document.createElement('div'); d.className = 'lcr-msg'; d.textContent = text; return d;
+}
+function renderLateCheckoutRequests(rows){
+  var body = document.getElementById('lcr-body');
+  if(!rows.length){ body.replaceChildren(lcrMsg('No pending requests.')); return; }
+  body.replaceChildren.apply(body, rows.map(function(row){
+    var el = document.createElement('div'); el.className = 'lcr-row';
+    var name = document.createElement('div'); name.className = 'lcr-name'; name.textContent = row.employee_name || row.employee;
+    var meta = document.createElement('div'); meta.className = 'lcr-meta';
+    meta.textContent = (row.department || '') + (row.department ? ' · ' : '') + 'Checkout for ' + row.date;
+    var reason = document.createElement('div'); reason.className = 'lcr-reason';
+    reason.textContent = row.reason ? 'Reason: ' + row.reason : 'No reason given';
+    var act = document.createElement('div'); act.className = 'lcr-act';
+    var input = document.createElement('input'); input.type = 'text'; input.maxLength = 200;
+    input.placeholder = 'Approval note (optional)';
+    input.setAttribute('aria-label', 'Approval note for ' + (row.employee_name || row.employee));
+    var btn = document.createElement('button'); btn.type = 'button'; btn.textContent = 'Approve';
+    btn.onclick = function(){ approveLateCheckout(row, input, btn); };
+    act.append(input, btn);
+    el.append(name, meta, reason, act);
+    return el;
+  }));
+}
+function approveLateCheckout(row, input, btn){
+  var note = input.value.trim();
+  btn.disabled = true;
+  frappe.call({
+    method:'st_attendance_tracker.api.unlock_late_checkout',
+    type:'POST',
+    args:{ employee: row.employee, date: row.date, reason: note },
+    callback:function(){ loadLateCheckoutRequests(); },
+    error:function(){ btn.disabled = false; btn.textContent = 'Retry'; }
+  });
+}
+
+
+var LOAD_ALL_GEN = 0;
+function loadAll(date){
+  var gen = ++LOAD_ALL_GEN;
+  loadLateCheckoutRequests();
+  resetDetailPanel();
+  document.getElementById('dept-list').innerHTML='<div id="loading" style="text-align:center;padding:48px;color:#9ca3af;font-size:13px"><i class="ti ti-loader" style="font-size:22px;animation:spin .7s linear infinite" aria-hidden="true"></i><br><br>Loading...</div>';
+  frappe.call({
+    method:'st_attendance_tracker.api.get_management_dashboard',
+    args:{ date: date || document.getElementById('sel-date').value },
+    callback:function(r){
+      if(gen !== LOAD_ALL_GEN) return; // a newer request has superseded this one
+      if(!r.message) return;
+      ALL_DEPTS = r.message.departments||[];
+      if(r.message.standard_workday_minutes) STANDARD_WORKDAY_MINUTES = r.message.standard_workday_minutes;
+      updateGlobal(r.message.summary);
+      if(r.message.rankings) renderLeaderboard(r.message.rankings);
+      renderDepts();
+    },
+    error:function(){
+      if(gen !== LOAD_ALL_GEN) return;
+      document.getElementById('dept-list').innerHTML =
+        '<div style="text-align:center;padding:48px;color:#b91c1c;font-size:13px">Could not load dashboard. <a href="#" onclick="loadAll();return false;">Retry</a></div>';
+    }
+  });
+}
+
+var MANAGEMENT_DASHBOARD_TOUR_STEPS = [
+  { element: '.gstats', popover: { title: 'Company overview', description: 'Total employees, checked in, checkout done, missing, and on leave — for the selected date.', side: 'bottom' } },
+  { element: '.filter-bar', popover: { title: 'Filter departments', description: 'Narrow every department card down by status.', side: 'bottom' } },
+  { element: '#dept-list', popover: { title: 'Departments', description: 'Click any employee card to see their tasks and time for the day.', side: 'right' } },
+  { element: '#detail-panel', popover: { title: 'Employee detail', description: 'Details for whoever you pick show up here.', side: 'left' } },
+  { element: '#leaderboard-body', popover: { title: 'Checkout leaderboard', description: 'Everyone who has submitted checkout for the date, ranked by net hours.', side: 'left' } }
+];
+
+frappe.ready(function(){
+  loadAll('{{ date }}'); initWhatsNew();
+  {% if show_tour_management_dashboard %}
+  setTimeout(function(){ STTour.start('management_dashboard_v1', MANAGEMENT_DASHBOARD_TOUR_STEPS); }, 600);
+  {% endif %}
+});
+
+function toggleProfileDropdown(e) {
+  if (e) e.stopPropagation();
+  var dd = document.getElementById('profile-dropdown');
+  if (dd) {
+    dd.classList.toggle('show');
+  }
+}
+
+document.addEventListener('click', function(e) {
+  var dd = document.getElementById('profile-dropdown');
+  if (dd && dd.classList.contains('show')) {
+    if (!dd.contains(e.target)) {
+      dd.classList.remove('show');
+    }
+  }
+});
+</script>
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_classic.css?v=19">
+<script src="/assets/st_attendance_tracker/js/st_classic.js?v=8" data-new="/management-dashboard"></script>
+{% endblock %}

@@ -3,11 +3,15 @@ from frappe.model.document import Document
 from frappe.utils import now_datetime, flt
 from st_attendance_tracker.time_utils import (
     parse_duration_to_hours, time_to_minutes, validate_lunch_hours, calculate_net_minutes,
+    is_checkout_locked,
 )
 from st_attendance_tracker.api import _get_attendance_settings
 
 
 _TIME_FIELDS = ("login_time", "logout_time", "lunch_from", "lunch_to")
+_UNLOCK_FIELDS = ("checkout_unlocked", "unlocked_by", "unlocked_at", "unlock_reason")
+_UNLOCK_REQUEST_FIELDS = ("unlock_requested_at", "unlock_request_reason")
+_UNLOCK_ROLES = {"HR Manager", "System Manager"}
 
 
 class DailyWorkLog(Document):
@@ -38,8 +42,9 @@ class DailyWorkLog(Document):
                 frappe.throw("No Employee record linked to your user account.")
 
     def validate(self):
-        self._check_ownership()
         self._check_locked()
+        self._guard_unlock_fields()
+        self._check_checkout_window()
         self._validate_no_duplicate()
         self._prepare_tasks()
         if self.eod_submitted and not self.login_time:
@@ -57,35 +62,44 @@ class DailyWorkLog(Document):
             self.locked_at = None
 
     def on_trash(self):
-        # validate() is never called on delete — without this, the ownership
-        # guard above is silently bypassed for the one action (delete) the
-        # doctype's own permissions actually allow employees to do.
-        self._check_ownership()
+        pass
 
-    def _check_ownership(self):
-        """Block logging attendance for another employee (BOLA guard)."""
-        if frappe.session.user in ("Administrator", "Guest"):
-            return
-        # Set only by api._assign_task, for the one legitimate cross-employee
-        # write this guard needs to allow: a Team Leader assigning a task to
-        # a team member. Narrower than granting "Team Lead" a role-wide
-        # bypass here (that would let them edit ANY employee's work log via
-        # Desk, not just their own team's) — _assign_task's callers already
-        # re-verify actual team membership via _get_team_members before this
-        # flag is ever set.
-        if getattr(frappe.flags, "in_task_assignment", False):
-            return
-        allowed_roles = {"HR Manager", "System Manager", "ST Task Assignment Agent"}
-        if allowed_roles & set(frappe.get_roles(frappe.session.user)):
-            return
-        current_employee = frappe.db.get_value(
-            "Employee", {"user_id": frappe.session.user}, "name"
+    def on_update(self):
+        if self.eod_submitted and self.get_doc_before_save() and not self.get_doc_before_save().eod_submitted:
+            self._trigger_eod_automation()
+
+    def _trigger_eod_automation(self):
+        from st_attendance_tracker.api import (
+            _cascade_series_done, _make_checkin, _make_lunch_checkins, _rollover_pending_tasks,
+            _send_eod_notifications
         )
-        if self.employee != current_employee:
-            frappe.throw(
-                "You are not allowed to create or edit another employee's attendance log.",
-                frappe.PermissionError,
-            )
+        
+        # Cascade done tasks
+        newly_done_series = [row.series_id for row in self.tasks if row.status == "Done" and row.series_id]
+        for series_id in newly_done_series:
+            _cascade_series_done(series_id, self.date)
+            
+        # Lunch goes in before the final OUT so no auto-attendance run sees a partial set
+        _make_lunch_checkins(self.employee, self.lunch_from, self.lunch_to, self.date)
+
+        # Check out
+        _make_checkin(self.employee, "OUT", self.logout_time, on_date=self.date)
+        
+        # Rollover
+        _rollover_pending_tasks(self.employee, self.date)
+        
+        # Notify
+        is_late_checkout = str(self.date) != str(now_datetime().strftime("%Y-%m-%d"))
+        frappe.enqueue(
+            _send_eod_notifications,
+            queue="short",
+            enqueue_after_commit=True,
+            employee_name=self.employee,
+            date=self.date,
+            checkout_action_time=now_datetime(),
+            is_late_checkout=is_late_checkout,
+        )
+
 
     def _check_locked(self):
         """Block edits once End of Day has been submitted (regular employee only)."""
@@ -101,6 +115,42 @@ class DailyWorkLog(Document):
             frappe.throw(
                 "Cannot modify this log after End of Day has been submitted.",
                 frappe.ValidationError,
+            )
+
+    def _guard_unlock_fields(self):
+        """The late-checkout approval fields are read-only in the form, but
+        that does not stop a direct REST write — enforce it here. Only an HR
+        Manager/System Manager may unlock; an employee may only record their
+        own request, and only through request_late_checkout_approval."""
+        if frappe.session.user == "Administrator":
+            return
+        before = self.get_doc_before_save()
+
+        def changed(fieldnames):
+            return any(
+                (self.get(f) or None) != ((before.get(f) if before else None) or None)
+                for f in fieldnames
+            )
+
+        if changed(_UNLOCK_FIELDS) and not (_UNLOCK_ROLES & set(frappe.get_roles(frappe.session.user))):
+            frappe.throw("Only an HR Manager can unlock late checkout.", frappe.PermissionError)
+        if changed(_UNLOCK_REQUEST_FIELDS) and not frappe.flags.in_late_checkout_request \
+                and not (_UNLOCK_ROLES & set(frappe.get_roles(frappe.session.user))):
+            frappe.throw("Request late checkout approval from the check-in page.", frappe.PermissionError)
+
+    def _check_checkout_window(self):
+        """Checkout closes at the cutoff time unless HR unlocked this log.
+        Enforced on the document so REST/desk writes cannot bypass the
+        whitelisted checkout API's own gate."""
+        if not self.eod_submitted or frappe.session.user == "Administrator":
+            return
+        before = self.get_doc_before_save()
+        if before and before.eod_submitted:
+            return
+        if is_checkout_locked(self.date, self.checkout_unlocked):
+            frappe.throw(
+                "Checkout window is closed. Get late checkout approval from HR.",
+                frappe.PermissionError,
             )
 
     def _validate_no_duplicate(self):
@@ -134,7 +184,15 @@ class DailyWorkLog(Document):
             if not (row.description or "").strip():
                 frappe.throw("Task description cannot be empty.")
             if row.status == "Done" and not row.actual_time:
-                frappe.throw("Time Taken for Task Completion is mandatory for completed tasks.")
+                if getattr(frappe.flags, "in_eod_draft", False):
+                    # Mid-edit autosave — the employee may have flipped the
+                    # status just before typing the time. Downgrade instead
+                    # of hard-failing a background save; submit_eod_log's
+                    # own path never sets this flag, so its "Done requires
+                    # actual_time" guarantee at final checkout is unchanged.
+                    row.status = "In Progress"
+                else:
+                    frappe.throw("Time Taken for Task Completion is mandatory for completed tasks.")
 
     def _check_late(self):
         if not self.login_time:

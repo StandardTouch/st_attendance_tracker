@@ -4,7 +4,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css">
 <link rel="stylesheet" href="/assets/st_attendance_tracker/css/whats_new.css"><style>
@@ -2567,6 +2567,22 @@ body {
   align-items: center;
   gap: 8px;
 }
+.lock-card {
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  color: #991b1b;
+}
+.lock-card-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.lock-card-row + .lock-card-row { margin-top: 8px; }
+.lock-card input[type=text] {
+  flex: 1 1 200px; min-width: 0; height: 34px; padding: 0 10px;
+  border: 1px solid #fecaca; border-radius: var(--radius-md); font-size: 12px;
+}
+.lock-card input[type=text]:focus-visible, .lock-card .fbtn:focus-visible { outline: 2px solid #dc2626; outline-offset: 1px; }
 .remark-toggle {
   display: flex;
   align-items: center;
@@ -2577,6 +2593,8 @@ body {
   user-select: none;
   margin-top: 6px;
 }
+.repeat-toggle { display: none; }
+.repeat-toggle.show { display: flex; }
 .remark-toggle input {
   cursor: pointer;
   accent-color: var(--primary);
@@ -3039,12 +3057,16 @@ body > .container { padding-top: 0 !important; }
   }
 }
 </style>
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_classic_layout.css?v=5">
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_classic.css?v=19">
 {% endblock %}
 {% block page_content %}
+{% from "st_attendance_tracker/templates/macros/classic_shell.html" import classic_nav, classic_sidebar, classic_mobnav %}
 <div class="app">
 <nav class="tnav">
   <div class="tnav-con">
-    <span class="tnav-logo">ST Tracker</span>
+    <button type="button" class="tnav-burger" id="cl-burger" aria-label="Open menu" aria-expanded="false" aria-controls="cl-drawer"><i class="ti ti-menu-2" aria-hidden="true"></i></button>
+    <span class="tnav-logo"><b>Standard</b><i>Touch</i></span>
     <span class="tnav-sep"></span>
     <span class="tnav-bc">{% if eod_done %}Day Complete{% elif is_checked_in %}Working{% else %}Check-In{% endif %}</span>
     <div class="tnav-pb" id="tnav-pb" style="display:flex; align-items:center; gap:12px; margin-left:16px; border-left:1px solid var(--border); padding-left:16px; transition:opacity 0.2s;">
@@ -3062,7 +3084,7 @@ body > .container { padding-top: 0 !important; }
     <div class="tnav-r">
       <span class="tnav-date">{{ date }}</span>
       <a href="/docs" target="_blank" class="tnav-btn"><i class="ti ti-book-2" aria-hidden="true"></i>Docs</a>
-      <a href="/my-history" class="tnav-btn tnav-btn-history"><i class="ti ti-history" aria-hidden="true"></i>History</a>
+      <a href="/my-history-classic" class="tnav-btn tnav-btn-history"><i class="ti ti-history" aria-hidden="true"></i>History</a>
       <button type="button" class="tnav-btn" onclick="STTour.start('daily_checkin_v1', DAILY_CHECKIN_TOUR_STEPS)"><i class="ti ti-map-2" aria-hidden="true"></i>Tour</button>
       <div class="wn-bell-wrap" id="wn-mount"></div>
       <div class="tnav-av" onclick="toggleProfileDropdown(event)" style="cursor:pointer;" title="Account Options">{{ employee.employee_name[:2].upper() }}</div>
@@ -3076,30 +3098,8 @@ body > .container { padding-top: 0 !important; }
 </nav>
 <div id="wn-banner-mount"></div>
 <div class="cols">
-<aside class="sidebar">
-  <div class="sb-top">
-    <div class="sb-card" style="align-items: flex-start;">
-      <div class="sb-av" style="margin-top: 2px;">{{ employee.employee_name[:2].upper() }}</div>
-      <div style="flex: 1; min-width: 0;">
-        <div class="sb-name" style="word-break: break-word; font-size: 13px; font-weight: 700; color: var(--text-main); line-height: 1.35;">{{ employee.employee_name }}</div>
-        <div class="sb-dept" style="word-break: break-word; font-size: 11px; color: var(--text-muted); margin-top: 2px; margin-bottom: 8px;">{{ employee.department or 'No department' }}</div>
-        {% if eod_done %}<span class="sb-badge sbb-eod" style="margin-left: 0; display: inline-block;">Checkout done</span>
-        {% elif is_checked_in %}<span class="sb-badge sbb-checked-in" style="margin-left: 0; display: inline-block;">Checked in</span>
-        {% else %}<span class="sb-badge sbb-out" style="margin-left: 0; display: inline-block;">Not checked in</span>{% endif %}
-      </div>
-    </div>
-  </div>
-  <div class="sb-sec">
-    <div class="sb-lbl">Navigation</div>
-    <a href="/daily-checkin" class="sb-link on"><i class="ti ti-check" aria-hidden="true"></i>Today<span class="sb-cnt">{{ total_count }}</span></a>
-    <a href="/my-history" class="sb-link"><i class="ti ti-history" aria-hidden="true"></i>My history</a>
-    <a href="/recurring-tasks" class="sb-link"><i class="ti ti-repeat" aria-hidden="true"></i>Recurring{% if recurring_count %}<span class="sb-cnt">{{ recurring_count }}</span>{% endif %}</a>
-    <a href="/task-backlog" class="sb-link"><i class="ti ti-list-details" aria-hidden="true"></i>Task Backlog{% if backlog_count %}<span class="sb-cnt">{{ backlog_count }}</span>{% endif %}</a>
-    <a href="/additional-work" class="sb-link"><i class="ti ti-briefcase" aria-hidden="true"></i>Additional work</a>
-    {% if is_team_leader %}<a href="/team-dashboard" class="sb-link"><i class="ti ti-users" aria-hidden="true"></i>My team</a>{% endif %}
-    {% if is_hr_manager %}<a href="/management-dashboard" class="sb-link"><i class="ti ti-building" aria-hidden="true"></i>Management Dashboard</a>{% endif %}
-  </div>
-</aside>
+{% if eod_done %}{% set badge_cls = 'sbb-eod' %}{% set badge_text = 'Checkout done' %}{% elif is_checked_in %}{% set badge_cls = 'sbb-checked-in' %}{% set badge_text = 'Checked in' %}{% else %}{% set badge_cls = 'sbb-out' %}{% set badge_text = 'Not checked in' %}{% endif %}
+{{ classic_sidebar(st_shell, employee, 'today', {'today': total_count|default(0), 'recurring': recurring_count|default(0), 'backlog': backlog_count|default(0)}, badge_cls, badge_text) }}
 <main class="main">
 <div class="st-stats-row">
   <div class="ss-item">
@@ -3153,18 +3153,43 @@ body > .container { padding-top: 0 !important; }
       <div><div class="dg-l">Working Hours</div><div class="dg-v" style="color:var(--primary)">{{ working_hours }}</div></div>
     </div>
     <div class="done-links">
-      <a href="/my-history" class="dl-btn"><i class="ti ti-history" aria-hidden="true"></i>View history</a>
-      {% if is_team_leader %}<a href="/team-dashboard" class="dl-btn"><i class="ti ti-users" aria-hidden="true"></i>Team</a>{% endif %}
-      {% if is_hr_manager %}<a href="/management-dashboard" class="dl-btn"><i class="ti ti-building" aria-hidden="true"></i>Management Dashboard</a>{% endif %}
+      <a href="/my-history-classic" class="dl-btn"><i class="ti ti-history" aria-hidden="true"></i>View history</a>
+      {% if is_team_leader %}<a href="/team-dashboard-classic" class="dl-btn"><i class="ti ti-users" aria-hidden="true"></i>Team</a>{% endif %}
+      {% if is_hr_manager %}<a href="/management-dashboard-classic" class="dl-btn"><i class="ti ti-building" aria-hidden="true"></i>Management Dashboard</a>{% endif %}
     </div>
   </div>
 </div>
 {% elif is_checked_in %}
 <div class="body">
+  {% if checkout_locked %}
+  <div class="lock-card" role="alert">
+    <div class="lock-card-row"><i class="ti ti-lock" aria-hidden="true"></i><span>Checkout closed at {{ checkout_cutoff_label }} for <strong>{{ checkout_date_label }}</strong>. Get late checkout approval from HR.</span></div>
+    {% if checkout_unlock_requested %}
+    <div class="lock-card-row"><i class="ti ti-clock-check" aria-hidden="true"></i><span>Approval requested. HR has been notified.</span></div>
+    {% else %}
+    <div class="lock-card-row">
+      <input type="text" maxlength="200" aria-label="Reason for late checkout" placeholder="Reason (required)…" id="lock-reason-{{ date }}">
+      <button type="button" class="fbtn dk" onclick="requestLateCheckout('{{ date }}', this)">Request HR approval</button>
+    </div>
+    {% endif %}
+  </div>
+  {% elif missed_checkout %}
+  <div class="lock-card" role="alert">
+    <div class="lock-card-row"><i class="ti ti-lock" aria-hidden="true"></i><span>You did not check out on <strong>{{ missed_checkout_label }}</strong>. Get late checkout approval from HR.{% if checkin_blocked %} You cannot check in until that checkout is completed.{% endif %}</span></div>
+    {% if missed_checkout.unlock_requested_at %}
+    <div class="lock-card-row"><i class="ti ti-clock-check" aria-hidden="true"></i><span>Approval requested. HR has been notified.</span></div>
+    {% else %}
+    <div class="lock-card-row">
+      <input type="text" maxlength="200" aria-label="Reason for late checkout" placeholder="Reason (required)…" id="lock-reason-{{ missed_checkout.date }}">
+      <button type="button" class="fbtn dk" onclick="requestLateCheckout('{{ missed_checkout.date }}', this)">Request HR approval</button>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
   {% if is_late_checkout %}
   <div class="late-checkout-banner">
     <i class="ti ti-alert-triangle" aria-hidden="true"></i>
-    <span>You're completing checkout for <strong>{{ checkout_date_label }}</strong> — check-in was left open from that day. Today's attendance is tracked separately.</span>
+    <span>You're completing checkout for <strong>{{ checkout_date_label }}</strong> — check-in was left open from that day. Enter the time you actually logged out. Today's attendance is tracked separately.</span>
   </div>
   {% endif %}
   <div class="eod-f">
@@ -3173,21 +3198,21 @@ body > .container { padding-top: 0 !important; }
       <div class="ef-sep"></div>
       <div class="ef-field">
         <span class="ef-field-label">Logout</span>
-        <input type="time" id="logout_time" value="{{ current_time }}" readonly>
+        {% if is_late_checkout %}<input type="time" id="logout_time" value="" required aria-label="Time you actually logged out on {{ checkout_date_label }}" title="Enter the time you actually logged out on {{ checkout_date_label }}">{% else %}<input type="time" id="logout_time" value="{{ current_time }}" readonly>{% endif %}
       </div>
       <label class="ef-lunch-toggle">
-        <input type="checkbox" id="include_lunch" onchange="toggleLunchFields()">
+        <input type="checkbox" id="include_lunch" onchange="toggleLunchFields()" {% if include_lunch %}checked{% endif %}>
         <span>Lunch break</span>
       </label>
-      <div class="ef-lunch-fields hidden" id="lunch-fields-wrap">
+      <div class="ef-lunch-fields {% if not include_lunch %}hidden{% endif %}" id="lunch-fields-wrap">
         <div class="ef-field">
           <span class="ef-field-label">From</span>
-          <input type="time" id="lunch_from" value="14:00" oninput="recalc()">
+          <input type="time" id="lunch_from" value="{{ lunch_from_input or '14:00' }}" oninput="recalc()">
         </div>
         <span class="ef-lunch-sep">→</span>
         <div class="ef-field">
           <span class="ef-field-label">To</span>
-          <input type="time" id="lunch_to" value="15:00" oninput="recalc()">
+          <input type="time" id="lunch_to" value="{{ lunch_to_input or '15:00' }}" oninput="recalc()">
         </div>
       </div>
       <div class="ef-rec" id="rec-lo-banner">
@@ -3319,6 +3344,7 @@ body > .container { padding-top: 0 !important; }
             <div class="tmeta-field"><label>Actual time</label><input type="text" class="tinp act-in" data-id="{{ task.name }}" value="{{ (task.actual_time_display or '')|e }}" placeholder="e.g. 1h 30m, 45m"></div>
           </div>
           <label class="remark-toggle"><input type="checkbox" class="remark-chk" onchange="toggleRemark(this)">Add remark</label>
+          <label class="remark-toggle repeat-toggle{% if task.status == 'Done' %} show{% endif %}" title="A copy of this task comes back on your next working day, even after you finish it"><input type="checkbox" class="repeat-chk" data-id="{{ task.name }}" {% if task.repeat_next_day %}checked{% endif %} onchange="toggleRepeat(this)">Repeat next day</label>
           <textarea class="tinp remark-in hidden" data-id="{{ task.name }}" placeholder="Optional remark..." onchange="saveRemarkEdit(this)">{{ (task.remarks or '')|e }}</textarea>
           <div class="attach-wrap">
             <label class="attach-btn"><i class="ti ti-paperclip" aria-hidden="true"></i>Attach<input type="file" multiple hidden onchange="uploadTaskFiles(this.files,'{{ task.name }}',this.closest('.attach-wrap').querySelector('.attach-list'));this.value=''"></label>
@@ -3359,6 +3385,7 @@ body > .container { padding-top: 0 !important; }
             <div class="tmeta-field"><label>Actual time</label><input type="text" class="tinp act-in" data-id="{{ task.name }}" value="{{ (task.actual_time_display or '')|e }}" placeholder="e.g. 1h 30m, 45m"></div>
           </div>
           <label class="remark-toggle"><input type="checkbox" class="remark-chk" onchange="toggleRemark(this)">Add remark</label>
+          <label class="remark-toggle repeat-toggle{% if task.status == 'Done' %} show{% endif %}" title="A copy of this task comes back on your next working day, even after you finish it"><input type="checkbox" class="repeat-chk" data-id="{{ task.name }}" {% if task.repeat_next_day %}checked{% endif %} onchange="toggleRepeat(this)">Repeat next day</label>
           <textarea class="tinp remark-in hidden" data-id="{{ task.name }}" placeholder="Optional remark..." onchange="saveRemarkEdit(this)">{{ (task.remarks or '')|e }}</textarea>
           <div class="attach-wrap">
             <label class="attach-btn"><i class="ti ti-paperclip" aria-hidden="true"></i>Attach<input type="file" multiple hidden onchange="uploadTaskFiles(this.files,'{{ task.name }}',this.closest('.attach-wrap').querySelector('.attach-list'));this.value=''"></label>
@@ -3374,15 +3401,29 @@ body > .container { padding-top: 0 !important; }
   <div style="height:20px"></div>
 </div>
 <footer class="app-footer">
-  <button class="fbtn dk" id="btn-eod" onclick="confirmCheckout()"><i class="ti ti-logout" aria-hidden="true"></i>Check out &amp; submit</button>
+  {% if not checkout_locked %}<button class="fbtn dk" id="btn-eod" onclick="confirmCheckout()"><i class="ti ti-logout" aria-hidden="true"></i>Check out &amp; submit</button>{% endif %}
   <button class="fbtn gh" onclick="addEodProject()" title="Add a new project (Shift+P)"><i class="ti ti-folder-plus" aria-hidden="true"></i>Project</button>
   <button class="fbtn gh" onclick="addAdhoc()" title="Add a task (Shift+T)"><i class="ti ti-plus" aria-hidden="true"></i>Task</button>
   <button class="fbtn grn" id="btn-save-adhoc" onclick="saveAllAdhocTasks()" title="Save newly added tasks now so your Team Leader sees them right away" style="display:none"><i class="ti ti-device-floppy" aria-hidden="true"></i>Save</button>
   <button class="fbtn gh" id="btn-reset-ci" onclick="resetCheckin()" style="background:#fff5f5;color:#dc2626;border:1px solid #fecaca"><i class="ti ti-rotate-clockwise" aria-hidden="true"></i>Reset check-in</button>
+  <span id="autosave-status" style="font-size:11px;color:var(--text-muted);margin-left:auto;align-self:center;white-space:nowrap"></span>
 
 </footer>
 {% else %}
 <div class="body">
+  {% if missed_checkout %}
+  <div class="lock-card" role="alert">
+    <div class="lock-card-row"><i class="ti ti-lock" aria-hidden="true"></i><span>You did not check out on <strong>{{ missed_checkout_label }}</strong>. Get late checkout approval from HR.{% if checkin_blocked %} You cannot check in until that checkout is completed.{% endif %}</span></div>
+    {% if missed_checkout.unlock_requested_at %}
+    <div class="lock-card-row"><i class="ti ti-clock-check" aria-hidden="true"></i><span>Approval requested. HR has been notified.</span></div>
+    {% else %}
+    <div class="lock-card-row">
+      <input type="text" maxlength="200" aria-label="Reason for late checkout" placeholder="Reason (required)…" id="lock-reason-{{ missed_checkout.date }}">
+      <button type="button" class="fbtn dk" onclick="requestLateCheckout('{{ missed_checkout.date }}', this)">Request HR approval</button>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
   <div class="wl-wrap" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 12px; background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; box-shadow: var(--shadow-sm);">
     <div>
       <label class="wl-lbl" style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;"><i class="ti ti-clock" aria-hidden="true"></i>Login time *</label>
@@ -3548,15 +3589,7 @@ body > .container { padding-top: 0 !important; }
 </aside>
 </div>
 </div>
-<nav class="mob-nav">
-  <a href="/daily-checkin" class="mn-it on"><i class="ti ti-check" aria-hidden="true"></i>Today</a>
-  <a href="/my-history" class="mn-it"><i class="ti ti-history" aria-hidden="true"></i>History</a>
-  <a href="/recurring-tasks" class="mn-it"><i class="ti ti-repeat" aria-hidden="true"></i>Recurring</a>
-  <a href="/task-backlog" class="mn-it"><i class="ti ti-list-details" aria-hidden="true"></i>Backlog</a>
-  <a href="/additional-work" class="mn-it"><i class="ti ti-briefcase" aria-hidden="true"></i>Additional Work</a>
-  {% if is_team_leader %}<a href="/team-dashboard" class="mn-it"><i class="ti ti-users" aria-hidden="true"></i>Team</a>{% endif %}
-  {% if is_hr_manager %}<a href="/management-dashboard" class="mn-it"><i class="ti ti-building" aria-hidden="true"></i>Management</a>{% endif %}
-</nav>
+{{ classic_mobnav(st_shell, 'today') }}
 <div class="wfh-ov" id="wfh-ov" style="display:none">
   <div class="wfh-mo">
     <div class="wfh-mi"><i class="ti ti-home-off" aria-hidden="true"></i></div>
@@ -3610,6 +3643,7 @@ frappe.ready(function(){
 });
 var LOGIN_TIME = "{{ login_time or current_time }}";
 var LOG_DATE = "{{ date }}";
+var SERVER_MORNING_DRAFT = {{ (morning_draft or none)|tojson }};
 var TODAY_DATE = "{{ actual_today }}"; // server's current calendar date, independent of LOG_DATE (which can be backdated for a late checkout)
 var IS_HALF_DAY = {{ 'true' if is_half_day_leave else 'false' }};
 var CARRIED = {{ carried_count }};
@@ -3712,21 +3746,19 @@ function parseTimeToMinutes(t) {
   return h * 60 + m;
 }
 
-var serverTimeStr = "{{ current_time }}";
-var serverMin = parseTimeToMinutes(serverTimeStr);
-var pageLoadPerformanceMs = performance.now();
-
 function getServerSyncedTime() {
-  if (serverMin === null) {
-    var now = new Date();
-    return String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
-  }
-  var elapsedMs = performance.now() - pageLoadPerformanceMs;
-  var elapsedMin = elapsedMs / 60000.0;
-  var syncedMin = Math.floor((serverMin + elapsedMin) % (24 * 60));
-  var h = Math.floor(syncedMin / 60);
-  var m = syncedMin % 60;
-  return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+  // Read the client's own wall clock directly rather than tracking elapsed
+  // time since page load via performance.now(): that monotonic delta does
+  // not reliably reflect real elapsed time across a laptop sleep / long
+  // OS-level tab suspension, so a tab left inactive for hours recomputed a
+  // still-stale time even on the visibilitychange-triggered refresh below —
+  // only a full reload (which re-fetches the server's current time) showed
+  // correctly. This field is purely informational: submit_eod_log() always
+  // stamps logout_time from the server's own clock at submit time regardless
+  // of what's displayed here, so there's no correctness reason to prefer a
+  // "server-synced" value over the browser's actual current time.
+  var now = new Date();
+  return String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
 }
 
 function updateClockAndLogoutTime() {
@@ -3744,6 +3776,7 @@ function updateClockAndLogoutTime() {
     clk.textContent = hStr + ':' + mStr + ' ' + ampm;
   }
   var lo = document.getElementById('logout_time');
+  if (lo && !lo.readOnly) return; // late checkout: the employee types the real logout time
   if (lo && lo.value !== newVal) {
     lo.value = newVal;
     recalc();
@@ -3883,7 +3916,11 @@ function recalc(){
   // Update recommended logout banner value
   var recVal = getRecommendedLogoutTime();
   var recEl = document.getElementById('rec-lo-val');
-  if (recEl && recVal) recEl.textContent = formatTimeAMPM(recVal);
+  if (recEl && recVal) {
+    // A recommendation earlier on the clock than the check-in lands after midnight: say so instead of a bare "01:51 AM".
+    var recMin = parseTimeToMinutes(recVal), inMin = parseTimeToMinutes(LOGIN_TIME);
+    recEl.textContent = formatTimeAMPM(recVal) + ((recMin !== null && inMin !== null && recMin < inMin) ? ' (next day)' : '');
+  }
 
   // Dynamic Net Hours calculation
   var loginMin = parseTimeToMinutes(LOGIN_TIME);
@@ -4297,6 +4334,7 @@ function addAdhoc(){
     '</div>'+
     '<label class="remark-toggle"><input type="checkbox" class="remark-chk" onchange="toggleRemark(this)">Add remark</label>'+
     '<textarea class="tinp remark-in hidden" data-aid="'+id+'" placeholder="Optional remark..."></textarea>'+
+    '<label class="remark-toggle repeat-toggle" title="A copy of this task comes back on your next working day, even after you finish it"><input type="checkbox" class="repeat-chk">Repeat next day</label>'+
     '<div class="attach-wrap"><label class="attach-btn"><i class="ti ti-paperclip" aria-hidden="true"></i>Attach<input type="file" multiple hidden onchange="uploadTaskFiles(this.files,null,this.closest(\'.attach-wrap\').querySelector(\'.attach-list\'));this.value=\'\'"></label><div class="attach-list"></div></div>'+
     '</div>';
   document.getElementById('adhoc-area').appendChild(d);
@@ -4335,6 +4373,7 @@ function addAdhocToProj(pgId, projName) {
     '</div>'+
     '<label class="remark-toggle"><input type="checkbox" class="remark-chk" onchange="toggleRemark(this)">Add remark</label>'+
     '<textarea class="tinp remark-in hidden" data-aid="'+id+'" placeholder="Optional remark..."></textarea>'+
+    '<label class="remark-toggle repeat-toggle" title="A copy of this task comes back on your next working day, even after you finish it"><input type="checkbox" class="repeat-chk">Repeat next day</label>'+
     '<div class="attach-wrap"><label class="attach-btn"><i class="ti ti-paperclip" aria-hidden="true"></i>Attach<input type="file" multiple hidden onchange="uploadTaskFiles(this.files,null,this.closest(\'.attach-wrap\').querySelector(\'.attach-list\'));this.value=\'\'"></label><div class="attach-list"></div></div>'+
     '</div>';
   var pgAdd = pgEl.querySelector('.pg-add');
@@ -4444,7 +4483,7 @@ async function submitEOD(){
     }
     if(!desc.trim() && proj.trim()) desc = "No description added";
     var remarkChk=row.querySelector('.remark-chk'), remark=row.querySelector('.remark-in[data-aid="'+id+'"]');
-    if(desc.trim()) at.push({description:desc.trim(),status:stat,estimated_time:est,actual_time:act,remarks:(remarkChk&&remarkChk.checked&&remark)?remark.value:'',project_name:proj,attachment_names:getRowAttachments(row).map(function(f){return f.name;}),series_id:row.dataset.savedSeries||undefined});
+    if(desc.trim()) at.push({description:desc.trim(),status:stat,estimated_time:est,actual_time:act,remarks:(remarkChk&&remarkChk.checked&&remark)?remark.value:'',project_name:proj,attachment_names:getRowAttachments(row).map(function(f){return f.name;}),series_id:row.dataset.savedSeries||undefined,repeat_next_day:(stat==='Done'&&(row.querySelector('.repeat-chk')||{}).checked)?1:0});
   });
   if(hasErrors){ toast('Please provide time taken for task completion for all completed tasks.', 'err'); return; }
   var btn=document.getElementById('btn-eod');
@@ -4454,6 +4493,7 @@ async function submitEOD(){
     if(r.message&&r.message.success){
       localStorage.removeItem('st_eod_draft');
       localStorage.removeItem('st_eod_edits');
+      localStorage.removeItem('st_eod_lunch');
       var p=r.message.pending_count, msg='Checked out at '+r.message.logout_time;
       if(p>0) msg+=' · '+p+' task'+(p>1?'s':'')+' carried to tomorrow';
       toast(msg,'ok',2000); setTimeout(function(){ window.location.href=window.location.href.split('?')[0]; },1800);
@@ -4744,6 +4784,64 @@ document.addEventListener('input', function(e) {
   // recalc() + Pending->In Progress auto-promotion for .act-in/.adhoc-act
   // is handled by the single input listener defined earlier (see recalc()).
 });
+async function requestLateCheckout(date, btn) {
+  var reasonEl = document.getElementById('lock-reason-' + date);
+  var reasonVal = reasonEl ? reasonEl.value.trim() : '';
+  if (!reasonVal) {
+    if (reasonEl) {
+      reasonEl.focus();
+      reasonEl.style.borderColor = '#dc2626';
+    }
+    toast('Please enter a reason for late checkout.', 'err');
+    return;
+  }
+  btn.disabled = true;
+  try {
+    await frappe.call({
+      method: 'st_attendance_tracker.api.request_late_checkout_approval',
+      type: 'POST',
+      args: { date: date, reason: reasonVal }
+    });
+    toast('Request sent to HR', 'ok');
+    setTimeout(function(){ location.reload(); }, 800);
+  } catch (e) {
+    btn.disabled = false;
+    var errMsg = (e && e.message) ? e.message : 'Could not send request. Try again or contact HR.';
+    toast(errMsg, 'err');
+  }
+}
+// "Repeat next day" only makes sense for a finished task: show it when the status is Done, and drop a
+// repeat the employee set before changing the task back to unfinished.
+function syncRepeatToggles() {
+  document.querySelectorAll('.repeat-toggle').forEach(function(label) {
+    var row = label.closest('.trow, .stask');
+    var sel = row && row.querySelector('.tsel');
+    var done = !!sel && sel.value === 'Done';
+    label.classList.toggle('show', done);
+    var chk = label.querySelector('.repeat-chk');
+    // A row that is not saved yet has no server record to clear; its checkbox is only read at checkout.
+    if (!done && chk && chk.checked) { chk.checked = false; if (chk.dataset.id) setRepeat(chk, false, true); }
+  });
+}
+
+function toggleRepeat(chk) { setRepeat(chk, chk.checked, false); }
+
+function setRepeat(chk, on, silent) {
+  chk.disabled = true;
+  frappe.call({
+    method: 'st_attendance_tracker.calendar_api.set_task_repeat',
+    type: 'POST',
+    args: { name: chk.dataset.id, repeat: on ? 1 : 0 },
+    callback: function() {
+      chk.disabled = false;
+      if (!silent) toast(on ? 'This task will come back on your next working day.' : 'This task will not repeat.', 'ok');
+    },
+    error: function() {
+      chk.checked = !on; chk.disabled = false;
+      if (!silent) toast('Could not change repeat. Please try again.', 'err');
+    }
+  });
+}
 async function resetCheckin() {
   if (!confirm("Are you sure you want to reset today's check-in? This will delete today's check-in log and newly added morning tasks, restoring your state back to before check-in.")) return;
   var btn = document.getElementById('btn-reset-ci');
@@ -5031,6 +5129,7 @@ window.addEventListener('keydown', function(e) {
   }
 }, true);
 function saveMorningDraft() {
+  if (restoringMorningDraft) return;
   if(!document.getElementById('btn-ci')) return; 
   var newTasks=[];
   document.querySelectorAll('.npg[data-pgid]').forEach(function(pg){
@@ -5061,7 +5160,45 @@ function saveMorningDraft() {
     }
   });
   localStorage.setItem('st_morning_edits', JSON.stringify(existingEdits));
+  scheduleServerMorningDraft(newTasks, existingEdits);
 }
+
+// The unsent plan lives in this browser's localStorage, so another device (or a reopened laptop)
+// showed nothing. Keep a copy on the server too; check-in clears it there.
+var serverDraftTimer = null, serverDraftBody = null;
+function serverDraftPayload(newTasks, edits) {
+  var hasTasks = newTasks.some(function(g) {
+    return (g.tasks || []).some(function(t) { return (t.desc || '').trim() || (t.est || '').trim(); }) ||
+           (g.type === 'standalone' && ((g.desc || '').trim() || (g.head || '').trim())) ||
+           (g.type === 'project' && (g.name || '').trim());
+  });
+  var hasEdits = Object.keys(edits).length > 0;
+  return { kind: 'classic', data: (hasTasks || hasEdits) ? JSON.stringify({ tasks: newTasks, edits: edits }) : '' };
+}
+function scheduleServerMorningDraft(newTasks, edits) {
+  serverDraftBody = serverDraftPayload(newTasks, edits);
+  clearTimeout(serverDraftTimer);
+  serverDraftTimer = setTimeout(sendServerMorningDraft, 800);
+}
+function sendServerMorningDraft() {
+  serverDraftTimer = null;
+  if (!serverDraftBody) return;
+  frappe.call({ method: 'st_attendance_tracker.api.save_morning_draft', type: 'POST', args: serverDraftBody, silent: true, error: function() {} });
+}
+// Closing the lid or tab inside the debounce window: send now, with keepalive so it finishes after the page is gone.
+function flushServerMorningDraft() {
+  if (serverDraftTimer === null || !serverDraftBody) return;
+  clearTimeout(serverDraftTimer); serverDraftTimer = null;
+  try {
+    fetch('/api/method/st_attendance_tracker.api.save_morning_draft', {
+      method: 'POST', keepalive: true, credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json', 'X-Frappe-CSRF-Token': frappe.csrf_token },
+      body: JSON.stringify(serverDraftBody)
+    });
+  } catch (e) { /* best effort */ }
+}
+document.addEventListener('visibilitychange', function() { if (document.hidden) flushServerMorningDraft(); });
+window.addEventListener('pagehide', flushServerMorningDraft);
 
 function saveEodDraft() {
   if(!document.getElementById('btn-eod')) return;
@@ -5138,12 +5275,38 @@ function saveEodDraft() {
     }
   });
   localStorage.setItem('st_eod_edits', JSON.stringify(existingEdits));
+
+  // Lunch checkbox/from/to live outside any task row, so they aren't covered
+  // by the drafts above — without this, a refresh silently reset them to
+  // unchecked/default times, unlike every other field on this page.
+  var lunchChk = document.getElementById('include_lunch');
+  if (lunchChk) {
+    var lunchFromEl = document.getElementById('lunch_from'), lunchToEl = document.getElementById('lunch_to');
+    localStorage.setItem('st_eod_lunch', JSON.stringify({
+      on: lunchChk.checked,
+      from: lunchFromEl ? lunchFromEl.value : '',
+      to: lunchToEl ? lunchToEl.value : ''
+    }));
+  }
 }
 
+// Rebuilding the rows calls updCounts() -> saveMorningDraft() while they are still empty; that save
+// would overwrite the stored draft (browser and server) with blanks. Hold saves until the restore ends.
+var restoringMorningDraft = false;
 function loadMorningDraft() {
+  restoringMorningDraft = true;
+  try { restoreMorningDraft(); }
+  finally { restoringMorningDraft = false; saveMorningDraft(); }
+}
+function restoreMorningDraft() {
   if(!document.getElementById('btn-ci')) return;
   try {
     var str = localStorage.getItem('st_morning_draft');
+    var serverEdits = null;
+    if (!str && SERVER_MORNING_DRAFT && SERVER_MORNING_DRAFT.data) {
+      str = JSON.stringify(SERVER_MORNING_DRAFT.data.tasks || []);
+      serverEdits = SERVER_MORNING_DRAFT.data.edits || null;
+    }
     if(!str) return;
     var draft = JSON.parse(str);
     if(draft.length === 0) return;
@@ -5187,7 +5350,7 @@ function loadMorningDraft() {
        }
     });
     
-    var editsStr = localStorage.getItem('st_morning_edits');
+    var editsStr = localStorage.getItem('st_morning_edits') || (serverEdits ? JSON.stringify(serverEdits) : null);
     if (editsStr) {
       var edits = JSON.parse(editsStr);
       Object.keys(edits).forEach(function(id) {
@@ -5290,6 +5453,19 @@ function loadEodDraft() {
       });
     }
 
+    var lunchStr = localStorage.getItem('st_eod_lunch');
+    if (lunchStr) {
+      var lunch = JSON.parse(lunchStr);
+      var lunchChk = document.getElementById('include_lunch');
+      if (lunchChk && lunch.on) {
+        lunchChk.checked = true;
+        toggleLunchFields();
+        var lunchFromEl = document.getElementById('lunch_from'), lunchToEl = document.getElementById('lunch_to');
+        if (lunchFromEl && lunch.from) lunchFromEl.value = lunch.from;
+        if (lunchToEl && lunch.to) lunchToEl.value = lunch.to;
+      }
+    }
+
     recalc(); // restored rows arrive with their own time values already filled in
   } catch(e){}
 }
@@ -5298,7 +5474,7 @@ document.addEventListener('input', function(e) {
   var t = e.target;
   if (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT') {
     if(document.getElementById('btn-ci')) saveMorningDraft();
-    if(document.getElementById('btn-eod')) saveEodDraft();
+    if(document.getElementById('btn-eod')) { saveEodDraft(); scheduleAutosave(); }
   }
 });
 
@@ -5309,10 +5485,114 @@ document.addEventListener('change', function(e) {
     if (val && /^\d+(\.\d+)?$/.test(val)) {
       t.value = val + 'm';
       if(document.getElementById('btn-ci')) saveMorningDraft();
-      if(document.getElementById('btn-eod')) saveEodDraft();
+      if(document.getElementById('btn-eod')) { saveEodDraft(); scheduleAutosave(); }
     }
   }
 });
+
+// ── Backend autosave of in-progress checkout edits ──────────────────────────
+// Debounced, best-effort periodic save of status/actual_time/remarks/lunch to
+// the server so they survive a refresh AND a switch to another device/browser
+// even before "Check out & submit" — localStorage (saveEodDraft, above) alone
+// only protects the current browser/tab.
+var autosaveTimer = null, autosaveInFlight = false, autosavePending = false;
+var autosaveRetryTimer = null, autosaveFailures = 0;
+
+function scheduleAutosave() {
+  if (!document.getElementById('btn-eod')) return;
+  clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(runAutosave, 1500);
+}
+
+function autosaveArgs() {
+  var taskUpdates = [];
+  document.querySelectorAll('.trow[data-id], .stask[data-id]').forEach(function(row) {
+    var sel = row.querySelector('.tsel'), act = row.querySelector('.act-in');
+    var rmkChk = row.querySelector('.remark-chk'), rmkIn = row.querySelector('.remark-in');
+    taskUpdates.push({
+      name: row.dataset.id,
+      status: sel ? sel.value : '',
+      actual_time: act ? act.value : '',
+      remarks: (rmkChk && rmkChk.checked && rmkIn) ? rmkIn.value : ''
+    });
+  });
+
+  var lunchChk = document.getElementById('include_lunch');
+  var lunchOn = lunchChk && lunchChk.checked;
+  var lunchFrom = lunchOn ? (document.getElementById('lunch_from') || {}).value : '';
+  var lunchTo = lunchOn ? (document.getElementById('lunch_to') || {}).value : '';
+  return { task_updates: JSON.stringify(taskUpdates), lunch_from: lunchFrom, lunch_to: lunchTo };
+}
+
+// A failed save used to say "will retry" and then wait for the employee's next edit, so a dropped
+// connection could leave the server stale until checkout. Retry on a growing delay (5s up to 60s),
+// and again straight away when the connection returns or the tab is shown.
+function scheduleAutosaveRetry() {
+  clearTimeout(autosaveRetryTimer);
+  var delay = Math.min(60000, 5000 * Math.pow(2, Math.max(0, autosaveFailures - 1)));
+  autosaveRetryTimer = setTimeout(function() { autosaveRetryTimer = null; runAutosave(); }, delay);
+}
+function retryAutosaveNow() {
+  if (autosaveFailures > 0 && !autosaveInFlight) { clearTimeout(autosaveRetryTimer); autosaveRetryTimer = null; runAutosave(); }
+}
+window.addEventListener('online', retryAutosaveNow);
+
+// Closing the lid or tab inside the 1.5s debounce window (or while a retry is waiting) would lose the
+// last edit: send it now, with keepalive so the request finishes after the page is gone.
+function flushAutosave() {
+  if (!document.getElementById('btn-eod')) return;
+  if (autosaveTimer === null && autosaveFailures === 0) return;
+  clearTimeout(autosaveTimer); autosaveTimer = null;
+  try {
+    fetch('/api/method/st_attendance_tracker.api.autosave_eod_progress', {
+      method: 'POST', keepalive: true, credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json', 'X-Frappe-CSRF-Token': frappe.csrf_token },
+      body: JSON.stringify(autosaveArgs())
+    });
+  } catch (e) { /* best effort */ }
+}
+document.addEventListener('visibilitychange', function() { if (document.hidden) flushAutosave(); else retryAutosaveNow(); });
+window.addEventListener('pagehide', flushAutosave);
+
+async function runAutosave() {
+  if (!document.getElementById('btn-eod')) return;
+  autosaveTimer = null;
+  if (autosaveInFlight) { autosavePending = true; return; }
+  autosaveInFlight = true;
+
+  var statusEl = document.getElementById('autosave-status');
+  if (statusEl) statusEl.textContent = 'Saving…';
+
+  try {
+    var r = await frappe.call({
+      method: 'st_attendance_tracker.api.autosave_eod_progress',
+      args: autosaveArgs()
+    });
+    if (r.message && r.message.success) {
+      autosaveFailures = 0;
+      clearTimeout(autosaveRetryTimer); autosaveRetryTimer = null;
+      // Sync-then-clear: these fields are now durable server-side, so drop
+      // the local-only copy — otherwise a later loadEodDraft() (e.g. after
+      // an unrelated reload) would overlay this now-stale local snapshot
+      // back on top of fresher server-rendered values.
+      localStorage.removeItem('st_eod_edits');
+      localStorage.removeItem('st_eod_lunch');
+      if (statusEl) {
+        var d = new Date(r.message.server_time);
+        var timeStr = isNaN(d.getTime()) ? '' : d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+        statusEl.textContent = 'Saved' + (timeStr ? ' ' + timeStr : '');
+      }
+    }
+  } catch (e) {
+    autosaveFailures++;
+    if (statusEl) statusEl.textContent = "Couldn't save — retrying";
+    scheduleAutosaveRetry();
+  } finally {
+    autosaveInFlight = false;
+    if (autosavePending) { autosavePending = false; scheduleAutosave(); }
+  }
+}
+
 loadMorningDraft();
 loadEodDraft();
 
@@ -5348,7 +5628,7 @@ function initView() {
   if (currentView === 'concise') buildConciseTable();
 }
 
-function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
 
 function _statusClass(val) {
   if (val === 'Done') return 's-done';
@@ -5392,7 +5672,7 @@ function buildConciseTable() {
   }
 
   // 1. Recurring/Standalone tasks (outside projects)
-  var standaloneRows = document.querySelectorAll('.body > .standalone-container > .stask, .body > div > .stask:not([data-adhocid]), #adhoc-area > .stask');
+  var standaloneRows = document.querySelectorAll('.body .standalone-container > .stask, .body > div > .stask:not([data-adhocid]), #adhoc-area > .stask');
   if (standaloneRows.length > 0) {
     var sHtml = '';
     standaloneRows.forEach(function(r) { sHtml += buildRowHtml(r); });
@@ -5453,6 +5733,24 @@ function applyDetailedFilter() {
     var status = sel ? sel.value : 'Pending';
     row.style.display = (status === currentFilter) ? '' : 'none';
   });
+  syncGroupVisibility();
+}
+
+// A project (or the Recurring / Standalone block) with no task matching the filter is hidden too,
+// instead of showing a header over nothing.
+function syncGroupVisibility() {
+  var rowSel = '.trow[data-id], .stask[data-id], .trow[data-adhocid], .stask[data-adhocid]';
+  document.querySelectorAll('.pg').forEach(function(pg) {
+    var rows = pg.querySelectorAll(rowSel);
+    var hasVisible = Array.prototype.some.call(rows, function(r) { return r.style.display !== 'none'; });
+    pg.style.display = (currentFilter === 'all' || rows.length === 0 || hasVisible) ? '' : 'none';
+  });
+  document.querySelectorAll('.standalone-container').forEach(function(box) {
+    var rows = box.querySelectorAll(rowSel);
+    var hasVisible = Array.prototype.some.call(rows, function(r) { return r.style.display !== 'none'; });
+    var block = box.parentElement;
+    if (block) block.style.display = (currentFilter === 'all' || rows.length === 0 || hasVisible) ? '' : 'none';
+  });
 }
 
 function applyConciseFilter() {
@@ -5502,6 +5800,7 @@ function updateFilterCounts() {
 var _origUpdProg = updProg;
 updProg = function() {
   _origUpdProg();
+  syncRepeatToggles();
   updateFilterCounts();
   colorizeAllSelects();
   if (currentView === 'concise') buildConciseTable();
@@ -5512,6 +5811,7 @@ var _origOnSel = onSel;
 onSel = function(s) {
   _origOnSel(s);
   colorizeStatusSelect(s);
+  syncRepeatToggles();
   updateFilterCounts();
   if (currentView === 'concise') buildConciseTable();
 };
@@ -5521,7 +5821,9 @@ try {
   initView();
   colorizeAllSelects();
   updateFilterCounts();
+  syncRepeatToggles();
 } catch(e) {}
 
 </script>
+<script src="/assets/st_attendance_tracker/js/st_classic.js?v=8" data-new="/daily-checkin"></script>
 {% endblock %}

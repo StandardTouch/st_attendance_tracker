@@ -1,0 +1,37 @@
+.stp { position: relative; display: inline-flex; align-items: center; width: 100%; min-width: 108px; height: var(--stp-h, 38px); }
+.stp-native { position: absolute !important; inset: 0; width: 100% !important; height: 100% !important; opacity: 0 !important; pointer-events: none !important; }
+.stp-text { width: 100%; height: 100%; padding: 0 34px 0 12px; border: 1px solid var(--st-line, var(--border, #E3E3E5)); border-radius: 10px; background: var(--st-panel2, var(--bg-card, #fff)); color: var(--st-ink, var(--text-main, #111112)); font: 600 13px var(--st-font-body, 'Montserrat', system-ui, sans-serif); font-variant-numeric: tabular-nums; cursor: pointer; }
+.stp-text:focus { outline: none; border-color: #ED1D24; box-shadow: 0 0 0 3px rgba(237, 29, 36, .18); cursor: text; }
+.stp.is-bad .stp-text { border-color: #ED1D24; background: #FDE8E9; color: #9B1015; }
+.stp.is-locked .stp-text { cursor: default; background: transparent; border-color: transparent; }
+.stp-btn { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 28px; height: 28px; display: grid; place-items: center; border: 0; border-radius: 8px; background: none; color: var(--st-muted, var(--text-muted, #5E5F63)); cursor: pointer; }
+.stp-btn:hover:not(:disabled) { background: var(--st-hover, #ECECEE); color: var(--st-ink, #111112); }
+.stp-btn:disabled { opacity: .35; cursor: default; }
+.stp-pop { position: fixed; z-index: 100000; width: 288px; padding: 16px 16px 8px; border: 1px solid var(--st-line, #E3E3E5); border-radius: 18px; background: var(--st-panel, #fff); color: var(--st-ink, #111112); box-shadow: 0 14px 40px rgba(0, 0, 0, .28); font: 600 13px var(--st-font-body, 'Montserrat', system-ui, sans-serif); user-select: none; touch-action: none; }
+.stp-title { font-size: 12px; font-weight: 600; color: var(--st-muted, #5E5F63); margin-bottom: 12px; }
+.stp-head { display: flex; align-items: center; gap: 6px; margin-bottom: 14px; }
+.stp-colon { font: 600 40px/1 var(--st-font-head, 'Poppins', sans-serif); color: var(--st-ink, #111112); }
+.stp-pop .stp-box { flex: 1; height: 68px; border: 0; border-radius: 12px; background: var(--st-hover, #ECECEE); color: var(--st-ink, #111112); font: 600 42px/1 var(--st-font-head, 'Poppins', sans-serif); font-variant-numeric: tabular-nums; cursor: pointer; }
+.stp-pop .stp-box.on { background: #FDE8E9; color: #C4151B; }
+:root[data-theme="dark"] .stp-pop .stp-box.on { background: #3A1416; color: #FF5A60; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .stp-pop .stp-box.on { background: #3A1416; color: #FF5A60; } }
+.stp-ap { display: flex; flex-direction: column; width: 56px; border: 1px solid var(--st-line, #D4D4D7); border-radius: 10px; overflow: hidden; margin-left: 6px; }
+.stp-pop .stp-ap button { height: 34px; border: 0; background: none; color: var(--st-muted, #5E5F63); font: 600 13px var(--st-font-body, 'Montserrat', sans-serif); cursor: pointer; }
+.stp-pop .stp-ap button + button { border-top: 1px solid var(--st-line, #D4D4D7); }
+.stp-pop .stp-ap button.on { background: #FDE8E9; color: #C4151B; }
+:root[data-theme="dark"] .stp-pop .stp-ap button.on { background: #3A1416; color: #FF5A60; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .stp-pop .stp-ap button.on { background: #3A1416; color: #FF5A60; } }
+.stp-dialwrap { width: 240px; height: 240px; margin: 0 auto; border-radius: 50%; cursor: pointer; outline: none; }
+.stp-dialwrap:focus-visible { box-shadow: 0 0 0 2px #ED1D24; }
+.stp-dial { width: 100%; height: 100%; display: block; }
+.stp-face { fill: var(--st-hover, #F1F1F2); }
+.stp-hand { stroke: #ED1D24; stroke-width: 2; }
+.stp-pin { fill: #ED1D24; }
+.stp-knob { fill: #ED1D24; }
+.stp-n { text-anchor: middle; dominant-baseline: central; font: 600 15px var(--st-font-body, 'Montserrat', sans-serif); fill: var(--st-ink, #111112); pointer-events: none; }
+.stp-foot { display: flex; align-items: center; gap: 4px; margin-top: 12px; }
+.stp-pop .stp-ico { width: 36px; height: 36px; border: 0; border-radius: 8px; background: none; color: var(--st-muted, #5E5F63); display: grid; place-items: center; cursor: pointer; }
+.stp-pop .stp-text-btn { height: 36px; padding: 0 12px; border: 0; border-radius: 8px; background: none; color: var(--st-accent-text, #C4151B); font: 600 13px var(--st-font-body, 'Montserrat', sans-serif); cursor: pointer; }
+.stp-pop .stp-text-btn.strong { font-weight: 700; }
+.stp-pop button:hover:not(.on):not(.stp-box) { background: var(--st-hover, #ECECEE); }
+.stp-pop button:focus-visible { outline: 2px solid #ED1D24; outline-offset: 1px; }

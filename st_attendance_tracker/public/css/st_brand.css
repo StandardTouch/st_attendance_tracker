@@ -1,0 +1,381 @@
+/*
+ * StandardTouch brand layer for www/ pages (opt-in: only pages that render
+ * the st_shell macro get .st-app). Palette and type follow the brand kit:
+ * red #ED1D24, black, white, stone #818285; Poppins headings, Montserrat body.
+ * Load AFTER a page's own <style> so the scoped overrides below win.
+ */
+.st-app {
+  --st-red: #ED1D24;
+  --st-red-dark: #C4151B;
+  --st-red-soft: #FDE8E9;
+  --st-black: #000;
+  --st-ink: #111112;
+  --st-stone: #818285;
+  --st-muted: #5E5F63;
+  --st-line: #E3E3E5;
+  --st-hover: #ECECEE;
+  --st-canvas: #F3F3F4;
+  --st-panel: #fff;
+  --st-panel2: #F7F7F8;
+  --st-accent-text: #B5121A;
+  --st-on-ink: #fff;
+  --ev-pending-bg: #818285; --ev-pending-fg: #000;
+  --ev-prog-bg: #ED1D24; --ev-prog-fg: #fff;
+  --ev-done-bg: #111112; --ev-done-fg: #fff;
+  --st-font-head: 'Poppins', system-ui, sans-serif;
+  --st-font-body: 'Montserrat', system-ui, sans-serif;
+
+  /* Re-point the legacy page variables so existing rules pick up the brand. */
+  --primary: var(--st-red);
+  --primary-hover: var(--st-red-dark);
+  --primary-light: var(--st-red-soft);
+  --primary-gradient: var(--st-red);
+  --dark: var(--st-ink);
+  --dark-light: var(--st-ink);
+  --bg-canvas: var(--st-canvas);
+  --bg-card: var(--st-panel);
+  --border: var(--st-line);
+  --text-main: var(--st-ink);
+  --text-muted: var(--st-muted);
+  --text-light: var(--st-stone);
+  --info-bg: var(--st-ink);
+  --info-text: var(--st-on-ink);
+  --info-border: var(--st-ink);
+  /* Brand palette has no green/amber: Done = black, In Progress = red, Pending = stone. */
+  --success: var(--st-ink);
+  --success-bg: #ECECEE;
+  --success-border: #C9C9CC;
+  --success-text: var(--st-ink);
+  --warning: var(--st-red-dark);
+  --warning-bg: var(--st-red-soft);
+  --warning-border: #F5B8BB;
+  --warning-text: #9B1015;
+
+  font-family: var(--st-font-body);
+  font-weight: 500;
+  color: var(--st-ink);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+body:has(.st-app) { background: var(--st-canvas) !important; font-family: var(--st-font-body) !important; }
+.st-app, .st-app *, .st-app *::before, .st-app *::after { box-sizing: border-box; }
+/* Montserrat for text, Poppins for headings. Icons (.ti / <i>) keep their own icon font. */
+.st-app :not(.ti):not(i) { font-family: var(--st-font-body) !important; }
+.st-app :not(.ti):not(i):is(h1, h2, h3, h4, .hero-title, .ph-title, .rt-desc, .rt-mt, .sc-n, .st-logo, .st-avatar) {
+  font-family: var(--st-font-head) !important;
+}
+.st-app :focus-visible { outline: 2px solid var(--st-black); outline-offset: 2px; }
+
+/* ── Top bar ── */
+.st-top {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; gap: 10px;
+  height: 64px; padding: 0 16px 0 12px;
+  background: var(--st-canvas);
+}
+.st-icon-btn {
+  width: 40px; height: 40px; border: 0; border-radius: 50%; background: transparent;
+  display: none; place-items: center; font-size: 22px; color: var(--st-ink); cursor: pointer; flex: none;
+}
+.st-icon-btn:hover { background: var(--st-hover); }
+.st-logo {
+  display: flex; flex-direction: column; line-height: 1; text-decoration: none !important;
+  font-family: var(--st-font-head); font-weight: 700; font-size: 19px; letter-spacing: -.4px; white-space: nowrap; padding-right: 12px;
+}
+.st-logo b { color: var(--st-red); }
+.st-logo i { color: var(--st-ink); font-style: normal; }
+.st-logo small { font: italic 600 9.5px var(--st-font-body); color: var(--st-stone); text-align: right; letter-spacing: 0; }
+.st-title {
+  margin: 0 0 0 8px; font-size: 20px; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+}
+.st-sp { flex: 1; }
+.st-pill {
+  display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 16px;
+  border: 1px solid var(--st-line); border-radius: 18px; background: transparent; color: var(--st-ink);
+  font: 600 13px var(--st-font-body); cursor: pointer;
+}
+.st-pill:hover { background: var(--st-hover); }
+.st-user { position: relative; }
+.st-avatar {
+  width: 34px; height: 34px; border-radius: 50%; border: 0; background: var(--st-black); color: var(--st-on-ink);
+  font: 700 13px var(--st-font-head); cursor: pointer;
+}
+.st-menu {
+  position: absolute; right: 0; top: 44px; min-width: 190px; padding: 6px 0;
+  background: var(--st-panel); border: 1px solid var(--st-line); border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .14); z-index: 200;
+}
+.st-menu[hidden] { display: none; }
+.st-menu a {
+  display: flex; align-items: center; gap: 10px; padding: 9px 16px; color: var(--st-ink);
+  font-size: 13px; font-weight: 600; text-decoration: none;
+}
+.st-menu a:hover { background: var(--st-hover); }
+.st-menu i { font-size: 16px; color: var(--st-muted); }
+
+/* ── Body: left rail + main panel ── */
+.st-body { display: grid; grid-template-columns: 240px minmax(0, 1fr); flex: 1; min-height: 0; position: relative; }
+.st-rail { padding: 8px 12px 16px 0; overflow: auto; }
+.st-nav-item {
+  display: flex; align-items: center; gap: 14px; height: 40px; padding: 0 16px 0 24px;
+  border-radius: 0 20px 20px 0; color: var(--st-ink); font-size: 13.5px; font-weight: 600; text-decoration: none !important;
+}
+.st-nav-item i { font-size: 19px; color: var(--st-muted); }
+.st-nav-item:hover { background: var(--st-hover); }
+.st-nav-item[aria-current="page"] { background: var(--st-red-soft); color: var(--st-accent-text); }
+.st-nav-item[aria-current="page"] i { color: var(--st-accent-text); }
+.st-main { background: var(--st-panel); border-radius: 16px 16px 0 0; margin-right: 12px; min-width: 0; padding-bottom: 32px; }
+.st-scrim { display: none; }
+
+/* ── Restyle of the legacy Recurring Tasks components ── */
+.st-app .wrap { max-width: 900px; }
+.st-app .hero {
+  background: var(--st-panel); color: var(--st-ink); border: 0; border-bottom: 1px solid var(--st-line);
+  border-radius: 0; box-shadow: none; padding: 8px 0 20px;
+}
+.st-app .hero::after { display: none; }
+.st-app .hero-eye { color: var(--st-red); }
+.st-app .hero-title { color: var(--st-ink); font-size: 24px; letter-spacing: -.3px; }
+.st-app .hero-sub { color: var(--st-muted); }
+.st-app .add-btn {
+  background: var(--st-red); color: #fff; border-radius: 22px; box-shadow: none; padding: 11px 20px; font-family: var(--st-font-head);
+}
+.st-app .add-btn:hover { background: var(--st-red-dark); transform: none; }
+.st-app .rt-card { border-radius: 12px; box-shadow: none; }
+.st-app .rt-ico { background: var(--st-red-soft); color: var(--st-red-dark); }
+.st-app .rt-day.on { background: var(--st-ink); color: var(--st-on-ink); border-color: var(--st-ink); }
+.st-app .rt-mb.pr { background: var(--st-red); color: #fff; border-radius: 20px; }
+.st-app .rt-mb.pr:hover { background: var(--st-red-dark); }
+.st-app .rt-mb.sc { border-radius: 20px; }
+
+/* ── Additional Work page ── */
+.st-app .cols { grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; padding: 24px; max-width: 1400px; }
+.st-app .aw-s-done { background: var(--st-ink); color: var(--st-on-ink); }
+.st-app .aw-s-prog { background: var(--st-red); color: #fff; }
+.st-app .aw-s-pend { background: var(--st-stone); color: #000; }
+@media (max-width: 1200px) { .st-app .cols { grid-template-columns: minmax(0, 1fr); } }
+
+/* ── Phone: rail becomes an off-canvas drawer ── */
+@media (max-width: 900px) {
+  .st-icon-btn { display: grid; }
+  .st-logo small { display: none; }
+  .st-title { font-size: 16px; }
+  .st-body { grid-template-columns: minmax(0, 1fr); }
+  .st-rail {
+    position: fixed; top: 64px; bottom: 0; left: 0; width: 264px; z-index: 150;
+    background: var(--st-canvas); transform: translateX(-100%); transition: transform .2s; box-shadow: 0 2px 10px rgba(0, 0, 0, .14);
+  }
+  body.st-rail-open .st-rail { transform: none; }
+  body.st-rail-open .st-scrim { display: block; position: fixed; inset: 64px 0 0 0; background: rgba(0, 0, 0, .35); z-index: 140; }
+  .st-main { margin: 0; border-radius: 16px 16px 0 0; }
+  .st-app .wrap { padding: 16px; }
+}
+@media (prefers-reduced-motion: reduce) { .st-rail { transition: none; } }
+
+/* ═══ Calendar-style shell parity (v3) ═══ */
+.st-top { gap: 8px; }
+.st-icon-btn { display: grid; }
+.st-icon-btn.st-show { display: grid; }
+.st-icon-btn.st-sm { width: 28px; height: 28px; font-size: 16px; }
+.st-seg { display: flex; border: 1px solid var(--st-line); border-radius: 18px; overflow: hidden; }
+.st-seg button { border: 0; background: transparent; height: 34px; padding: 0 14px; font: 600 13px var(--st-font-body); color: var(--st-ink); cursor: pointer; }
+.st-seg button[aria-pressed="true"] { background: var(--st-red); color: #fff; }
+
+
+body.st-rail-collapsed .st-body { grid-template-columns: 0 minmax(0, 1fr); }
+body.st-rail-collapsed .st-rail { visibility: hidden; padding: 0; overflow: hidden; }
+body.st-rail-collapsed .st-main { margin-left: 12px; }
+
+.st-rail { padding: 6px 12px 16px 16px; }
+.st-create-wrap { position: relative; margin: 6px 0 18px; }
+.st-create {
+  display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 22px 0 16px; border: 0; border-radius: 16px;
+  background: var(--st-red); color: #fff; font: 700 14px var(--st-font-head); box-shadow: 0 2px 8px rgba(0, 0, 0, .14); cursor: pointer;
+}
+.st-create:hover { background: var(--st-red-dark); }
+.st-create i { font-size: 20px; }
+.st-create-menu { left: 0; right: auto; top: 58px; min-width: 210px; }
+.st-mini { margin-bottom: 16px; }
+.st-mini-h { display: flex; align-items: center; justify-content: space-between; font: 700 13px var(--st-font-head); padding: 0 0 4px 4px; }
+.st-mini-h span { display: flex; }
+.st-mini-g { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 11px; }
+.st-mini-g span { color: var(--st-muted); font-weight: 600; height: 24px; line-height: 24px; }
+.st-mini-g button { border: 0; background: transparent; height: 30px; width: 30px; border-radius: 50%; margin: 0 auto; font: 600 11px var(--st-font-body); color: var(--st-ink); cursor: pointer; }
+.st-mini-g button:hover { background: var(--st-hover); }
+.st-mini-g button.out { color: var(--st-stone); }
+.st-mini-g button.sel { background: var(--st-red-soft); color: var(--st-accent-text); }
+.st-mini-g button.today { background: var(--st-red); color: #fff; }
+.st-nav-item { margin-left: -16px; padding-left: 28px; }
+.st-rail-extra { margin-top: 12px; }
+
+/* Collapsible side panels */
+.st-collapse-btn {
+  display: grid; place-items: center; width: 28px; height: 28px; margin: 0 0 6px auto; border: 0; border-radius: 50%;
+  background: transparent; color: var(--st-muted); font-size: 16px; cursor: pointer;
+}
+.st-collapse-btn:hover { background: var(--st-hover); color: var(--st-ink); }
+.st-collapsed { width: 44px !important; min-width: 44px !important; overflow: hidden; padding-left: 6px !important; padding-right: 6px !important; }
+.st-collapsed > *:not(.st-collapse-btn) { display: none !important; }
+.st-collapsed .st-collapse-btn { margin: 0 auto; }
+.st-app .cols:has(> .st-collapsed) { grid-template-columns: minmax(0, 1fr) 44px; }
+
+@media (max-width: 900px) {
+  .st-hide-s { display: none; }
+  body.st-rail-collapsed .st-body { grid-template-columns: minmax(0, 1fr); }
+  body.st-rail-collapsed .st-rail { visibility: visible; padding: 6px 12px 16px 16px; }
+  .st-rail { transform: translateX(-100%); }
+}
+
+/* Frappe's web template wraps page content in a centred Bootstrap container; the shell needs the full width. */
+body:has(.st-app) main.container, body:has(.st-app) .page-content-wrapper { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+body:has(.st-app) .page-header-wrapper, body:has(.st-app) .page-breadcrumbs { display: none; }
+
+/* ═══ Dark theme: follows the system unless the user picked one with the top-bar toggle ═══ */
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .st-app {
+    --st-black: #F4F4F5; --st-ink: #F4F4F5; --st-on-ink: #000; --st-muted: #A3A4A8; --st-line: #2E2E32; --st-hover: #26262A;
+    --st-canvas: #0C0C0D; --st-panel: #18181A; --st-panel2: #202023; --st-red-soft: #3A1416; --st-accent-text: #FF5A60;
+    --ev-done-bg: #F4F4F5; --ev-done-fg: #000; color-scheme: dark;
+  }
+}
+html[data-theme="dark"] .st-app {
+  --st-black: #F4F4F5; --st-ink: #F4F4F5; --st-on-ink: #000; --st-muted: #A3A4A8; --st-line: #2E2E32; --st-hover: #26262A;
+  --st-canvas: #0C0C0D; --st-panel: #18181A; --st-panel2: #202023; --st-red-soft: #3A1416; --st-accent-text: #FF5A60;
+  --ev-done-bg: #F4F4F5; --ev-done-fg: #000; color-scheme: dark;
+}
+.st-app { background: var(--st-canvas); }
+@media (prefers-color-scheme: dark) { html:not([data-theme="light"]) body:has(.st-app) { background: #0C0C0D !important; } }
+html[data-theme="dark"] body:has(.st-app) { background: #0C0C0D !important; }
+html[data-theme="light"] body:has(.st-app) { background: #F3F3F4 !important; }
+.st-app .st-logo i { color: var(--st-ink); }
+.st-app .st-avatar { background: var(--st-ink); color: var(--st-on-ink); }
+.st-app input, .st-app select, .st-app textarea { color: var(--st-ink); }
+.st-app input::placeholder, .st-app textarea::placeholder { color: var(--st-muted); }
+.st-app :is(h1, h2, h3, h4) { color: var(--st-ink); }
+.st-mini-g button.over { outline: 2px dashed var(--st-red); background: var(--st-hover); }
+
+/* Phones: keep the top bar inside the screen */
+@media (max-width: 600px) {
+  .st-top { gap: 4px; padding: 0 8px 0 4px; }
+  .st-logo { display: none; }
+  .st-top .wn-bell-wrap { display: none; }
+  .st-title { font-size: 15px; margin-left: 2px; flex: 1 1 0; }
+  .st-sp { display: none; }
+  .st-seg button { padding: 0 7px; font-size: 11.5px; }
+  .st-title { max-width: none; }
+  .st-icon-btn { width: 34px; height: 34px; }
+}
+@media (max-width: 600px) { .st-top .st-seg { flex: none; } }
+
+/* Dark theme for the original List/Classic views: they hard-code light surfaces */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .st-app .hero, :root:not([data-theme="light"]) .st-app .ph { background: var(--st-panel2) !important; color: var(--st-ink) !important; border-color: var(--st-line) !important; }
+  :root:not([data-theme="light"]) .st-app .hero-title, :root:not([data-theme="light"]) .st-app .ph-title { color: var(--st-ink) !important; }
+  :root:not([data-theme="light"]) .st-app .hero-eye { color: var(--st-accent-text) !important; }
+  :root:not([data-theme="light"]) .st-app .hero-sub, :root:not([data-theme="light"]) .st-app .ph-sub { color: var(--st-muted) !important; }
+  :root:not([data-theme="light"]) .st-app .day-date-box, :root:not([data-theme="light"]) .st-app .day-detail, :root:not([data-theme="light"]) .st-app .tc, :root:not([data-theme="light"]) .st-app .ttag,
+  :root:not([data-theme="light"]) .st-app .sbb-out, :root:not([data-theme="light"]) .st-app .pg-head, :root:not([data-theme="light"]) .st-app .gstats { background: var(--st-panel2) !important; border-color: var(--st-line) !important; color: var(--st-ink); }
+  :root:not([data-theme="light"]) .st-app .day-badge { border-color: var(--st-line); }
+}
+
+:root[data-theme="dark"] .st-app .hero, :root[data-theme="dark"] .st-app .ph { background: var(--st-panel2) !important; color: var(--st-ink) !important; border-color: var(--st-line) !important; }
+:root[data-theme="dark"] .st-app .hero-title, :root[data-theme="dark"] .st-app .ph-title { color: var(--st-ink) !important; }
+:root[data-theme="dark"] .st-app .hero-eye { color: var(--st-accent-text) !important; }
+:root[data-theme="dark"] .st-app .hero-sub, :root[data-theme="dark"] .st-app .ph-sub { color: var(--st-muted) !important; }
+:root[data-theme="dark"] .st-app .day-date-box, :root[data-theme="dark"] .st-app .day-detail, :root[data-theme="dark"] .st-app .tc, :root[data-theme="dark"] .st-app .ttag,
+:root[data-theme="dark"] .st-app .sbb-out, :root[data-theme="dark"] .st-app .pg-head, :root[data-theme="dark"] .st-app .gstats { background: var(--st-panel2) !important; border-color: var(--st-line) !important; color: var(--st-ink); }
+:root[data-theme="dark"] .st-app .day-badge { border-color: var(--st-line); }
+
+
+/* ═══ Dark theme for legacy page styles: pages hard-code light colours with !important, so re-assert theme tokens here ═══ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .st-app .hero-info .title, :root:not([data-theme="light"]) .st-app .ph-title, :root:not([data-theme="light"]) .st-app .ph-time { color: var(--st-ink) !important; }
+  :root:not([data-theme="light"]) .st-app .hero-info .sub, :root:not([data-theme="light"]) .st-app .ph-sub, :root:not([data-theme="light"]) .st-app .ph-date, :root:not([data-theme="light"]) .st-app .hero-info .eye { color: var(--st-accent-text) !important; }
+  :root:not([data-theme="light"]) .st-app .ph-av, :root:not([data-theme="light"]) .st-app .sb-av, :root:not([data-theme="light"]) .st-app .tnav-av { background: var(--st-red-soft) !important; color: var(--st-accent-text) !important; border-color: var(--st-line) !important; }
+  :root:not([data-theme="light"]) .st-app .btn:not(.red), :root:not([data-theme="light"]) .st-app .tnav-btn, :root:not([data-theme="light"]) .st-app .fbtn:not(.red), :root:not([data-theme="light"]) .st-app .ctrl-btn { background: var(--st-panel2) !important; color: var(--st-ink) !important; border-color: var(--st-line) !important; }
+  :root:not([data-theme="light"]) .st-app .btn:not(.red):hover, :root:not([data-theme="light"]) .st-app .tnav-btn:hover, :root:not([data-theme="light"]) .st-app .fbtn:not(.red):hover, :root:not([data-theme="light"]) .st-app .ctrl-btn:hover { background: var(--st-hover) !important; color: var(--st-ink) !important; border-color: var(--st-muted) !important; }
+  :root:not([data-theme="light"]) .st-app .tinp, :root:not([data-theme="light"]) .st-app .tsel, :root:not([data-theme="light"]) .st-app .date-inp, :root:not([data-theme="light"]) .st-app .wl-sel { background: var(--st-panel2) !important; color: var(--st-ink) !important; border-color: var(--st-line) !important; color-scheme: dark; }
+  :root:not([data-theme="light"]) .st-app .trow, :root:not([data-theme="light"]) .st-app .ec { background: var(--st-panel) !important; border-color: var(--st-line) !important; }
+  :root:not([data-theme="light"]) .st-app .trow:hover, :root:not([data-theme="light"]) .st-app .ec:hover { background: var(--st-hover) !important; }
+  :root:not([data-theme="light"]) .st-app .sb-lbl, :root:not([data-theme="light"]) .st-app .ch, :root:not([data-theme="light"]) .st-app .tbar-t, :root:not([data-theme="light"]) .st-app .dp-lbl, :root:not([data-theme="light"]) .st-app .tc-l, :root:not([data-theme="light"]) .st-app .hl, :root:not([data-theme="light"]) .st-app .gs-l { color: var(--st-muted) !important; }
+  :root:not([data-theme="light"]) .st-app .hv, :root:not([data-theme="light"]) .st-app .sb-name, :root:not([data-theme="light"]) .st-app .dept-name, :root:not([data-theme="light"]) .st-app .dp-name, :root:not([data-theme="light"]) .st-app .ec-name, :root:not([data-theme="light"]) .st-app .gs-n { color: var(--st-ink) !important; }
+  :root:not([data-theme="light"]) .st-app .sb-link { color: var(--st-muted) !important; }
+  :root:not([data-theme="light"]) .st-app .sb-link.on { background: var(--st-red-soft) !important; color: var(--st-accent-text) !important; }
+  :root:not([data-theme="light"]) .st-app .pc-in, :root:not([data-theme="light"]) .st-app .sbb-in { background: #0F2A1E !important; color: #34D399 !important; border-color: #14532D !important; }
+  :root:not([data-theme="light"]) .st-app .pc-ca { background: #33270A !important; color: #FBBF24 !important; border-color: #6B4E0E !important; }
+  :root:not([data-theme="light"]) .st-app .pc-eo, :root:not([data-theme="light"]) .st-app .sbb-eod { background: #10223F !important; color: #60A5FA !important; border-color: #1E3A8A !important; }
+  :root:not([data-theme="light"]) .st-app .sbb-out, :root:not([data-theme="light"]) .st-app .ttag, :root:not([data-theme="light"]) .st-app .tp, :root:not([data-theme="light"]) .st-app .tc, :root:not([data-theme="light"]) .st-app .pg-head { background: var(--st-panel2) !important; color: var(--st-muted) !important; border-color: var(--st-line) !important; }
+  :root:not([data-theme="light"]) .st-app .gstats { background: var(--st-panel) !important; border-color: var(--st-line) !important; }
+  :root:not([data-theme="light"]) .st-app .gs { border-color: var(--st-line) !important; }
+  :root:not([data-theme="light"]) .st-app .gs-n.g { color: #34D399 !important; }
+  :root:not([data-theme="light"]) .st-app .gs-n.r { color: #F87171 !important; }
+  :root:not([data-theme="light"]) .st-app .gs-n.a { color: #FBBF24 !important; }
+  :root:not([data-theme="light"]) .st-app .gs-n.b { color: #60A5FA !important; }
+  :root:not([data-theme="light"]) .st-app .fc { background: var(--st-panel) !important; color: var(--st-muted); border-color: var(--st-line); }
+  :root:not([data-theme="light"]) .st-app .fc:hover { background: var(--st-hover) !important; color: var(--st-ink); }
+  :root:not([data-theme="light"]) .st-app .fc.on { background: var(--st-red) !important; color: #fff; border-color: var(--st-red); }
+  :root:not([data-theme="light"]) .st-app .task-row { border-color: var(--st-line) !important; }
+  :root:not([data-theme="light"]) .st-app .dp-trk, :root:not([data-theme="light"]) .st-app .ecp-t { background: var(--st-line) !important; }
+  :root:not([data-theme="light"]) .st-app .profile-dropdown { background: var(--st-panel) !important; border-color: var(--st-line) !important; }
+  :root:not([data-theme="light"]) .st-app .pd-item { color: var(--st-ink) !important; }
+  :root:not([data-theme="light"]) .st-app .pd-item:hover { background: var(--st-hover) !important; }
+  :root:not([data-theme="light"]) .st-app .lcr-name, :root:not([data-theme="light"]) .st-app .lcr-reason { color: var(--st-ink); }
+  :root:not([data-theme="light"]) .st-app .lcr-meta, :root:not([data-theme="light"]) .st-app .lcr-msg { color: var(--st-muted); }
+  :root:not([data-theme="light"]) .st-app .lcr-act input { background: var(--st-panel2); color: var(--st-ink); border-color: var(--st-line); }
+  :root:not([data-theme="light"]) .st-app ::-webkit-scrollbar-thumb { background: var(--st-line) !important; }
+}
+:root[data-theme="dark"] .st-app .hero-info .title, :root[data-theme="dark"] .st-app .ph-title, :root[data-theme="dark"] .st-app .ph-time { color: var(--st-ink) !important; }
+:root[data-theme="dark"] .st-app .hero-info .sub, :root[data-theme="dark"] .st-app .ph-sub, :root[data-theme="dark"] .st-app .ph-date, :root[data-theme="dark"] .st-app .hero-info .eye { color: var(--st-accent-text) !important; }
+:root[data-theme="dark"] .st-app .ph-av, :root[data-theme="dark"] .st-app .sb-av, :root[data-theme="dark"] .st-app .tnav-av { background: var(--st-red-soft) !important; color: var(--st-accent-text) !important; border-color: var(--st-line) !important; }
+:root[data-theme="dark"] .st-app .btn:not(.red), :root[data-theme="dark"] .st-app .tnav-btn, :root[data-theme="dark"] .st-app .fbtn:not(.red), :root[data-theme="dark"] .st-app .ctrl-btn { background: var(--st-panel2) !important; color: var(--st-ink) !important; border-color: var(--st-line) !important; }
+:root[data-theme="dark"] .st-app .btn:not(.red):hover, :root[data-theme="dark"] .st-app .tnav-btn:hover, :root[data-theme="dark"] .st-app .fbtn:not(.red):hover, :root[data-theme="dark"] .st-app .ctrl-btn:hover { background: var(--st-hover) !important; color: var(--st-ink) !important; border-color: var(--st-muted) !important; }
+:root[data-theme="dark"] .st-app .tinp, :root[data-theme="dark"] .st-app .tsel, :root[data-theme="dark"] .st-app .date-inp, :root[data-theme="dark"] .st-app .wl-sel { background: var(--st-panel2) !important; color: var(--st-ink) !important; border-color: var(--st-line) !important; color-scheme: dark; }
+:root[data-theme="dark"] .st-app .trow, :root[data-theme="dark"] .st-app .ec { background: var(--st-panel) !important; border-color: var(--st-line) !important; }
+:root[data-theme="dark"] .st-app .trow:hover, :root[data-theme="dark"] .st-app .ec:hover { background: var(--st-hover) !important; }
+:root[data-theme="dark"] .st-app .sb-lbl, :root[data-theme="dark"] .st-app .ch, :root[data-theme="dark"] .st-app .tbar-t, :root[data-theme="dark"] .st-app .dp-lbl, :root[data-theme="dark"] .st-app .tc-l, :root[data-theme="dark"] .st-app .hl, :root[data-theme="dark"] .st-app .gs-l { color: var(--st-muted) !important; }
+:root[data-theme="dark"] .st-app .hv, :root[data-theme="dark"] .st-app .sb-name, :root[data-theme="dark"] .st-app .dept-name, :root[data-theme="dark"] .st-app .dp-name, :root[data-theme="dark"] .st-app .ec-name, :root[data-theme="dark"] .st-app .gs-n { color: var(--st-ink) !important; }
+:root[data-theme="dark"] .st-app .sb-link { color: var(--st-muted) !important; }
+:root[data-theme="dark"] .st-app .sb-link.on { background: var(--st-red-soft) !important; color: var(--st-accent-text) !important; }
+:root[data-theme="dark"] .st-app .pc-in, :root[data-theme="dark"] .st-app .sbb-in { background: #0F2A1E !important; color: #34D399 !important; border-color: #14532D !important; }
+:root[data-theme="dark"] .st-app .pc-ca { background: #33270A !important; color: #FBBF24 !important; border-color: #6B4E0E !important; }
+:root[data-theme="dark"] .st-app .pc-eo, :root[data-theme="dark"] .st-app .sbb-eod { background: #10223F !important; color: #60A5FA !important; border-color: #1E3A8A !important; }
+:root[data-theme="dark"] .st-app .sbb-out, :root[data-theme="dark"] .st-app .ttag, :root[data-theme="dark"] .st-app .tp, :root[data-theme="dark"] .st-app .tc, :root[data-theme="dark"] .st-app .pg-head { background: var(--st-panel2) !important; color: var(--st-muted) !important; border-color: var(--st-line) !important; }
+:root[data-theme="dark"] .st-app .gstats { background: var(--st-panel) !important; border-color: var(--st-line) !important; }
+:root[data-theme="dark"] .st-app .gs { border-color: var(--st-line) !important; }
+:root[data-theme="dark"] .st-app .gs-n.g { color: #34D399 !important; }
+:root[data-theme="dark"] .st-app .gs-n.r { color: #F87171 !important; }
+:root[data-theme="dark"] .st-app .gs-n.a { color: #FBBF24 !important; }
+:root[data-theme="dark"] .st-app .gs-n.b { color: #60A5FA !important; }
+:root[data-theme="dark"] .st-app .fc { background: var(--st-panel) !important; color: var(--st-muted); border-color: var(--st-line); }
+:root[data-theme="dark"] .st-app .fc:hover { background: var(--st-hover) !important; color: var(--st-ink); }
+:root[data-theme="dark"] .st-app .fc.on { background: var(--st-red) !important; color: #fff; border-color: var(--st-red); }
+:root[data-theme="dark"] .st-app .task-row { border-color: var(--st-line) !important; }
+:root[data-theme="dark"] .st-app .dp-trk, :root[data-theme="dark"] .st-app .ecp-t { background: var(--st-line) !important; }
+:root[data-theme="dark"] .st-app .profile-dropdown { background: var(--st-panel) !important; border-color: var(--st-line) !important; }
+:root[data-theme="dark"] .st-app .pd-item { color: var(--st-ink) !important; }
+:root[data-theme="dark"] .st-app .pd-item:hover { background: var(--st-hover) !important; }
+:root[data-theme="dark"] .st-app .lcr-name, :root[data-theme="dark"] .st-app .lcr-reason { color: var(--st-ink); }
+:root[data-theme="dark"] .st-app .lcr-meta, :root[data-theme="dark"] .st-app .lcr-msg { color: var(--st-muted); }
+:root[data-theme="dark"] .st-app .lcr-act input { background: var(--st-panel2); color: var(--st-ink); border-color: var(--st-line); }
+:root[data-theme="dark"] .st-app ::-webkit-scrollbar-thumb { background: var(--st-line) !important; }
+
+/* management dashboard: card surfaces hard-coded white */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .st-app .tnav, :root:not([data-theme="light"]) .st-app .sidebar, :root:not([data-theme="light"]) .st-app .pg, :root:not([data-theme="light"]) .st-app .dept-card, :root:not([data-theme="light"]) .st-app .dp, :root:not([data-theme="light"]) .st-app .wl-wrap, :root:not([data-theme="light"]) .st-app .sb-card, :root:not([data-theme="light"]) .st-app .hcell { background: var(--st-panel) !important; border-color: var(--st-line) !important; }
+  :root:not([data-theme="light"]) .st-app .ec-status span:not(.dot) { color: var(--st-muted) !important; }
+  :root:not([data-theme="light"]) .st-app .dept-head { border-color: var(--st-line) !important; }
+  :root:not([data-theme="light"]) .st-app .tnav { border-bottom-color: var(--st-line) !important; }
+}
+:root[data-theme="dark"] .st-app .tnav, :root[data-theme="dark"] .st-app .sidebar, :root[data-theme="dark"] .st-app .pg, :root[data-theme="dark"] .st-app .dept-card, :root[data-theme="dark"] .st-app .dp, :root[data-theme="dark"] .st-app .wl-wrap, :root[data-theme="dark"] .st-app .sb-card, :root[data-theme="dark"] .st-app .hcell { background: var(--st-panel) !important; border-color: var(--st-line) !important; }
+:root[data-theme="dark"] .st-app .ec-status span:not(.dot) { color: var(--st-muted) !important; }
+:root[data-theme="dark"] .st-app .dept-head { border-color: var(--st-line) !important; }
+:root[data-theme="dark"] .st-app .tnav { border-bottom-color: var(--st-line) !important; }
+
+/* Phones: give the date title room next to the Day/Week/Month switch */
+@media (max-width: 600px) {
+  .st-top { gap: 2px; }
+  .st-top .st-icon-btn { width: 30px; }
+  .st-seg button { padding: 0 5px; }
+  .st-title { margin-left: 0; min-width: 52px; }
+}

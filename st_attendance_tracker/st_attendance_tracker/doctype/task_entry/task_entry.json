@@ -11,6 +11,7 @@
   "col_break_1",
   "task_type",
   "status",
+  "repeat_next_day",
   "section_break_task",
   "project_name",
   "description",
@@ -20,6 +21,7 @@
   "section_break_time",
   "estimated_time",
   "actual_time",
+  "start_time",
   "sequence"
  ],
  "fields": [
@@ -63,6 +65,13 @@
    "in_list_view": 1,
    "label": "Status",
    "options": "Pending\nIn Progress\nDone\nRolled Over\nDropped"
+  },
+  {
+   "default": "0",
+   "description": "Set by the employee: a copy of this task comes back on the next working day even after it is Done. Not related to Recurring Tasks.",
+   "fieldname": "repeat_next_day",
+   "fieldtype": "Check",
+   "label": "Repeat Next Day"
   },
   {
    "fieldname": "section_break_task",
@@ -120,6 +129,12 @@
    "fieldtype": "Float",
    "label": "Time Taken for Task Completion",
    "description": "e.g. 2 hrs, 30 mins"
+  },
+  {
+   "fieldname": "start_time",
+   "fieldtype": "Time",
+   "label": "Scheduled Start",
+   "description": "Calendar position on the day; empty = laid out automatically"
   },
   {
    "default": "0",

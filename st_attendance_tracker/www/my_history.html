@@ -8,12 +8,13 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css">
 <link rel="stylesheet" href="/assets/st_attendance_tracker/css/whats_new.css">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --primary: #6366f1;
-  --primary-hover: #4f46e5;
-  --primary-light: #e0e7ff;
-  --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  --primary: #ED1D24;
+  --primary-hover: #C4151B;
+  --primary-light: #FDE8E9;
+  --primary-gradient: linear-gradient(135deg, #ED1D24 0%, #ED1D24 100%);
   --success: #10b981;
   --success-bg: #ecfdf5;
   --success-border: #a7f3d0;
@@ -621,7 +622,7 @@ body {
 
 .tnav { border-bottom: 1px solid #e2e8f0 !important; }
 .tnav-logo {
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+    background: linear-gradient(135deg, #C4151B 0%, #C4151B 100%) !important;
     -webkit-background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
 }
@@ -630,22 +631,22 @@ body {
 .ph, .hero {
     background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%),
                 repeating-linear-gradient(45deg, rgba(79, 70, 229, 0.02) 0, rgba(79, 70, 229, 0.02) 1px, transparent 1px, transparent 10px) !important;
-    border: 1px solid #e0e7ff !important;
-    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.05) !important;
+    border: 1px solid #FDE8E9 !important;
+    box-shadow: 0 4px 15px rgba(237, 29, 36, 0.05) !important;
 }
-.ph-title, .hero-title { color: #1e1b4b !important; }
-.ph-sub, .hero-sub { color: #4338ca !important; }
-.hero-eye { color: #4f46e5 !important; }
-.ph-time { color: #312e81 !important; }
-.ph-date { color: #4f46e5 !important; }
+.ph-title, .hero-title { color: #111112 !important; }
+.ph-sub, .hero-sub { color: #B5121A !important; }
+.hero-eye { color: #C4151B !important; }
+.ph-time { color: #111112 !important; }
+.ph-date { color: #C4151B !important; }
 
 /* Avatars */
-.ph-av { background: #e0e7ff !important; color: #4338ca !important; border: 1px solid #c7d2fe !important; }
-.sb-av, .tnav-av { background: #e0e7ff !important; color: #4338ca !important; border: 1px solid #c7d2fe !important; }
+.ph-av { background: #FDE8E9 !important; color: #B5121A !important; border: 1px solid #F5B8BB !important; }
+.sb-av, .tnav-av { background: #FDE8E9 !important; color: #B5121A !important; border: 1px solid #F5B8BB !important; }
 
 /* Primary Buttons (Indigo) */
 .btn.red, .fbtn.red {
-    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%) !important;
+    background: linear-gradient(135deg, #C4151B 0%, #ED1D24 100%) !important;
     color: #ffffff !important;
     border: none !important;
     box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25) !important;
@@ -680,8 +681,8 @@ body {
     border-radius: 6px !important;
 }
 .tinp:focus, .tsel:focus, .date-inp:focus, .wl-sel:focus {
-    border-color: #6366f1 !important;
-    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2) !important;
+    border-color: #ED1D24 !important;
+    box-shadow: 0 0 0 2px rgba(237, 29, 36, 0.2) !important;
     outline: none !important;
 }
 
@@ -700,14 +701,14 @@ body {
 .hv { color: #0f172a !important; }
 .sb-name, .dept-name, .dp-name { color: #0f172a !important; }
 .sb-link { color: #475569 !important; }
-.sb-link.on { background: #e0e7ff !important; color: #4338ca !important; border-radius: 6px !important;}
+.sb-link.on { background: #FDE8E9 !important; color: #B5121A !important; border-radius: 6px !important;}
 
 /* Subtle Checkboxes */
 .tck {
     border: 1px solid #cbd5e1 !important;
     border-radius: 4px !important;
 }
-.tck:hover { border-color: #6366f1 !important; background: #e0e7ff !important; }
+.tck:hover { border-color: #ED1D24 !important; background: #FDE8E9 !important; }
 .tck.dn {
     background: #10b981 !important;
     border-color: #10b981 !important;
@@ -790,29 +791,27 @@ body {
   margin: 0 !important;
 }
 </style>
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_brand.css?v=22">
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_calendar.css?v=19">
 {% endblock %}
 {% block page_content %}
-<nav class="tnav">
-  <div class="tnav-con">
-    <a href="/daily-checkin" class="tnav-logo" style="text-decoration:none;cursor:pointer">ST Tracker</a>
-    <span class="tnav-sep"></span>
-    <span class="tnav-bc">My History</span>
-    <div class="tnav-r">
-      <a href="/daily-checkin" class="tnav-btn"><i class="ti ti-check" aria-hidden="true"></i>My check-in</a>
-      <a href="/recurring-tasks" class="tnav-btn"><i class="ti ti-repeat" aria-hidden="true"></i>Recurring</a>
-      <a href="/task-backlog" class="tnav-btn"><i class="ti ti-list-details" aria-hidden="true"></i>Backlog</a>
-      <button type="button" class="tnav-btn" onclick="STTour.start('my_history_v1', MY_HISTORY_TOUR_STEPS)"><i class="ti ti-map-2" aria-hidden="true"></i>Tour</button>
-      <div class="wn-bell-wrap" id="wn-mount"></div>
-      <div class="tnav-av" onclick="toggleProfileDropdown(event)" style="cursor:pointer;" title="Account Options">{{ employee.employee_name[:2].upper() }}</div>
-      <div class="profile-dropdown" id="profile-dropdown">
-        <a href="/app/employee/{{ employee.name }}" class="pd-item"><i class="ti ti-user" aria-hidden="true"></i>My Profile</a>
-        <a href="/app" class="pd-item"><i class="ti ti-layout-dashboard" aria-hidden="true"></i>Switch to Desk</a>
-        <a href="/?cmd=web_logout" class="pd-item"><i class="ti ti-logout" aria-hidden="true"></i>Logout</a>
-      </div>
-    </div>
+{% from "st_attendance_tracker/templates/macros/st_shell.html" import shell %}
+<script>window.ST_HIST = {"today": {{ date | tojson }}}; window.ST_SHELL_DATE = window.ST_HIST.today;</script>
+{% call shell(st_shell, "My History", "STTour.start('my_history_v1', MY_HISTORY_TOUR_STEPS)", None, None, True, False) %}
+<div class="hist-bar">
+  <div class="st-seg" role="group" aria-label="History view">
+    <button type="button" data-hist-view="calendar" aria-pressed="true">Calendar</button>
+    <button type="button" data-hist-view="list" aria-pressed="false">List</button>
   </div>
-</nav>
-<div id="wn-banner-mount"></div>
+</div>
+<div class="cal-page" id="hist-cal">
+  <section class="cal-main" aria-label="Month">
+    <div class="hist-kpis" id="hist-kpis"></div>
+    <div class="cal-month" id="hist-month"><div class="cal-empty" style="grid-column:1/-1;margin:16px">Loading history…</div></div>
+  </section>
+  <aside class="cal-side" id="hist-side" data-st-collapsible="day detail" aria-label="Day detail"><div id="hist-detail"></div></aside>
+</div>
+<div id="hist-list-view" hidden>
 <div class="wrap">
   <div class="hero">
     <div class="hero-eye">Attendance history</div>
@@ -827,6 +826,10 @@ body {
   </div>
   <button class="load-more-btn" id="load-more" style="display:none" onclick="loadMore()">Load more records</button>
 </div>
+</div>
+{% endcall %}
+<script src="/assets/st_attendance_tracker/js/st_shell.js?v=11"></script>
+<script src="/assets/st_attendance_tracker/js/st_history_calendar.js?v=1"></script>
 <script src="/assets/st_attendance_tracker/js/dashboard_utils.js"></script>
 <script src="/assets/st_attendance_tracker/js/whats_new.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
@@ -950,7 +953,9 @@ function loadDayDetail(date) {
     },
     error: function() {
       DAY_DETAIL_LOADING[date] = false;
-      container.innerHTML = '<div style="font-size:12px;color:#b91c1c;padding:8px">Could not load details. <a href="#" onclick="loadDayDetail(\'' + esc(date) + '\');return false;">Retry</a></div>';
+      container.innerHTML = '<div style="font-size:12px;color:#b91c1c;padding:8px">Could not load details. <a href="#" class="retry-day">Retry</a></div>';
+      // Listener, not an inline onclick: `date` must never be spliced into JS source.
+      container.querySelector('.retry-day').addEventListener('click', function(e) { e.preventDefault(); loadDayDetail(date); });
     }
   });
 }
@@ -1012,33 +1017,16 @@ function loadHistory(reset) {
 }
 
 var MY_HISTORY_TOUR_STEPS = [
-  { element: '.hero', popover: { title: 'My History', description: 'A running record of your own attendance.', side: 'bottom' } },
-  { element: '#history-list', popover: { title: 'Past days', description: 'Click any day to expand its login/logout times and the tasks you logged.', side: 'top' } },
-  { element: '#load-more', popover: { title: 'Load more', description: 'Keep loading further back in time.', side: 'top' } }
+  { element: '#hist-kpis', popover: { title: 'My History', description: 'A summary of your attendance for the month on screen.', side: 'bottom' } },
+  { element: '#hist-month', popover: { title: 'Month calendar', description: 'Click any day to see its login/logout times and the tasks you logged.', side: 'top' } },
+  { element: '#hist-side', popover: { title: 'Day detail', description: 'Check-in, lunch, hours worked and tasks for the selected day.', side: 'left' } }
 ];
 
 frappe.ready(function(){
-  loadHistory(true); initWhatsNew();
+  initWhatsNew();
   {% if show_tour_my_history %}
   setTimeout(function(){ STTour.start('my_history_v1', MY_HISTORY_TOUR_STEPS); }, 600);
   {% endif %}
-});
-
-function toggleProfileDropdown(e) {
-  if (e) e.stopPropagation();
-  var dd = document.getElementById('profile-dropdown');
-  if (dd) {
-    dd.classList.toggle('show');
-  }
-}
-
-document.addEventListener('click', function(e) {
-  var dd = document.getElementById('profile-dropdown');
-  if (dd && dd.classList.contains('show')) {
-    if (!dd.contains(e.target)) {
-      dd.classList.remove('show');
-    }
-  }
 });
 </script>
 {% endblock %}

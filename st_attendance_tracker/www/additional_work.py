@@ -1,11 +1,15 @@
 import frappe
 from frappe.utils import today, getdate, add_days, get_first_day_of_week
 
+from st_attendance_tracker.ui_shell import get_shell_context, redirect_for_design
+
 
 def get_context(context):
     if frappe.session.user == "Guest":
         frappe.local.flags.redirect_location = "/login?redirect-to=/additional-work"
         raise frappe.Redirect
+
+    redirect_for_design()
 
     employee = frappe.db.get_value(
         "Employee", {"user_id": frappe.session.user, "status": "Active"},
@@ -54,6 +58,9 @@ def get_context(context):
     context.employee = employee
     context.date = today_date
     context.title = "Additional Work"
+    context.st_shell = get_shell_context("additional", employee)
+    context.week_start = str(week_start)
+    context.month_start = str(month_start)
     context.week_hours = round(week_hours, 1)
     context.month_hours = round(month_hours, 1)
     context.total_entries = total_entries

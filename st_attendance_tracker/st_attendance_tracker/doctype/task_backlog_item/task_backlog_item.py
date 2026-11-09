@@ -3,6 +3,13 @@ from frappe.model.document import Document
 
 
 class TaskBacklogItem(Document):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Frappe back-fills every Time field with nowtime(); an empty start_time means "no time chosen".
+        if self.is_new():
+            self.set("start_time", None)
+        self.dont_update_if_missing = ["start_time"]
+
     def before_insert(self):
         if not self.employee:
             self.employee = frappe.db.get_value(
@@ -47,3 +54,4 @@ class TaskBacklogItem(Document):
 
 def on_doctype_update():
     frappe.db.add_index("Task Backlog Item", ["employee", "creation"])
+    frappe.db.add_index("Task Backlog Item", ["employee", "scheduled_for"])

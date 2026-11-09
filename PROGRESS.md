@@ -104,3 +104,131 @@ Only step 9 remains: let the migrated data sit through a verification window (sp
 
 - Spec Section 8.1's remaining caching items (HR-manager-email list, `ST Attendance Settings` singleton reads) — `_get_team_members()` caching already existed before this session.
 - Section 8.2 (further `get_page_state()` query consolidation), 8.3 (moving notification emails to `frappe.enqueue()`), 8.4 (scheduler job batch-safety audit) — flagged in the spec as same-release-but-separate performance work, not touched here.
+
+## Calendar-style UI redesign (spec: `specs/calendar-ui-redesign.md`)
+
+Test site: `st-prod` (no `excel` site exists on this bench; user approved running there; DB backed up first to `sites/st-prod/private/backups/20261003_121819-*`).
+
+**Baseline before any UI change** (`daily_work_log` module): 110 tests, 7 failing already (2 failures, 5 errors: leave-exclusion/missed-report tests, `NoneType * int`). `doctype/additional_work/test_additional_work.py` fails to import (`save_additional_work` was removed from `api.py` in the phase 4 REST migration). These are not caused by the redesign. Regression rule: the failing set must not grow.
+
+- [x] Phase 0: baseline + spec
+- [x] Phase 1: brand tokens (`public/css/st_brand.css`), shell macro (`templates/macros/st_shell.html`), `ui_shell.py` (role-based nav), `public/js/st_shell.js`. Applied to Recurring Tasks only. 7 new tests in `test_ui_shell.py` pass; baseline failures unchanged; page renders 200 server-side as a real employee. Other pages do not load the brand CSS, so they are unchanged.
+- [x] Phase 2: Additional Work page uses the shell (left page-nav sidebar removed; login/logout/project/status form and all JS unchanged). Status colours via brand layer. Render tests added.
+- [x] Phase 3: Task Backlog and My History use the shell (`mob-nav` bottom bar on backlog removed, replaced by the shell's off-canvas rail). Indigo colours on all migrated pages replaced with brand reds. My History is still the existing expandable day list; the month-calendar view from the prototype is not built yet (needs its own step).
+  Regression after each phase: `daily_work_log` module 110 tests, same 7 failures as baseline; `task_backlog_item` 17/17; `test_ui_shell` 11/11.
+- [x] Phase 4: Team Dashboard and Management Dashboard use the shell. Their employee detail panels (`get_employee_task_detail`, server-side access check) already existed and are untouched; no new endpoint. Docs links moved into the shell's account menu. Tests: allowed render for a real Team Leader / HR Manager, and denied paths (non-Team-Leader redirected from team dashboard, plain employee redirected from management dashboard). `test_ui_shell` 15/15; `daily_work_log` same 7 baseline failures.
+- [ ] Phase 5: Daily Check-in calendar (needs `Task Entry` start_time/duration, patch, new move/resize API). **Needs a decision before starting** (see below).
+- [x] Phase 5a: shell parity with the prototype: Create menu, mini month calendar, Today/prev/next + Day/Week/Month controls (opt-in), desktop-collapsible left rail (remembered), collapsible right panels via `data-st-collapsible` (Additional Work, Backlog, Check-in panel).
+- [x] Phase 5b: Daily Check-in rebuilt as a calendar (`www/checkin_calendar.*`, `public/js/st_checkin_calendar.js`, `public/css/st_calendar.css`), served at `/daily-checkin`; previous page kept at `/daily-checkin-classic` (menu link "Classic check-in"). Uses existing endpoints (`get_page_state`, `submit_morning_log`, `autosave_eod_progress`, `add_adhoc_tasks`, `submit_eod_log`, `move_task_to_backlog`, `pull_backlog_item_to_today`, `delete_carried_task`, `reset_morning_checkin`) plus new `calendar_api.get_calendar_range` / `set_task_schedule`.
+  - Schema: `Task Entry.start_time` (Time, optional) added; synced on st-prod with `bench --site st-prod reload-doc st_attendance_tracker doctype task_entry` (not a full migrate, to avoid running other apps' patches). Controller keeps it empty because Frappe back-fills Time fields with now (same quirk as Daily Work Log).
+  - Tests: `test_calendar_api` (10) and route/page tests; `daily_work_log` still the same 7 baseline failures.
+  - Not ported yet (use classic): task attachments, editing descriptions at checkout, half-day session change after check-in. Moving tasks across days is not supported (only within the open day).
+  - UI was exercised in a browser against an in-page fake of the endpoints (no login available); real-server behaviour is covered by the API tests only.
+  - Note: `late_checkin_threshold` on st-prod is `18:24`, an auto-filled Time default (nobody counts as late). Not changed here; worth fixing in ST Attendance Settings.
+- [x] Phase 6: My History is a month calendar (`public/js/st_history_calendar.js`): KPI tiles, attendance chips, task counts, collapsible day-detail panel; reads `calendar_api.get_calendar_range` (own data only). The original day-by-day list stays under a Calendar / List toggle and loads lazily.
+- [ ] Remaining for full visual parity with the prototype: Team Dashboard (employee x week matrix with drag-to-reassign), Management Dashboard (KPI/chart/employee table), and Additional Work / Task Backlog / Recurring Tasks page layouts. These currently use the new shell, brand colours and collapsible panels, with their existing page structure.
+- [x] Phase 7: Team Dashboard = week matrix (employees x days) with KPI tiles, search/status filter, per-day status and task chips, record drawer (`st_employee_drawer.js`, uses `get_employee_task_detail`), "Assign task" through the original modal, realtime refresh. Management Dashboard = overview (KPI tiles, weekly attendance chart, department bars, employees table with filters, collapsible checkout leaderboard) with the same drawer. New endpoints `calendar_api.get_team_week` (Team Leader of those employees only) and `get_company_week` (HR Manager / Management only); 8 permission tests (allowed and denied).
+  The original card views are unchanged and sit under the List / Departments toggles. Tests assert their markup and JS functions are still present, and `git diff` shows only the dead profile-dropdown JS was removed from both pages.
+  Not built: drag-to-reassign tasks between people/days (no existing business rule or endpoint for reassigning a task; assigning stays via the existing modal).
+- [x] Phase 8 (partial): Additional Work gets KPI tiles (same `sum-*` ids the page JS updates) and a table-style history; Task Backlog and Recurring Tasks get flatter artifact-style CSS (`public/css/st_pages.css`); Recurring gets a "This week" strip and opens the new-task dialog from `#new`. Page JS/APIs otherwise unchanged.
+- [x] Phase 8 (complete): Additional Work = KPI tiles + single-entry form + table (the multi-task form is under "Several tasks"); Task Backlog = table (Add / Edit / Delete / Schedule today / Schedule all, drag a row onto today in the mini calendar; original cards under "Cards"); Recurring Tasks = table with weekday buttons, Active switch, edit/delete, "This week" strip (original cards under "Cards"). Create menu links open the matching dialog (`#new`, `#new-task`, `#assign`).
+- [x] Dark theme: all shell/calendar/table styles use tokens; follows the system setting, top-bar toggle overrides and is remembered (`st.theme`). Legacy markup that still sits behind the List / Cards / Several-tasks toggles only follows the tokens it already used (best effort).
+- Known gaps vs the prototype: text wordmark instead of the real logo SVG; backlog tasks can only be scheduled for today (they have no date field); no drag-reassign on Team; phone layout checked only on Recurring Tasks.
+- [x] Additional Work next to check-in/check-out (no approval flow, by decision): linked by (employee, work_date), which is unique per Daily Work Log, so no new field. `AdditionalWork.validate` rejects a partial time overlap with another entry of the same employee and day (identical window allowed for the "Several tasks" form; work past midnight not blocked). `calendar_api.get_day_context(date)` feeds the form (check-in window, other entries, extra-hours vs inside-working-hours hint, overlap blocks submit). Team week cells and the record drawer show extra hours/entries (`get_team_week`, additive `additional_work` key on `get_employee_task_detail`); Management table has an Extra hours column (`get_company_extra_hours`, HR/Management only). 9 new tests.
+- [x] Browser test as Imran on st-prod (emails suspended by owner): check-in, status change, drag (start time persisted), ad-hoc task, move to backlog, check-out dialog (not submitted), reset check-in, Additional Work entry + server overlap rejection all work. Bugs found and fixed: resize handle swallowing drags on short blocks; derived layout piling many carried tasks at day end; open check-in window treated as closed in the Additional Work hint; **clicking an empty calendar slot did nothing** (handler was missing) — now opens an add dialog (today task / additional work / backlog; future days only backlog; past days only additional work/backlog).
+- [x] Recommended features (each: built, unit-tested, browser-tested as Imran on st-prod with cleanup, full regression after):
+  - A bulk "move to backlog" (`calendar_api.bulk_move_to_backlog`, reuses `move_task_to_backlog` rules, partial success). 5 tests.
+  - B edit task from calendar (`calendar_api.update_task`; recurring text locked). 4 tests.
+  - C totals strip (days present, net hours, extra hours, tasks done) and D project filter + remembered view/status filters (client only).
+  - E attachments in the edit dialog and popover (existing endpoints).
+  - F schedule backlog items on a day: `Task Backlog Item.scheduled_for/start_time` (synced with `reload-doc`), `schedule_backlog_item`, `api._pull_scheduled_backlog` (runs before morning check-in next to recurring tasks; needs `scheduled_for is set`, because Frappe compares a Date as ifnull(col, '0001-01-01') and would otherwise pull every unscheduled item — caught by a test), dashed blocks on the calendar that can be dragged to other days, scheduling from the add dialog, tray and mini calendar. 10 tests.
+  - G Team Leader reassign (`calendar_api.reassign_task`): drag a Pending chip to another person's today cell, or pick from the record drawer; only today, Pending, non-recurring, no attachments, neither person checked out. 6 tests.
+  - H phone layout: top bar and tables fixed (no horizontal page scroll at 390px on check-in, history, team, additional work, backlog, recurring).
+  - Bugs found and fixed while testing: `$$` missing in the drawer script (drawer stuck on "Loading…"), comment swallowing a closing tag in event markup, NULL-date matching (above).
+  - Not possible here: the real logo SVG (file not provided).
+- [x] `ST Attendance Settings.late_checkin_threshold` on st-prod was `18:24:54` (Frappe back-filled the current time into the empty Time field, so nobody was ever Late). Set to `10:00:00` (the doctype default) through the document API so the settings cache cleared. Existing Daily Work Logs keep the `is_late` they were saved with (no recompute). Manual test list for the new pages: `specs/calendar-ui-manual-checklist.md`.
+- [x] Tasks typed into the morning check-in form (or added by clicking the calendar before check-in) now show on today's column as dashed draft blocks, marked not saved until check-in, and are replaced by the real tasks after check-in.
+
+## Test repair and browser verification (2026-10-05)
+
+- Fixed 7 failing tests (all in `daily_work_log/test_daily_work_log.py`):
+  - 3 leave tests: site Server Script `auto_approve_one_day_leave` plus HRMS submit crashed on fixture creation. Fixture now inserted with `db_insert`.
+  - 2 QAHR duplicate-log errors: cascaded from `test_3_4` not cleaning up. `tearDown` now cleans both employees; `test_3_4` uses try/finally.
+  - `test_3_4_bola_task_edit_blocked`: QA user lacked the Employee User Permission that real users have, and the doc kept `flags.ignore_permissions`. Test now creates the User Permission and reloads the doc.
+  - `test_10_4`: stale, `_get_team_members` cache was removed. Replaced with a test that changes show up immediately.
+- Repaired `additional_work/test_additional_work.py` (removed `save_additional_work` import; local shims using the document API).
+- Added `tearDownModule` cleanup of `*@test.example.com` User Permissions to 9 test files. 452 orphans deleted; 0 left.
+- All 10 modules pass on st-prod: additional_work 14, daily_work_log 110, task_backlog_item 17, ui_shell 27, calendar_api 24, team_calendar_api 8, additional_work_link 9, bulk_backlog 5, backlog_schedule 10, team_reassign 6.
+- Whole-app `bench run-tests --app st_attendance_tracker` fails in an ERPNext Account test-record autoname TypeError (environment). Run per module.
+- Browser check as imran@standardtouch.com: check-in calendar (popover, add dialog, bulk move, check out), My History, Additional Work, Task Backlog, Recurring Tasks, Team Dashboard (drawer opens), Management redirects an employee. No console errors other than Frappe's `file_uploader.bundle.js`.
+- Security note: access now relies on native Employee User Permissions (phase 3). Abdul Nasir (EMP-100100017) has none; confirm intended.
+- Not browser-tested: Management/HR path, check-out submit, Team Assign task, phone width. Logo SVG still needed. Nothing committed.
+
+## Employee manual checklist run as Imran + fixes (2026-10-05)
+
+Sections 1 and 2 of `specs/calendar-ui-manual-checklist.md` run in the browser on st-prod as imran@standardtouch.com (reset flag cleared once to test the pre-check-in flow; all QA rows deleted afterwards, Imran's day restored).
+
+Passed: 1.1, 1.2, 1.5-1.10, 1.12-1.20 (check-out validations only), 1.24; 2.1, 2.3-2.12, 2.13 (calendar + list).
+Not run (would lock Imran's real day or need other users): 1.3, 1.4 (recurring tasks cannot be removed so the "no task" case is not reachable), 1.21-1.23, 1.25, 1.16 confirm (dialog only, Cancel pressed), 2.2, 2.14 detail, all Team Leader / HR sections.
+
+Bugs found and fixed:
+- Team Dashboard: "Assign task" saved but the week grid and open record did not refresh, and a day with planned tasks but no check-in said "No check-in recorded". Now `st:team-changed` reloads the grid and `STDrawer.refresh()`; the drawer lists planned tasks.
+- Check-in calendar: marking a task Done from the panel/popover showed Done but the server silently set it back to In Progress (Done needs a time taken). Now asks for time taken first and re-syncs from the server.
+- Check-in calendar: month totals counted the grid's leading/trailing days; now the month only (matches My History).
+- Additional Work: Hours this week / month tiles stayed 0h after saving an entry; now refreshed. History hours rounded to 2 decimals.
+- Dark theme: Additional Work "Several tasks" form, My History list view header/day cards had light hard-coded surfaces.
+
+Known leftovers: Recurring Tasks add/edit modal and some other legacy dialogs are still light in dark theme; draft preview position before check-in can differ from the final slot; synthetic JS drag events race with real pointer drag (use real mouse for drag tests).
+Regression: test_ui_shell 27, test_calendar_api 24, test_additional_work_link 9, additional_work 14 all OK. Nothing committed.
+
+## Bot check-in emails + check-in page polish (2026-10-06)
+
+- Bot emails: the Hermes bot (`hermes-agent@standardtouch.com`) inserts a bare Employee Checkin (empty device_id), skipping `submit_morning_log`/`submit_eod_log`, so no emails fired. Added `Employee Checkin after_insert` hook `api.notify_external_checkin` (hooks.py): for rows made by a user with role "ST Task Assignment Agent", enqueues the same HR/Team Leader/employee emails. Once per employee/day/direction via atomic Redis `SET NX` (a get-then-set pair misses in Frappe's request-local cache). Skipped for `ST Daily Checkin` rows, tests/import/migrate, and when a web check-in/out already emailed. 10 tests in `test_bot_checkin_notifications.py`. Verified on st-prod: bot-style insert queued HR/TL + employee mail (Not Sent, mail still suspended), repeat queued nothing; test rows removed. Bot still does not create a Daily Work Log.
+- Check-in calendar (`checkin_calendar`): remarks (check-out table, edit dialog) are resizable textareas that grow with text; task description in the morning form, carried rows and Add a task is a growing textarea; project/estimate row no longer truncates; empty error line no longer leaves a gap under Add a task; check-out dialog wider with minimum column widths so task names do not wrap per letter.
+- Classic page redesign: artifact published for review (https://claude.ai/artifact/TdzRDnSLu9Aw61PAS542if); not built yet.
+Regression: test_ui_shell 27, test_calendar_api 24, test_bot_checkin_notifications 10, daily_work_log 110 all OK. Nothing committed.
+
+## Classic pages, branded (2026-10-06)
+
+Decision: the redesign artifact for the classic check-in was rejected. Classic keeps its original layout; only the StandardTouch brand is applied. Every navigation entry now has two pages: new design and classic.
+- Classic routes: `/daily-checkin-classic` (existing `daily_checkin.html`, unchanged markup), `/my-history-classic`, `/recurring-tasks-classic`, `/task-backlog-classic`, `/additional-work-classic`, `/team-dashboard-classic`, `/management-dashboard-classic` (rules in `hooks.py`). Each `*_classic.html` is the original template from git HEAD with the brand applied; each `*_classic.py` re-exports the new page's `get_context`, so both designs share data and permissions.
+- Brand: `public/css/st_classic.css` (loaded after each page's inline CSS) re-points the legacy `--primary/--dark/...` variables to red/black/white/stone, Montserrat + Poppins, wordmark logo replaces "ST Tracker", rainbow stat icons and indigo/green/blue accents replaced. Classic sidebars/nav links now point at classic pages.
+- Switching: `public/js/st_classic.js` adds a red "New design" button to the classic top bar; new pages get "Classic design" in the avatar menu (`ui_shell.get_shell_context` -> `menu_links`).
+- Tests: `TestClassicPages` in `test_ui_shell.py` (every nav route has classic route + files; menu link). test_ui_shell 29 OK.
+- Browser (Imran): all classic pages load 200; management classic redirects non-HR as before. Not verified: HR/Management classic render, dark theme (classic is light only), phone width.
+
+## Classic check-in in document style (2026-10-06)
+
+Per user reference (Range check-in): `/daily-checkin-classic` restyled as a document layout. Markup, ids, JS and backend calls unchanged; presentation only.
+- `public/css/st_classic_doc.css` (scoped by `.app.st-doc`): flat full-height left nav with tinted active pill, one centred 780px working column, round tick circles, quiet ruled task rows with small status/estimate/actual controls, project groups as plain labels, sticky bottom action bar, flat right summary panel; new heading block (title, date, status tag) in `daily_checkin.html`.
+- `st_classic.css`: task status colours Pending=stone, In progress=red, Done=black (select and concise view).
+- Fixed a pre-existing bug: Concise view listed no recurring/standalone tasks (selector `.body > .standalone-container > .stask` did not match the real nesting); now `.body .standalone-container > .stask`.
+- Verified as Imran: morning state, check-in submit (09:30), status change / tick, concise view, add task + remark toggle; test data reverted (tasks Pending, drafts cleared). Not verified: checkout submit, late-checkout banner, half-day banner, phone width, other classic pages in this style.
+- test_ui_shell 29 OK. Nothing committed.
+
+Update (2026-10-06): the Range-style document layout for the classic check-in was removed on request (`st_classic_doc.css`, heading block and `st-doc` class deleted). Classic check-in keeps its original layout with the StandardTouch brand (`st_classic.css`) and the Concise view fix.
+
+## Time picker (2026-10-06)
+Browser-native `<input type=time>` (24h hour/minute columns) replaced by a branded picker: `public/js/st_timepicker.js` + `public/css/st_timepicker.css`, loaded from `st_shell.js` (new pages) and `st_classic.js` (classic pages). Every `input[type=time]`, including ones created later in dialogs, is enhanced; the native input stays hidden with its "HH:MM" value (value setter wrapped), so existing code and `input`/`change` handlers are unchanged. Field shows 12-hour text and accepts typing (930, 9.45 pm, 21:30, 9pm), up/down arrows (+-5 min), clock button opens hour grid, 5-minute grid, AM/PM and Now; read-only fields stay plain. Verified as Imran: classic login time, new calendar add dialog and morning panel, dark theme, typing/invalid input, programmatic value sync. Not verified: check-out dialog lunch fields, Additional Work and Backlog pages, phone width.
+
+Update (2026-10-06): time picker popover changed to a clock-face dial (hour then minute, drag or click, big HH : MM boxes, a.m./p.m., Now / Cancel / OK, keyboard icon jumps to typing), on user's reference. Typing, arrow keys and programmatic `.value` sync unchanged. OK applies, Cancel/outside click/Esc discard. Verified in the calendar Add dialog (dark theme, real mouse clicks: 5 then 50 then OK). Not verified: classic page lunch/login fields after this change, touch/drag on a phone.
+
+## Calendar live view + time picker theme fixes (2026-10-06)
+Browser test of `/daily-checkin` as Imran (real mouse): views Day/Week/Month, prev/next/Today, popover, check-in submit via clock picker, drag with toast, add dialog. Found and fixed:
+- Live view did not live: the current-time line never moved and data never refreshed. Now `tickNowLine()` every 30s (also on focus/visibility), quiet data refresh every ~60s when checked in and idle (not while a dialog is open, a field in the side panel has focus, or a drag is in progress); scroll positions preserved. Before check-in only a new check-in elsewhere (e.g. the bot) triggers a reload, so typing in the morning form is never wiped.
+- Calendar now opens scrolled to the current time when today is visible (was always 8 AM).
+- Before check-in, today's tasks without a saved time were laid out from 9 AM (in the past); now from the current time.
+- Side panel scrolls to top after check-in.
+- Clock picker opened from the page body showed light colours in dark theme (tokens live under `.st-app`); popup now mounts inside `.st-app`. No auto-focus ring on open.
+Test state: Imran is now checked in at 4:23 PM (was reset by the user before); "Meta ads optimisation" moved to 7:30 PM by the drag test.
+Not verified: resize handle by mouse, month-view interactions, phone width.
+
+## Morning check-in panel decluttered (2026-10-06)
+`morningHTML()` in `st_checkin_calendar.js` rebuilt with sections (check-in details, "Your list today" with count and Move-all, "From your backlog" one-line checkboxes, "Add tasks") separated by hairlines instead of a stack of bordered cards; task rows are quiet (borderless text that shows its field on hover/focus, project + estimate + kind on one line, move-to-backlog/remove icons only on hover or focus), the Submit button is sticky at the bottom, and the panel has a date in its header. Same element ids, data attributes and handlers (`#m-in`, `#m-loc`, `data-carried`, `data-f`, `data-act`, `data-pull`, `#m-rows`, `#m-add`, `#m-submit`). Also: Reset check-in button now always shown on the working panel, disabled with a note after the once-a-day reset is used. Verified visually as Imran (light data, dark theme); check-in submit from the new markup not re-tested after this change.
+Update (2026-10-06): collapsible backlog. Morning panel "From your backlog" (`#mc-bk-toggle`, key `st.cal.bk`, default closed when >3 items, "N selected" badge) and the working panel's Backlog tray (`#tray-toggle`, key `st.cal.tray`, default closed, count badge, View all stays visible; tray is still a drop target when collapsed). Verified toggle open/close and persistence as Imran; dragging a calendar task onto the collapsed tray not re-tested.
+
+## Default design, Additional Work rule and email (2026-10-06)
+- Default design: `ui_shell.get_design_preference` / `set_design_preference` (user default `st_design_preference`), `redirect_for_design()` called in every page's `get_context` (honours session cookie `st_view` set by the "New design"/"Classic design" switch links), `public/js/st_design_pref.js` + `st_design_pref.css`: asks once when no choice is saved ("Not now" skips for the session), "Default design" item in both account menus changes it. Test: `test_design_preference.py` (9). Browser-verified as Imran (first-ask dialog, save -> redirect to classic, /daily-checkin redirected, switch link keeps new for the session, menu change back). Imran's preference is now `new`.
+- Additional Work rule: entries can only be created for a day that is checked out (`Daily Work Log.eod_submitted`) or on full-day leave (`_get_employees_on_leave`; half-day leave and weekly off/holidays are NOT allowed days). Enforced in `AdditionalWork._check_day_is_closed` (new entries or a changed day/employee only; edits of existing entries are not blocked), shown on the Additional Work page (single and several-tasks forms disable Submit with the reason) and `get_day_context` (`can_log`, `blocked_message`); the calendar Add dialog offers "Additional work" only on checked-out days. Tests: 6 new in `test_additional_work.py`; other AW tests patch the rule.
+- Additional Work email: `additional_work_mail.py` (`Additional Work.after_insert`): HR Managers + Team Leader get one email and the employee one, one per employee and day (Redis SET NX, 8s batch window, escaped text, entries table + total hours). Verified on st-prod with 2 entries -> 2 queued emails (HR/TL, employee) listing both entries, test rows removed. Tests: `test_additional_work_mail.py` (5).
+- Not done: "continues work from" link between days; HR/Team Leader view of the new rule; weekly off/holiday handling.

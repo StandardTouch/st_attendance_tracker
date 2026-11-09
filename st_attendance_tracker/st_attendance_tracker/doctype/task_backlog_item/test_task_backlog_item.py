@@ -257,3 +257,10 @@ class TestTaskBacklogItem(FrappeTestCase):
         frappe.set_user(self.stranger_user)
         with self.assertRaises(frappe.PermissionError):
             move_task_to_backlog(row.name)
+
+
+def tearDownModule():
+    # HRMS creates a User Permission for every Employee user, and these tests delete their employees
+    # with raw SQL, so the permissions would pile up in the site database run after run.
+    frappe.db.sql("DELETE FROM `tabUser Permission` WHERE user LIKE %s", ("%@test.example.com",))
+    frappe.db.commit()

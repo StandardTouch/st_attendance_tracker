@@ -1,0 +1,40 @@
+{% extends "templates/web.html" %}
+{% block title %}Daily Check-in · {{ employee.employee_name }}{% endblock %}
+{% block head_include %}
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/whats_new.css">
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_brand.css?v=22">
+<link rel="stylesheet" href="/assets/st_attendance_tracker/css/st_calendar.css?v=23">
+{% endblock %}
+{% block page_content %}
+{% from "st_attendance_tracker/templates/macros/st_shell.html" import shell %}
+{% set rail_extra %}
+<div class="cal-rail-filters">
+  <h3>Task status</h3>
+  <label class="cal-chk"><input type="checkbox" data-status-filter="Pending" checked>○ Pending</label>
+  <label class="cal-chk"><input type="checkbox" data-status-filter="In Progress" checked>◐ In progress</label>
+  <label class="cal-chk"><input type="checkbox" data-status-filter="Done" checked>✓ Done</label>
+  <h3>Project</h3>
+  <select id="cal-project" class="cal-input" aria-label="Filter by project"><option value="">All projects</option></select>
+  <p>Colour shows status on the calendar. A padlock means the task is locked (past day or after check-out).</p>
+</div>
+{% endset %}
+<script>window.ST_CAL = {{ boot | tojson }}; window.ST_SHELL_DATE = window.ST_CAL.active_date;</script>
+{% call shell(st_shell, "Daily Check-in", None, None, rail_extra, True, True) %}
+<div class="cal-page">
+  <section class="cal-main" id="cal-main" aria-label="Calendar"><div class="cal-empty" style="margin:24px">Loading calendar…</div></section>
+  <aside class="cal-side" id="cal-side" data-st-collapsible="today panel" aria-label="Today"></aside>
+</div>
+{# inside the shell so dialogs and popovers inherit the brand tokens #}
+<div id="cal-pop-root"></div>
+<dialog id="cal-dlg" class="cal-dlg"></dialog>
+{% endcall %}
+<script src="/assets/st_attendance_tracker/js/st_shell.js?v=11"></script>
+<script src="/assets/st_attendance_tracker/js/dashboard_utils.js"></script>
+<script src="/assets/st_attendance_tracker/js/whats_new.js"></script>
+<script src="/assets/st_attendance_tracker/js/st_checkin_calendar.js?v=34"></script>
+{% endblock %}

@@ -7,6 +7,9 @@
   "section_thresholds",
   "late_checkin_threshold",
   "standard_workday_hours",
+  "checkout_cutoff_time",
+  "block_checkin_until_checkout_done",
+  "checkin_block_effective_from",
   "section_hybrid",
   "hybrid_office_days",
   "hybrid_days_note",
@@ -41,6 +44,27 @@
    "fieldname": "standard_workday_hours",
    "fieldtype": "Float",
    "label": "Standard Workday Hours"
+  },
+  {
+   "default": "22:00:00",
+   "description": "After this time employees cannot check out; an HR Manager must unlock late checkout for that employee and date.",
+   "fieldname": "checkout_cutoff_time",
+   "fieldtype": "Time",
+   "label": "Checkout Cutoff Time"
+  },
+  {
+   "default": "1",
+   "description": "When on, an employee who did not check out on their last working day cannot check in until that checkout is completed (HR approval is needed once the cutoff has passed).",
+   "fieldname": "block_checkin_until_checkout_done",
+   "fieldtype": "Check",
+   "label": "Block Check-in Until Last Working Day Is Checked Out"
+  },
+  {
+   "depends_on": "block_checkin_until_checkout_done",
+   "description": "The block only applies to working days on or after this date, so older unclosed days are ignored. Leave empty to switch the block off.",
+   "fieldname": "checkin_block_effective_from",
+   "fieldtype": "Date",
+   "label": "Block Applies From"
   },
   {
    "fieldname": "section_hybrid",

@@ -124,6 +124,35 @@ class TestGetCredentialsByTelegramId(FrappeTestCase):
         with self.assertRaises(frappe.DoesNotExistError):
             get_credentials_by_telegram_id(telegram_id="nonexistent_tg_id_12345")
 
+    # ── (b2) Blank / non-string telegram_id ─────────────────────────────────────
+
+    def test_blank_telegram_id_rejected(self):
+        """None/blank/non-string must not match an Employee with no telegram_id."""
+        frappe.set_user(self.service_user)
+
+        for bad in (None, "", "   ", 123):
+            with self.assertRaises(frappe.ValidationError):
+                get_credentials_by_telegram_id(telegram_id=bad)
+
+    # ── (b3) Existing secret, missing key ──────────────────────────────────────
+
+    def test_key_persisted_when_secret_already_exists(self):
+        """A user that has an api_secret but no api_key must get a *saved* key,
+        stable across calls."""
+        frappe.set_user("Administrator")
+        frappe.db.set_value("User", self.target_user, "api_key", "")
+        user_doc = frappe.get_doc("User", self.target_user)
+        user_doc.api_secret = "preexistingsecret"
+        user_doc.save(ignore_permissions=True)
+
+        frappe.set_user(self.service_user)
+        first = get_credentials_by_telegram_id(telegram_id=self.TELEGRAM_ID)
+        second = get_credentials_by_telegram_id(telegram_id=self.TELEGRAM_ID)
+
+        self.assertEqual(first["api_secret"], "preexistingsecret")
+        self.assertEqual(frappe.db.get_value("User", self.target_user, "api_key"), first["api_key"])
+        self.assertEqual(first["api_key"], second["api_key"])
+
     # ── (c) Missing role ──────────────────────────────────────────────────────
 
     def test_caller_without_role_rejected(self):

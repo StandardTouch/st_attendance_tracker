@@ -1,0 +1,178 @@
+/* StandardTouch brand for the classic (original layout) pages.
+   Layout and markup stay as they were; only colour, type and brand marks change.
+   Loaded after each page's inline <style>, so these :root values win. */
+:root {
+  --primary-h: 358; --primary-s: 85%; --primary-l: 53%;
+  --primary: #ED1D24; --primary-hover: #C4151B; --primary-light: #FDE8E9;
+  --primary-gradient: #ED1D24;
+  --success: #111112; --success-bg: #ECECEE; --success-border: #D4D4D7; --success-text: #111112;
+  --warning: #C4151B; --warning-bg: #FDE8E9; --warning-border: #F5B8BB; --warning-text: #9B1015;
+  --info: #818285; --info-bg: #F3F3F4; --info-border: #D4D4D7; --info-text: #4A4B4F;
+  --danger: #ED1D24; --danger-bg: #FDE8E9; --danger-border: #F5B8BB; --danger-text: #9B1015;
+  --dark: #111112; --dark-light: #1C1C1E;
+  --bg-canvas: #F3F3F4; --bg-card: #FFFFFF; --border: #E3E3E5; --border-focus: #B8B9BC;
+  --text-main: #111112; --text-muted: #5E5F63; --text-light: #818285;
+  --st-font-head: 'Poppins', system-ui, sans-serif; --st-font-body: 'Montserrat', system-ui, sans-serif;
+}
+html body { font-family: var(--st-font-body); font-weight: 500; }
+/* Brand type: Montserrat for text, Poppins for headings and numbers. Icon fonts keep their own face. */
+html body :not(.ti):not(i):not([class*="ti-"]) { font-family: var(--st-font-body); }
+html body :not(.ti):not(i):is(h1, h2, h3, h4, h5, .tnav-logo, .hero-title, .ph-title, .sc-n, .st-stat-v, .ss-v, .pg-name, .ss-val) { font-family: var(--st-font-head); letter-spacing: -.2px; }
+
+/* Wordmark replaces the old text logo */
+.tnav-logo, .sb-logo { background: none !important; -webkit-text-fill-color: currentColor !important; color: var(--text-main) !important; font-family: var(--st-font-head) !important; font-weight: 700 !important; letter-spacing: -.3px; }
+.tnav-logo b { color: var(--primary); font-weight: 700; }
+.tnav-logo i { font-style: normal; }
+
+/* Stat strip icon tiles: neutral and red instead of rainbow */
+.ss-icon.ic-clock, .ss-icon.ic-mode { background: #F3F3F4 !important; color: #111112 !important; }
+.ss-icon.ic-tasks { background: #ECECEE !important; color: #111112 !important; }
+.ss-icon.ic-login { background: #FDE8E9 !important; color: #C4151B !important; }
+.sc-n.g, .sc-n.b { color: var(--text-main); }
+
+/* Primary actions and focus */
+a, .tnav-btn:hover { color: inherit; }
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+input:focus, select:focus, textarea:focus { border-color: var(--primary) !important; box-shadow: 0 0 0 3px rgba(237, 29, 36, .18) !important; }
+.tnav-av, .sb-av, .ph-av { background: #111112 !important; color: #fff !important; border-color: #111112 !important; }
+::-webkit-scrollbar-thumb { background: #C9C9CC; }
+
+/* Switch link between classic and new design */
+.st-switch { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: var(--primary); color: #fff !important; font-weight: 600; font-size: 12px; text-decoration: none; white-space: nowrap; }
+.st-switch:hover { background: var(--primary-hover); color: #fff !important; }
+
+.tnav-logo { white-space: nowrap; flex: none; }
+.tnav-r { flex-wrap: nowrap; }
+.tnav-btn, .tnav-bc { white-space: nowrap; }
+
+/* Remaining indigo / green / blue / amber accents on the classic pages */
+.hero { background: linear-gradient(135deg, #FFFFFF 0%, #FDE8E9 100%) !important; border-color: #F5B8BB !important; }
+.hero::after { display: none !important; }
+.hero-eye, .date-lbl, .stat-l { color: #C4151B !important; }
+.hero-title, .date-inp, .stat-n, .stat-n.g, .stat-n.b { color: #111112 !important; }
+.stat-n.r, .stat-n.a { color: #C4151B !important; }
+.hero-sub { color: #5E5F63 !important; }
+.stat-strip { background: #FFFFFF !important; border-color: #E3E3E5 !important; }
+.date-inp { border-color: #E3E3E5 !important; }
+.mc-av { background: #F3F3F4 !important; color: #111112 !important; border-color: #E3E3E5 !important; }
+.tnav-btn, .tnav-btn i { color: #3A3B3F; }
+.hero .stat-strip { background: #FFFFFF !important; border-color: #E3E3E5 !important; }
+.hero .stat-cell { border-color: #E3E3E5 !important; }
+.hero .stat-n, .hero .stat-n.g, .hero .stat-n.b { color: #111112 !important; }
+.hero .stat-n.r, .hero .stat-n.a { color: #C4151B !important; }
+.hero .stat-l, .hero .date-lbl { color: #C4151B !important; }
+.hero .date-inp { color: #111112 !important; border-color: #E3E3E5 !important; background: #FFFFFF !important; }
+.st-stats-row .ss-icon { background: #F3F3F4 !important; color: #111112 !important; }
+.st-stats-row .ss-icon.ic-login { background: #FDE8E9 !important; color: #C4151B !important; }
+.trm, .trm i { color: #818285 !important; }
+.aw-s-done, .aw-hist-status.aw-s-done, .aw-hf-status.aw-s-done, .aw-hf-status.done { background: #111112 !important; color: #FFFFFF !important; border-color: #111112 !important; }
+/* Task status: Pending = stone, In progress = red, Done = black */
+.tsel.status-done, .tsel.status-done option { background: #111112; color: #FFFFFF; border-color: #111112; }
+.tsel.status-progress { background: #FDE8E9; color: #C4151B; border-color: #F5B8BB; }
+.tsel.status-pending { background: #ECECEE; color: #4A4B4F; border-color: #D4D4D7; }
+.c-status.s-done { background: #111112; color: #FFFFFF; }
+.c-status.s-done::before { background: #FFFFFF; }
+.c-status.s-progress { background: #FDE8E9; color: #C4151B; }
+.c-status.s-progress::before { background: #ED1D24; }
+.c-status.s-pending { background: #ECECEE; color: #4A4B4F; }
+.c-status.s-pending::before { background: #818285; }
+
+/* ── Phones and tablets: keep the top bar and columns inside the screen (shared by every classic page) ── */
+@media (max-width: 900px) {
+  .tnav-con { padding: 0 12px; gap: 8px; }
+  .tnav-sep, .tnav-bc, .tnav-date { display: none; }
+  .tnav-r { gap: 6px; min-width: 0; margin-left: auto; }
+  .tnav-btn, .st-switch { font-size: 0; gap: 0; padding: 8px 10px; }
+  .tnav-btn i, .st-switch i { font-size: 16px; }
+  #tnav-pb { margin-left: 0 !important; padding-left: 0 !important; border-left: 0 !important; gap: 8px !important; min-width: 0; }
+  #tnav-pb > div:first-child { width: 48px !important; flex: none; }
+  .cols, .cols > .main, .cols > .sidebar, .wrap { min-width: 0; }
+}
+@media (max-width: 600px) {
+  .tnav { height: 56px; }
+  .tnav-logo { font-size: 16px; padding-right: 0; }
+  .tnav-con { gap: 6px; }
+  .tnav-r { gap: 4px; }
+  .tnav-btn, .st-switch { padding: 8px; }
+  .tnav-btn[onclick*="STTour"] { display: none; }
+  #tnav-pb { display: none !important; }
+  .wl-note { min-width: 0; flex-basis: 100%; }
+  .app-footer { gap: 8px; }
+  .app-footer .fbtn { white-space: normal; text-align: center; justify-content: center; }
+  .done-card { padding: 20px 16px; }
+  .done-grid { grid-template-columns: 1fr !important; gap: 8px !important; }
+  .dg-l, .dg-v { overflow-wrap: anywhere; }
+  .cols { padding: 12px; gap: 16px; }
+  .wrap { padding-left: 12px; padding-right: 12px; }
+}
+
+/* ── Brand lock: some pages carry a later "slate/indigo" override block with !important; re-assert the brand over it ── */
+html body { font-family: var(--st-font-body) !important; background: var(--bg-canvas) !important; color: var(--text-main) !important; }
+html body .sb-link { color: var(--text-muted) !important; }
+html body .sb-link.on { background: var(--primary-light) !important; color: var(--primary) !important; }
+html body .btn.red, html body .fbtn.red { box-shadow: 0 4px 10px rgba(237, 29, 36, 0.25) !important; }
+html body .btn.red:hover, html body .fbtn.red:hover { box-shadow: 0 6px 15px rgba(237, 29, 36, 0.4) !important; }
+html body .tnav { background: rgba(255, 255, 255, 0.85) !important; }
+html body .tnav-btn { color: var(--text-muted) !important; }
+html body .tnav-btn:hover { color: var(--text-main) !important; }
+html body .sb-lbl { color: var(--text-light) !important; }
+
+/* ── Phone fixes found by rendering the checked-in task list at 390px ── */
+@media (max-width: 900px) {
+  .task-section-header, .tsh-left, .tsh-right, .filter-pills { flex-wrap: wrap; min-width: 0; max-width: 100%; }
+  .tsh-left, .tsh-right { gap: 8px; }
+  .tsh-right .btn { flex: 1 1 auto; justify-content: center; }
+  .filter-pills .fp { flex: 0 0 auto; }
+}
+@media (max-width: 600px) {
+  .app-footer { padding: 10px 12px; gap: 8px; }
+  .app-footer .fbtn { flex: 1 1 calc(50% - 8px); min-width: 0; padding: 10px 8px; font-size: 13px; justify-content: center; white-space: normal; text-align: center; }
+}
+
+/* ── New-task rows: stay inside the project card and wrap on phones ── */
+.npg-row { padding: 10px 20px; margin-bottom: 0; min-width: 0; }
+.npg-ti, .npg-ei, .npg-trm, .ns-ti, .ns-ei, .ns-rm { box-sizing: border-box; }
+.npg-ti, .ns-ti { min-width: 0; }
+@media (max-width: 600px) {
+  .npg-row { flex-wrap: wrap; padding: 10px 12px; }
+  .npg-ti { flex: 1 1 100%; }
+  .npg-ei { flex: 1 1 0; width: auto; min-width: 0; }
+  .ns { flex-wrap: wrap; padding: 12px; }
+  .ns > div { flex: 1 1 100%; min-width: 0; }
+  .ns-ei { flex: 1 1 0; width: auto; min-width: 0; }
+}
+
+/* ── Very narrow phones (≤420px): the top bar and section bars must still fit ── */
+@media (max-width: 420px) {
+  .tnav-con { gap: 4px; padding-left: 8px; padding-right: 8px; }
+  .tnav-btn:not(.tnav-burger) { display: none; }
+  .tnav-logo { font-size: 15px; }
+  .tbar { flex-wrap: wrap; gap: 8px; }
+  .tbar-r { flex-wrap: wrap; width: 100%; }
+  .tbar-r .btn { flex: 1 1 auto; justify-content: center; }
+}
+
+/* ── Small laptops / tablets landscape: drop the secondary top-bar items before they overflow ── */
+@media (max-width: 1100px) {
+  #tnav-pb > div:last-child, .tnav-date { display: none !important; }
+}
+
+/* ── Task rows on phones: description gets a full line, estimate and actions wrap underneath ── */
+@media (max-width: 600px) {
+  .trow-main, .stask-main { flex-wrap: wrap; gap: 10px; }
+  .trow-main > .tdesc-wrap, .stask-main > .tdesc-wrap { flex: 1 1 0; min-width: 60%; }
+  .tmeta-fields { margin-left: 0; flex-wrap: wrap; gap: 10px; }
+  .trow-main > .trm, .stask-main > .trm { margin-left: auto; }
+  .trow-main > .trm ~ .trm, .stask-main > .trm ~ .trm { margin-left: 0; }
+}
+
+/* ── Checkout "Time" strip: logout shows as a compact read-only pill, brand colours, tidy wrapping ── */
+.ef-strip { gap: 12px 16px; }
+.ef-field .stp { width: 132px; min-width: 0; flex: none; }
+.ef-field .stp.is-locked .stp-text { background: var(--bg-canvas); border-color: var(--border); padding-right: 12px; }
+.ef-field .stp.is-locked .stp-btn { display: none; }
+.ef-rec { color: var(--primary); background: var(--primary-light); border-color: var(--danger-border, #F5B8BB); }
+@media (max-width: 600px) {
+  .ef-strip > .ef-sep { display: none; }
+  .ef-strip > .ef-rec { flex: 1 1 100%; justify-content: center; }
+}
