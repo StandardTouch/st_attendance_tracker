@@ -1081,7 +1081,7 @@ def _get_team_leader_emails(employee_name):
     return emails
 
 
-def _notify_hr_and_team_leader(employee_name, employee_display_name, event, detail_rows=None, tasks=None, department=None, extra_hours=None):
+def _notify_hr_and_team_leader(employee_name, employee_display_name, event, detail_rows=None, tasks=None, department=None):
     """
     Send email to:
     1. All users with HR Manager role (auto-fetched)
@@ -1090,8 +1090,6 @@ def _notify_hr_and_team_leader(employee_name, employee_display_name, event, deta
     detail_rows: list of (label, value) tuples — same structured detail
                  card shown to the employee, so HR/TL see identical facts.
     tasks: optional list of Daily Task dicts for the relevant date.
-    extra_hours: optional checkout summary (time_bank.checkout_summary). On a day with extra hours used or
-                 earned the email is split: the employee gets the full box, the Team Leader and HR get one line.
     """
     try:
         hr_emails = _get_hr_manager_emails()
@@ -1137,12 +1135,11 @@ def _notify_hr_and_team_leader(employee_name, employee_display_name, event, deta
         # Checkout only, since that's the only flow with an attach control.
         attachment_specs = _task_attachment_specs(tasks) if event == "checkout" else []
 
-        def build_html(extra_html=""):
+        def build_html():
             return f"""
         <div style="{EMAIL_WRAPPER_STYLE}">
           <div style="{EMAIL_HEADING_STYLE}">{html_escape(subject)}</div>
           {detail_table_html}
-          {extra_html}
           <div style="{EMAIL_SUBHEADING_STYLE}">{task_label}</div>
           <div>
             {task_html}
@@ -1159,23 +1156,7 @@ def _notify_hr_and_team_leader(employee_name, employee_display_name, event, deta
                 sender=sender, reply_to=reply_to, attachments=attachment_specs, inline_images=inline,
             )
 
-        if event == "checkout" and extra_hours and emp_email:
-            from st_attendance_tracker.time_bank_mail import full_block, one_line
-
-            # The employee gets the full box; everyone else gets one line.
-            send([emp_email], [], build_html(full_block(extra_hours)))
-            others = [t for t in team_leaders if t != emp_email]
-            hr_only = [hr for hr in hr_emails if hr != emp_email and hr not in others]
-            if others or hr_only:
-                send(others or hr_only, hr_only if others else [], build_html(one_line(extra_hours)))
-            return
-
-        extra_html = ""
-        if event == "checkout" and extra_hours:
-            from st_attendance_tracker.time_bank_mail import one_line
-
-            extra_html = one_line(extra_hours)
-        send(recipients, cc, build_html(extra_html))
+        send(recipients, cc, build_html())
     except Exception as e:
         frappe.log_error(
             f"Notification failed for {employee_name} ({event}): {e}",
@@ -1868,8 +1849,7 @@ def get_additional_work(page=0):
     page = int(page or 0)
     rows = frappe.get_all("Additional Work",
         filters={"employee": employee.name},
-        fields=["name", "work_date", "project_name", "hours_spent", "description", "remarks", "login_time", "logout_time", "status",
-                "compensated_hours", "remaining_hours"],
+        fields=["name", "work_date", "project_name", "hours_spent", "description", "remarks", "login_time", "logout_time", "status"],
         order_by="work_date desc, creation desc",
         start=page * ADDITIONAL_WORK_PAGE_SIZE,
         page_length=ADDITIONAL_WORK_PAGE_SIZE + 1)
@@ -2049,7 +2029,6 @@ def get_page_state():
         "leave_today":    leave_today,
         "has_reset_today": has_reset_today,
         "reset_seconds_left": _reset_seconds_left(employee.name, date) if morning_done and not eod_done else 0,
-        "time_bank_balance": _time_bank_available(employee.name, date),
         "morning_draft":  None if morning_done else _get_morning_draft(),
     }
 
@@ -2120,12 +2099,9 @@ def _send_eod_notifications(employee_name, date, checkout_action_time, is_late_c
         ("Half-Day Session", work_log.half_day_session),
         ("Tasks Completed", f"{done_count}/{total_count}"),
     ]
-    from st_attendance_tracker.time_bank import checkout_summary
-
     _notify_hr_and_team_leader(
         employee.name, employee.employee_name, "checkout",
         detail_rows, tasks=all_tasks, department=employee.department,
-        extra_hours=checkout_summary(employee.name, date, work_log),
     )
 
 # ── Check-ins made outside the web page (Hermes Telegram bot) ──────────────────
@@ -2418,17 +2394,8 @@ def submit_morning_log(new_tasks, login_time=None, carried_updates=None, work_lo
 
 # ── EOD submit ─────────────────────────────────────────────────────────────────
 
-_AUTO_REMARK_RE = re.compile(r"\[(?:Auto-carried|Carried|Repeated) from [^\]]*\]")
-
-
-def _has_employee_remark(text):
-    """True when `text` holds words the employee wrote. Rollover stamps such as
-    "[Carried from 2026-11-02]" are system notes and do not count."""
-    return bool(_AUTO_REMARK_RE.sub("", text or "").strip())
-
-
 @frappe.whitelist(methods=["POST"])
-def submit_eod_log(lunch_from, lunch_to, logout_time, task_updates, adhoc_tasks, use_bank_hours=0):
+def submit_eod_log(lunch_from, lunch_to, logout_time, task_updates, adhoc_tasks):
     checkout_action_time = now_datetime()
     employee = _get_employee()
     # Lock employee record to serialize checkout/EOD processing
@@ -2444,11 +2411,6 @@ def submit_eod_log(lunch_from, lunch_to, logout_time, task_updates, adhoc_tasks,
     if work_log.eod_submitted:
         frappe.throw(f"You have already checked out for {date}.")
     _assert_checkout_allowed(work_log)
-    # Reject an impossible time-bank request before anything is changed.
-    from st_attendance_tracker import time_bank
-
-    bank_hours = time_bank.validate_use(employee.name, date, use_bank_hours)
-
     if is_late_checkout:
         # Approved late checkout: "now" is days after the fact, so the employee states the real time.
         logout_time = _resolve_late_logout_time(logout_time, work_log)
@@ -2494,8 +2456,6 @@ def submit_eod_log(lunch_from, lunch_to, logout_time, task_updates, adhoc_tasks,
         # and pre-parsing here too would double it down to bare minutes.
         row.actual_time = actual_time
         row.remarks = t.get("remarks", "")
-        if status != "Done" and not _has_employee_remark(row.remarks):
-            frappe.throw(f"Please add a remark explaining why this task is not done: '{t.get('description') or row.description or name}'")
         # Allow description edit during EOD
         if (t.get("description") or "").strip():
             row.description = t["description"].strip()
@@ -2548,10 +2508,6 @@ def submit_eod_log(lunch_from, lunch_to, logout_time, task_updates, adhoc_tasks,
     work_log.lunch_to = lunch_to or ""
     work_log.logout_time = logout_time
     work_log.eod_submitted = 1
-
-    # Record the banked hours first: saving the log commits, and the use must commit with the checkout.
-    if bank_hours:
-        time_bank.apply_use(work_log, bank_hours)
 
     _save_work_log(work_log)
     net_hours = work_log.net_hours or ""
@@ -2912,30 +2868,12 @@ def get_my_history(page=0):
         "employee": employee.name,
         "morning_submitted": 1,
         "date": ["<=", today()],
-    }, fields=["name", "date", "login_time", "logout_time", "net_hours",
+    }, fields=["date", "login_time", "logout_time", "net_hours",
                "lunch_from", "lunch_to", "is_late", "eod_submitted"],
         order_by="date desc", start=offset, page_length=limit)
 
     for log in logs:
         log["eod_done"] = 1 if log.get("eod_submitted") else 0
-
-    # Extra hours on each day: overtime earned (and how much of it was used since), and hours used that day.
-    overtime = {r.source_log: r for r in frappe.get_all(
-        "Extra Hours Entry",
-        filters={"employee": employee.name, "entry_type": "Credit", "source": "Overtime",
-                 "source_log": ["in", [log.name for log in logs]]} if logs else {"name": ["is", "not set"]},
-        fields=["source_log", "hours", "used_hours"])} if logs else {}
-    used_on_day = {}
-    for r in (frappe.get_all(
-            "Extra Hours Entry",
-            filters={"employee": employee.name, "entry_type": "Use", "date": ["in", [log.date for log in logs]]},
-            fields=["date", "hours"]) if logs else []):
-        used_on_day[r.date] = used_on_day.get(r.date, 0) + (r.hours or 0)
-    for log in logs:
-        credit = overtime.get(log.name)
-        log["overtime_hours"] = round(credit.hours or 0, 2) if credit else 0
-        log["overtime_used_hours"] = round(credit.used_hours or 0, 2) if credit else 0
-        log["extra_hours_used_today"] = round(used_on_day.get(log.date, 0), 2)
 
     dates = [log.date for log in logs]
     counts_by_date = {}
@@ -3196,20 +3134,6 @@ def delete_carried_project(project_name, task_date):
     _save_work_log(work_log)
     frappe.db.commit()
     return {"success": True}
-
-
-def _time_bank_available(employee, date):
-    from st_attendance_tracker.time_bank import available_hours
-
-    return available_hours(employee, date)
-
-
-@frappe.whitelist()
-def get_my_time_bank(days=90):
-    """The signed-in employee's own time bank (read only): balance and recent entries."""
-    from st_attendance_tracker.time_bank import get_my_ledger
-
-    return get_my_ledger(days)
 
 
 RESET_WINDOW_MINUTES = 60

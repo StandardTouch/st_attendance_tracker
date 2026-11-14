@@ -2866,7 +2866,6 @@ body {
         <div class="aw-hist-meta">
           {% if e.project_name %}<span><i class="ti ti-folder" aria-hidden="true"></i>{{ e.project_name }}</span>{% endif %}
           <span><i class="ti ti-clock" aria-hidden="true"></i>{{ (e.hours_spent or 0)|round(2) }}h</span>
-          {% set _c = e.compensated_hours or 0 %}{% set _r = e.remaining_hours or 0 %}{% if _c > 0 and _r > 0 %}<span class="aw-bank" title="Extra hours from this work. You can use them as time off on a later day, from the check-out screen." style="background:rgba(21,128,61,.14);border:1px solid rgba(21,128,61,.45);border-radius:6px;padding:1px 8px;font-weight:700;font-size:12px;white-space:normal;max-width:100%"><i class="ti ti-hourglass" aria-hidden="true"></i>{{ _c|round(2) }}h used · {{ _r|round(2) }}h left</span>{% elif _c > 0 %}<span class="aw-bank" title="Extra hours from this work. You can use them as time off on a later day, from the check-out screen." style="background:rgba(21,128,61,.14);border:1px solid rgba(21,128,61,.45);border-radius:6px;padding:1px 8px;font-weight:700;font-size:12px;white-space:normal;max-width:100%"><i class="ti ti-circle-check" aria-hidden="true"></i>All {{ _c|round(2) }}h used</span>{% elif _r > 0 %}<span class="aw-bank" title="Extra hours from this work. You can use them as time off on a later day, from the check-out screen." style="background:rgba(21,128,61,.14);border:1px solid rgba(21,128,61,.45);border-radius:6px;padding:1px 8px;font-weight:700;font-size:12px;white-space:normal;max-width:100%"><i class="ti ti-hourglass" aria-hidden="true"></i>{{ _r|round(2) }}h left to use</span>{% endif %}
         </div>
       </div>
       {% endfor %}
@@ -3482,7 +3481,7 @@ function renderHistCard(e){
   return '<div class="aw-hist-full" data-name="' + esc(e.name) + '">' +
     '<span class="aw-hf-date">' + esc(e.work_date) + '</span>' +
     '<span class="aw-c-time">' + times + '</span>' +
-    '<span class="aw-c-hrs">' + (Math.round((+e.hours_spent || 0) * 100) / 100) + 'h' + awBankChip(e) + '</span>' +
+    '<span class="aw-c-hrs">' + (Math.round((+e.hours_spent || 0) * 100) / 100) + 'h' + '</span>' +
     '<span class="aw-c-proj">' + (e.project_name ? esc(e.project_name) : '—') + '</span>' +
     '<span class="aw-c-desc">' + esc(e.description || '') + (e.remarks ? '<small>' + esc(e.remarks) + '</small>' : '') + '</span>' +
     '<span class="aw-hf-status ' + statusCls + '">' + esc(e.status || 'Done') + '</span>' +
@@ -3531,15 +3530,6 @@ function loadAWHistory(reset){
       if (sp) sp.style.display = 'none';
     }
   });
-}
-
-function awBankChip(e) {
-  var c = +e.compensated_hours || 0, r = +e.remaining_hours || 0, r2 = function (n) { return Math.round(n * 100) / 100; };
-  var st = 'background:rgba(21,128,61,.14);border:1px solid rgba(21,128,61,.45);border-radius:6px;padding:1px 8px;font-weight:700;font-size:12px;white-space:normal;max-width:100%', t = '';
-  if (c > 0 && r > 0) t = '<i class="ti ti-hourglass" aria-hidden="true"></i>' + r2(c) + 'h used · ' + r2(r) + 'h left';
-  else if (c > 0) t = '<i class="ti ti-circle-check" aria-hidden="true"></i>All ' + r2(c) + 'h used';
-  else if (r > 0) t = '<i class="ti ti-hourglass" aria-hidden="true"></i>' + r2(r) + 'h left to use';
-  return t ? '<span class="aw-bank" title="Extra hours from this work. You can use them as time off on a later day, from the check-out screen." style="' + st + '">' + t + '</span>' : '';
 }
 
 async function deleteAWEntry(name, el){

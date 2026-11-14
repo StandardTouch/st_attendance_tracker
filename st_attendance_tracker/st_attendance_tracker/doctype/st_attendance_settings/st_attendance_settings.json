@@ -7,7 +7,6 @@
   "section_thresholds",
   "late_checkin_threshold",
   "standard_workday_hours",
-  "time_bank_expiry_days",
   "checkout_cutoff_time",
   "block_checkin_until_checkout_done",
   "checkin_block_effective_from",
@@ -45,13 +44,6 @@
    "fieldname": "standard_workday_hours",
    "fieldtype": "Float",
    "label": "Standard Workday Hours"
-  },
-  {
-   "default": "60",
-   "description": "Extra hours (overtime and additional work) can be used as time off for this many days after the work date. Leave empty for 60 days.",
-   "fieldname": "time_bank_expiry_days",
-   "fieldtype": "Int",
-   "label": "Extra Hours Expiry (days)"
   },
   {
    "default": "22:00:00",

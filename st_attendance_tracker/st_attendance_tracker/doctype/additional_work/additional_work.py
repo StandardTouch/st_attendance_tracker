@@ -80,12 +80,6 @@ class AdditionalWork(Document):
 
         queue_additional_work_email(self)
 
-    def on_update(self):
-        # Every additional work banks its hours (insert and later edits).
-        from st_attendance_tracker.time_bank import sync_additional_work_credit
-
-        sync_additional_work_credit(self)
-
     def _check_no_partial_overlap(self):
         """Two entries on one day may not overlap in time, except an identical window: the
         "Several tasks" form saves each task as its own entry with the same login/logout.
@@ -131,9 +125,6 @@ class AdditionalWork(Document):
         # guard above is silently bypassed for the one action (delete) the
         # doctype's own permissions actually allow employees to do.
         self._check_ownership()
-        from st_attendance_tracker.time_bank import remove_additional_work_credit
-
-        remove_additional_work_credit(self)
 
     def _check_ownership(self):
         """Block cross-employee edits (BOLA guard) — same pattern as Daily Task."""

@@ -6,7 +6,6 @@ from frappe.utils import add_days, date_diff, getdate, today
 from st_attendance_tracker.api import (
     _format_hours, _get_attendance_settings, _parse_time_to_hours, _to_ampm, _to_hhmm,
 )
-from st_attendance_tracker.time_bank import balances_for, get_ledger
 from st_attendance_tracker.time_utils import time_to_minutes
 
 MAX_RANGE_DAYS = 366
@@ -171,13 +170,10 @@ def get_management_report(from_date=None, to_date=None, department=None):
             "approval_note": row.unlock_reason or "",
         })
 
-    bank = balances_for(list(people))
     employees = []
     for person in people.values():
         employees.append({
             **person,
-            "bank_hours": bank.get(person["employee"], 0.0),
-            "bank_label": _format_hours(bank.get(person["employee"], 0.0)) or "0h",
             "task_hours": _format_hours(person["task_minutes"] / 60) or "0m",
             "net_hours": _format_hours(person["net_minutes"] / 60) or "0m",
             "ot_hours": _format_hours(person["ot_minutes"] / 60) or "0m",
@@ -341,9 +337,4 @@ def get_employee_report(employee, from_date=None, to_date=None):
         "median_login_minutes": _median(minutes_in), "median_logout_minutes": _median(minutes_out),
         "calendar": calendar,
         "task_counts": counts, "tasks": tasks,
-        "time_bank": {
-            "balance": balances_for([employee])[employee],
-            "balance_label": _format_hours(balances_for([employee])[employee]) or "0h",
-            "entries": get_ledger(employee, start, end),
-        },
     }

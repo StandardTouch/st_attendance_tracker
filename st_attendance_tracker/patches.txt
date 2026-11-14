@@ -1,6 +1,5 @@
 [pre_model_sync]
 st_attendance_tracker.patches.cleanup_task_times
-st_attendance_tracker.patches.rename_time_bank_doctypes
 
 [post_model_sync]
 st_attendance_tracker.patches.backfill_work_location

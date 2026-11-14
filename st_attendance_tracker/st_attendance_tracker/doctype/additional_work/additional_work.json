@@ -14,8 +14,6 @@
   "col_break_1",
   "project_name",
   "hours_spent",
-  "compensated_hours",
-  "remaining_hours",
   "status",
   "section_break_details",
   "description",
@@ -80,20 +78,6 @@
    "label": "Hours Spent",
    "reqd": 1,
    "description": "e.g. 1h 30m, 45m"
-  },
-  {
-   "description": "Hours of this work that were already used as time off on a later day",
-   "fieldname": "compensated_hours",
-   "fieldtype": "Float",
-   "label": "Hours Used as Time Off",
-   "read_only": 1
-  },
-  {
-   "description": "Hours of this work still available to use as time off",
-   "fieldname": "remaining_hours",
-   "fieldtype": "Float",
-   "label": "Hours Still Available",
-   "read_only": 1
   },
   {
    "default": "Done",

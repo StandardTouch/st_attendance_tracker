@@ -30,10 +30,6 @@ doc_events = {
     "Employee Checkin": {
         "after_insert": "st_attendance_tracker.api.notify_external_checkin",
     },
-    "Attendance": {
-        "before_validate": "st_attendance_tracker.time_bank.apply_to_attendance",
-        "after_insert": "st_attendance_tracker.time_bank.note_attendance",
-    },
 }
 
 

@@ -187,7 +187,6 @@
     { key: 'net_minutes', label: 'Net hours', num: 1, val: function (e) { return e.net_minutes; } },
     { key: 'completion', label: 'Task completion', val: function (e) { return e.tasks_total ? e.tasks_done / e.tasks_total : -1; } },
     { key: 'ot_minutes', label: 'Overtime', num: 1, val: function (e) { return e.ot_minutes; } },
-    { key: 'bank_hours', label: 'Extra hours left', num: 1, val: function (e) { return e.bank_hours; } },
     { key: 'late_checkins', label: 'Late in', num: 1, val: function (e) { return e.late_checkins; } },
     { key: 'late_checkouts', label: 'Late out', num: 1, val: function (e) { return e.late_checkouts; } }
   ];
@@ -212,9 +211,9 @@
       return '<tr data-emp="' + esc(e.employee) + '"><td><button type="button" class="rp-row-btn" data-open="' + esc(e.employee) + '">' + esc(e.employee_name) + '</button></td><td>' + esc(e.department || '') + '</td>' +
         '<td class="rp-num">' + e.days_worked + '</td><td class="rp-num">' + esc(e.task_hours) + '</td><td class="rp-num">' + esc(e.net_hours) + '</td>' +
         '<td>' + (pct == null ? '-' : '<div class="rp-bar-cell"><div class="rp-bar"><i style="width:' + pct + '%;background:var(--rp-green)"></i></div><b>' + pct + '%</b></div>') + '</td>' +
-        '<td class="rp-num">' + (e.ot_minutes ? '<b>' + esc(e.ot_hours) + '</b>' : '-') + '</td><td class="rp-num">' + (e.bank_hours ? esc(e.bank_label) : '-') + '</td>' +
+        '<td class="rp-num">' + (e.ot_minutes ? '<b>' + esc(e.ot_hours) + '</b>' : '-') + '</td>' +
         '<td class="rp-num">' + e.late_checkins + '</td><td class="rp-num">' + e.late_checkouts + '</td></tr>';
-    }).join('') || empty(10, 'No employees match.');
+    }).join('') || empty(9, 'No employees match.');
   }
 
   var LATE_FILTERS = {
@@ -268,8 +267,7 @@
   }
 
   /* ── employee view ── */
-  var SOURCE_LABEL = { 'Overtime': 'Overtime', 'Additional Work': 'Additional work', 'Compensation': 'Time off' };
-  var ETABS = [['attendance', 'Attendance'], ['tasks', 'Tasks'], ['late', 'Late checkouts'], ['bank', 'Extra hours']];
+  var ETABS = [['attendance', 'Attendance'], ['tasks', 'Tasks'], ['late', 'Late checkouts']];
   function openEmployee(key) {
     S.emp = key; S.detailTab = 'attendance'; S.metric = 'in'; S.taskStatus = 'all'; S.taskQ = '';
     showEmployeeView(true); writeHash(); loadDetail();
@@ -299,7 +297,7 @@
       kpiCard('Days worked', r.days_worked + ' of ' + r.range_days) +
       kpiCard('Average check-in', avg(r.avg_login_minutes), r.median_login_minutes == null ? '' : 'median ' + clock(r.median_login_minutes)) +
       kpiCard('Average checkout', avg(r.avg_logout_minutes), r.median_logout_minutes == null ? '' : 'median ' + clock(r.median_logout_minutes) + (r.days.some(function (d) { return d.logout_next_day; }) ? ', after-midnight counted' : '')) +
-      kpiCard('Late checkouts', r.late_checkouts.length, '', r.late_checkouts.length) + kpiCard('Extra hours left', r.time_bank.balance_label, 'can be used as time off') +
+      kpiCard('Late checkouts', r.late_checkouts.length, '', r.late_checkouts.length) +
       kpiCard('Tasks', c.total, c.completed + ' completed (' + pct + '%)') + '</div>';
   }
 
@@ -409,18 +407,6 @@
     return '<div class="rp-tw"><table class="rp-table"><thead><tr><th>Date</th><th>Status</th><th>Reason</th><th>Approved by</th><th>Approval note</th></tr></thead><tbody>' +
       (r.late_checkouts.map(function (x) { return '<tr><td>' + esc(fullDate(x.date)) + '</td><td>' + tag(x.status, x.status === 'Pending approval' ? 'amber' : '') + '</td><td class="rp-wrap">' + esc(x.reason || '-') + '</td><td>' + esc(x.approved_by || '-') + '</td><td class="rp-wrap">' + esc(x.approval_note || '-') + '</td></tr>'; }).join('') || empty(5, 'No late checkouts for this employee.')) + '</tbody></table></div>';
   }
-  function bankPane(r) {
-    var rows = r.time_bank.entries.map(function (x) {
-      var credit = x.entry_type === 'Credit';
-      var detail = credit ? (x.expired ? 'Expired ' + fullDate(x.expires_on) : (x.expires_on ? 'Expires ' + fullDate(x.expires_on) : '')) :
-        x.taken_from.map(function (t) { return t.hours + 'h from ' + shortDate(t.date); }).join(', ');
-      return '<tr><td>' + esc(fullDate(x.date)) + '</td><td>' + tag(credit ? 'Earned' : 'Used as time off', credit ? 'green' : '') + '</td><td>' + esc(SOURCE_LABEL[x.source] || x.source) + '</td>' +
-        '<td class="rp-num">' + x.hours + 'h</td><td class="rp-num">' + (credit ? x.used_hours + 'h' : '-') + '</td><td class="rp-num">' + (credit ? '<b>' + x.remaining_hours + 'h</b>' : '-') + '</td><td class="rp-wrap">' + esc(detail || '-') + '</td></tr>';
-    }).join('') || empty(7, 'No extra hours for this employee in this period.');
-    return '<p class="rp-hint">Extra hours left: <b>' + esc(r.time_bank.balance_label) + '</b>. These are hours worked beyond a full day (overtime) and additional work. An employee can use them as time off on a later day. Shows entries in the period, plus older hours that are still available.' +
-      '<div class="rp-tw" style="margin-top:10px"><table class="rp-table"><thead><tr><th>Date</th><th>Type</th><th>Source</th><th class="rp-num">Hours</th><th class="rp-num">Used</th><th class="rp-num">Remaining</th><th>Detail</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
-  }
-
   function renderDetail() {
     var r = S.detail, ini = (r.employee_name || '?').split(' ').filter(Boolean).slice(0, 2).map(function (w) { return w[0]; }).join('').toUpperCase();
     $('#rp-emp-range').textContent = fullDate(r.from_date) + ' to ' + fullDate(r.to_date);
@@ -429,7 +415,7 @@
       var on = t[0] === S.detailTab, n = t[0] === 'tasks' ? ' (' + r.task_counts.total + ')' : t[0] === 'late' ? ' (' + r.late_checkouts.length + ')' : '';
       return '<button type="button" class="rp-tab' + (on ? ' on' : '') + '" role="tab" aria-selected="' + on + '" data-etab="' + t[0] + '"' + (on ? '' : ' tabindex="-1"') + '>' + t[1] + n + '</button>';
     }).join('');
-    $('#rp-detail-body').innerHTML = S.detailTab === 'tasks' ? tasksPane(r) : S.detailTab === 'late' ? latePane(r) : S.detailTab === 'bank' ? bankPane(r) : attendancePane(r);
+    $('#rp-detail-body').innerHTML = S.detailTab === 'tasks' ? tasksPane(r) : S.detailTab === 'late' ? latePane(r) : attendancePane(r);
   }
 
   /* ── CSV export (client side, from the rows already loaded) ── */
@@ -505,8 +491,8 @@
     function range() { return S.data.from_date + '-to-' + S.data.to_date; }
     $('#rp-csv-emps').addEventListener('click', function () {
       if (!S.data) return;
-      csv([['Employee', 'Department', 'Days worked', 'Task hours', 'Net hours', 'Task completion %', 'OT hours', 'Extra hours left', 'Late check-ins', 'Late checkouts']].concat(visibleEmployees(S.data).map(function (e) {
-        return [e.employee_name, e.department, e.days_worked, e.task_hours, e.net_hours, e.tasks_total ? Math.round(e.tasks_done / e.tasks_total * 100) : '', e.ot_hours, e.bank_label, e.late_checkins, e.late_checkouts]; })), 'employees-' + range() + '.csv');
+      csv([['Employee', 'Department', 'Days worked', 'Task hours', 'Net hours', 'Task completion %', 'OT hours', 'Late check-ins', 'Late checkouts']].concat(visibleEmployees(S.data).map(function (e) {
+        return [e.employee_name, e.department, e.days_worked, e.task_hours, e.net_hours, e.tasks_total ? Math.round(e.tasks_done / e.tasks_total * 100) : '', e.ot_hours, e.late_checkins, e.late_checkouts]; })), 'employees-' + range() + '.csv');
     });
     $('#rp-csv-late').addEventListener('click', function () {
       if (!S.data) return;

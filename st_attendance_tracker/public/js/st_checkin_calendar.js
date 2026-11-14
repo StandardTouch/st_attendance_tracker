@@ -689,7 +689,7 @@
       '<form id="cal-af" class="cal-card" style="display:flex;flex-direction:column;gap:8px;margin-top:10px" novalidate><b>Add a task</b>' +
       '<textarea class="cal-ta" id="a-d" rows="1" placeholder="Task description" aria-label="Task description" required></textarea><div class="cal-pe" style="margin-top:0"><input class="cal-input" id="a-p" placeholder="Project" aria-label="Project"><input class="cal-input" id="a-e" placeholder="1h" aria-label="Estimated time"></div>' +
       '<p id="a-err" class="cal-err" role="alert"></p><button class="cal-btn" type="submit">Save task</button></form>' +
-      '<div class="cal-card" style="margin-top:14px"><b>End of day</b><p style="margin:4px 0 10px;color:var(--st-muted)">Set each task\'s status, enter lunch time, then check out.</p>' + (bankBalance() > 0 ? '<p class="cal-hint" style="margin:0 0 10px">Extra hours you can use today: <b>' + esc(hoursText(bankBalance())) + '</b></p>' : '') + '<button type="button" class="cal-btn dark block" id="cal-checkout"' + (BOOT.checkout_locked ? ' disabled' : '') + '>Check out</button></div>' +
+      '<div class="cal-card" style="margin-top:14px"><b>End of day</b><p style="margin:4px 0 10px;color:var(--st-muted)">Set each task\'s status, enter lunch time, then check out.</p>' + '<button type="button" class="cal-btn dark block" id="cal-checkout"' + (BOOT.checkout_locked ? ' disabled' : '') + '>Check out</button></div>' +
       (S.page && !BOOT.is_late_checkout && S.page._reset_until > Date.now() ? (S.page.has_reset_today
         ? '<button type="button" class="cal-btn block" id="cal-reset" style="margin-top:12px" disabled aria-describedby="cal-reset-note">Reset check-in</button><p id="cal-reset-note" class="cal-hint" style="margin:6px 2px 0">Already reset once today. A check-in can be reset once a day.</p>'
         : '<button type="button" class="cal-btn block" id="cal-reset" style="margin-top:12px">Reset check-in</button>') : '') + trayHTML();
@@ -1023,15 +1023,6 @@
 
   /* ── checkout dialog ── */
   var dlg = function () { return $('#cal-dlg'); };
-  /* Optional "use my extra hours" block of the checkout form: only shown when there are extra hours to use. */
-  function bankBalance() { return (S.page && S.page.time_bank_balance) || 0; }
-  function bankBox() {
-    var bal = bankBalance();
-    if (!(bal > 0)) return '';
-    return '<div class="cal-card" style="display:flex;flex-direction:column;gap:8px"><label class="cal-chk"><input type="checkbox" id="c-bank"><span><b>Use my extra hours</b> · you have ' + esc(hoursText(bal)) + ' from earlier overtime or additional work</span></label>' +
-      '<label class="cal-f" id="c-bankf" hidden>Hours to use today<input id="c-bankh" type="number" min="0.25" max="' + bal + '" step="0.25" placeholder="e.g. 1"></label>' +
-      '<p class="cal-hint" style="margin:0">These hours count as worked time today, so a short day still counts as a full day. Hours you do not use stay available for later days.</p></div>';
-  }
   function openCheckout() {
     var log = openLog(), tasks = openDayTasks(), d = dlg();
     d.className = 'cal-dlg wide';
@@ -1049,19 +1040,14 @@
           '<td><label class="cal-chk"><input type="checkbox" data-f="carry" checked><span>Yes</span></label>' +
           (t.task_type === 'Recurring' ? '' : '<label class="cal-chk" data-rep-cell style="display:none"' + '><input type="checkbox" data-f="repeat"' + (t.repeat_next_day ? ' checked' : '') + '><span>Repeat next day</span></label>') + '</td></tr>';
       }).join('') + '</tbody></table></div>' +
-      bankBox() +
       '<p id="c-note" style="margin:0;color:var(--st-muted)"></p><p id="c-err" class="cal-err" role="alert"></p>' +
       '<div class="cal-actions"><button type="button" class="cal-btn" id="c-x">Cancel</button><button type="submit" class="cal-btn primary" id="c-ok">Submit check-out</button></div></form>';
-    var bank = $('#c-bank', d);
-    if (bank) bank.onchange = function () { $('#c-bankf', d).hidden = !bank.checked; if (bank.checked) $('#c-bankh', d).focus(); };
     var note = function () {
       $$('tr[data-name]', d).forEach(function (tr) {
-        var st = $('[data-f=st]', tr).value, ta = $('[data-f=rem]', tr), add = $('[data-f=rem-add]', tr);
-        // A task that is not Done must say why, so its remark box is always open and required.
-        if (st !== 'Done') { ta.hidden = false; ta.placeholder = 'Why is this task not done? (required)'; }
-        else { ta.placeholder = 'Add a remark…'; }
-        add.hidden = !ta.hidden;
-        ta.classList.remove('cal-bad');
+        var st = $('[data-f=st]', tr).value, ta = $('[data-f=rem]', tr), add = $('[data-f=rem-add]', tr), eligible = st === 'Done' || st === 'In Progress';
+        if (!eligible) { ta.value = ''; }
+        add.hidden = !eligible || !ta.hidden;
+        if (!eligible) ta.hidden = true;
       });
       var open = $$('tr[data-name]', d).filter(function (tr) { return $('[data-f=st]', tr).value !== 'Done'; });
       $$('tr[data-name]', d).forEach(function (tr) {
@@ -1087,25 +1073,15 @@
       if (!lo) { err.textContent = 'Enter the time you actually logged out.'; return; }
       if ((ls && !le) || (!ls && le)) { err.textContent = 'Enter both lunch start and end, or leave both empty.'; return; }
       if (ls && le && toMin(le) <= toMin(ls)) { err.textContent = 'Lunch end must be after lunch start.'; return; }
-      var bankH = 0;
-      if (bank && bank.checked) {
-        bankH = parseFloat($('#c-bankh', d).value);
-        if (!(bankH > 0) || bankH > bankBalance() + 1e-9) { err.textContent = 'Enter hours between 0 and ' + hoursText(bankBalance()) + '.'; return; }
-      }
       var updates = [], bad = null;
       $$('tr[data-name]', d).forEach(function (tr) {
         var st = $('[data-f=st]', tr).value, act = $('[data-f=act]', tr).value.trim(), t = tasks.filter(function (x) { return x.name === tr.dataset.name; })[0];
         if (st === 'Done' && !act && !bad) bad = 'Enter the time taken for "' + t.description + '".';
-        var remText = $('[data-f=rem]', tr).value.trim() || t.remarks || '';
-        if (st !== 'Done' && !remText.replace(/\[(?:Auto-carried|Carried|Repeated) from [^\]]*\]/g, '').trim() && !bad) {
-          bad = 'Add a remark explaining why "' + t.description + '" is not done.';
-          $('[data-f=rem]', tr).classList.add('cal-bad'); $('[data-f=rem]', tr).focus();
-        }
         updates.push({ name: tr.dataset.name, status: st, actual_time: act, remarks: $('[data-f=rem]', tr).value.trim() || t.remarks || '', carry_forward: st === 'Done' ? true : $('[data-f=carry]', tr).checked, repeat_next_day: st === 'Done' && $('[data-f=repeat]', tr) && $('[data-f=repeat]', tr).checked ? 1 : 0 });
       });
       if (bad) { err.textContent = bad; return; }
       var ok = $('#c-ok'); ok.disabled = true; ok.textContent = 'Checking out…';
-      api(API + 'submit_eod_log', { lunch_from: ls, lunch_to: le, logout_time: lo, task_updates: JSON.stringify(updates), adhoc_tasks: '[]', use_bank_hours: bankH }, true).then(function (r) {
+      api(API + 'submit_eod_log', { lunch_from: ls, lunch_to: le, logout_time: lo, task_updates: JSON.stringify(updates), adhoc_tasks: '[]' }, true).then(function (r) {
         d.close(); toast('Checked out at ' + r.logout_time + (r.pending_count ? '. ' + r.pending_count + ' unfinished task(s) carry over.' : '.'));
         if (BOOT.is_late_checkout) { setTimeout(function () { window.location.reload(); }, 1200); } else { S.page = null; loadAll(true); }
       }).catch(function (e2) { err.textContent = e2.message; ok.disabled = false; ok.textContent = 'Submit check-out'; });
